@@ -28,6 +28,63 @@ footer{border-top:1px solid #202d40;background:#060a12;padding:28px 0;color:#879
 @media(max-width:390px){.news-grid{grid-template-columns:1fr}.side-stories{grid-template-columns:1fr}.side-card{min-height:165px}.search{width:105px}}
 </style>
 </head>
+  <script>
+async function loadWFArticles() {
+  const grid = document.getElementById("newsGrid");
+  const empty = document.getElementById("empty");
+
+  try {
+    const response = await fetch("/api/articles");
+    if (!response.ok) throw new Error("Could not load articles");
+
+    const data = await response.json();
+
+    if (!data.success || !Array.isArray(data.articles)) {
+      throw new Error("Invalid response");
+    }
+
+    grid.innerHTML = "";
+
+    data.articles.forEach(article => {
+      const card = document.createElement("article");
+      card.className = "news-card";
+
+      const thumb = document.createElement("div");
+      thumb.className = "thumb";
+
+      if (article.image_url && /^https:\/\//i.test(article.image_url)) {
+        thumb.style.backgroundImage = `url("${article.image_url}")`;
+      }
+
+      const body = document.createElement("div");
+      body.className = "news-body";
+
+      const category = document.createElement("div");
+      category.className = "meta";
+      category.textContent = article.category || "Women's Football";
+
+      const title = document.createElement("h3");
+      title.textContent = article.title || "";
+
+      const summary = document.createElement("p");
+      summary.textContent = article.summary || "";
+
+      body.append(category, title, summary);
+      card.append(thumb, body);
+      grid.appendChild(card);
+    });
+
+    empty.style.display = data.articles.length ? "none" : "block";
+
+  } catch (error) {
+    console.error(error);
+    empty.textContent = "Unable to load stories. Please try again later.";
+    empty.style.display = "block";
+  }
+}
+
+loadWFArticles();
+  </script>
 <body>
 <div class="topline"><div class="wrap"><div class="ticker"><b>WF PUNDIT</b> THE HOME OF WOMEN'S FOOTBALL</div><div>NEWS · TRANSFERS · MATCHDAY · ANALYSIS</div></div></div>
 <header><div class="wrap nav" id="nav">
