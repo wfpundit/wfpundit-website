@@ -5,7 +5,77 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="WF Pundit — women's football news, match coverage, transfers and analysis.">
 <title>WF Pundit | Women's Football, Unfiltered</title>
-<style>
+/* LIGHT MODE */
+body.light-mode {
+  background: #f4f7fb;
+  color: #172033;
+}
+body.light-mode header {
+  background: rgba(255,255,255,.96);
+}
+body.light-mode nav {
+  color: #344158;
+}
+body.light-mode .topline,
+body.light-mode footer {
+  background: #e8edf5;
+  color: #526078;
+}
+body.light-mode .search,
+body.light-mode .signup input {
+  background: #fff;
+  color: #172033;
+  border-color: #cbd5e1;
+}
+body.light-mode .news-card,
+body.light-mode .panel,
+body.light-mode .empty {
+  background: #fff;
+  color: #172033;
+  border-color: #d8e0ec;
+}
+body.light-mode .news-body h3,
+body.light-mode .section-head h2,
+body.light-mode .panel h2 {
+  color: #172033;
+}
+body.light-mode .news-body p,
+body.light-mode .section-head p,
+body.light-mode .placeholder {
+  color: #526078;
+}
+body.light-mode .fixture,
+body.light-mode .standings td {
+  border-color: #d8e0ec;
+}
+body.light-mode .filter {
+  background: #fff;
+  color: #344158;
+  border-color: #cbd5e1;
+}
+body.light-mode .breaking {
+  background: #fff;
+  border-color: #d8e0ec;
+}
+body.light-mode .breaking span {
+  color: #344158;
+}
+.theme-toggle {
+  border: 1px solid #47709e;
+  background: #152033;
+  color: #fff;
+  padding: 9px 12px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+}
+body.light-mode .theme-toggle {
+  background: #fff;
+  color: #172033;
+  border-color: #cbd5e1;
+}
+  <style>
 :root{--bg:#080d17;--panel:#101827;--panel2:#152033;--line:#263247;--text:#f5f7fb;--muted:#a7b2c4;--blue:#2586ff;--cyan:#57c7ff;--red:#ff4d61;--gold:#f3c969;--max:1220px}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
 a{color:inherit;text-decoration:none}button,input{font:inherit}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
@@ -90,7 +160,7 @@ loadWFArticles();
 <header><div class="wrap nav" id="nav">
   <a class="brand" href="#"><span class="mark">wf_pundit</span><span class="verified">✓</span></a>
   <nav id="links"><a class="active" href="#home">Home</a><a href="#latest">Latest news</a><a href="#competitions">Competitions</a><a href="#matchday">Matchday</a><a href="#about">About</a></nav>
-  <div class="navright"><input class="search" id="search" type="search" placeholder="Search stories…" aria-label="Search stories"><button class="menu" id="menu" aria-label="Toggle menu">☰</button></div>
+  <div class="navright"><input class="search" <button class="theme-toggle" id="themeToggle" type="button">☀️ Light Mode</button> id="search" type="search" placeholder="Search stories…" aria-label="Search stories"><button class="menu" id="menu" aria-label="Toggle menu">☰</button></div>
 </div></header>
 <main id="home">
 <div class="wrap hero">
@@ -151,6 +221,20 @@ document.getElementById('menu').addEventListener('click',()=>document.getElement
 document.querySelectorAll('#links a').forEach(a=>a.addEventListener('click',()=>document.getElementById('nav').classList.remove('open')));
 document.getElementById('signup').addEventListener('submit',e=>{e.preventDefault();alert('Thanks for your interest! Newsletter sign-up will be enabled when the site is connected to an email service.');});
 document.getElementById('year').textContent=new Date().getFullYear();
-</script>
+const themeToggle = document.getElementById("themeToggle");
+
+function applyTheme(theme) {
+  document.body.classList.toggle("light-mode", theme === "light");
+  themeToggle.textContent = theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+}
+
+const savedTheme = localStorage.getItem("wf-theme") || "dark";
+applyTheme(savedTheme);
+
+themeToggle.addEventListener("click", function() {
+  const newTheme = document.body.classList.contains("light-mode") ? "dark" : "light";
+  localStorage.setItem("wf-theme", newTheme);
+  applyTheme(newTheme);
+});</script>
 </body>
 </html>
