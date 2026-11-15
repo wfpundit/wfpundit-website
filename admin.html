@@ -1,0 +1,326 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WF Pundit | Admin Dashboard</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background: #080f20;
+  color: #fff;
+  min-height: 100vh;
+}
+
+.header {
+  background: linear-gradient(120deg, #101e3d, #123c82);
+  padding: 25px 20px;
+  border-bottom: 3px solid #1688ff;
+}
+
+.brand {
+  font-size: 27px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.brand span {
+  color: #36a0ff;
+}
+
+.header p {
+  color: #c5d7ef;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+.container {
+  max-width: 850px;
+  margin: 30px auto;
+  padding: 0 16px;
+}
+
+.welcome {
+  margin-bottom: 25px;
+}
+
+.welcome h2 {
+  font-size: 25px;
+  margin-bottom: 8px;
+}
+
+.welcome p {
+  color: #9eacc3;
+  font-size: 14px;
+}
+
+.panel {
+  background: #111d34;
+  border: 1px solid #243958;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 12px 35px rgba(0,0,0,.25);
+}
+
+.panel h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.panel .description {
+  color: #9eacc3;
+  font-size: 13px;
+  margin-bottom: 23px;
+}
+
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  margin: 17px 0 8px;
+  color: #dce9fb;
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 14px;
+  background: #091326;
+  border: 1px solid #304463;
+  border-radius: 8px;
+  color: white;
+  font-size: 14px;
+  outline: none;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #2995ff;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+select option {
+  background: #111d34;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  margin-top: 22px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(100deg, #0878ee, #36a0ff);
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+.token-box {
+  background: #0a1830;
+  padding: 16px;
+  border: 1px solid #285184;
+  border-radius: 10px;
+  margin-bottom: 23px;
+}
+
+.token-box p {
+  color: #91bce9;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+#message {
+  margin-top: 18px;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.footer {
+  text-align: center;
+  color: #71829c;
+  padding: 30px 10px;
+  font-size: 12px;
+}
+
+@media(max-width: 500px) {
+  .brand { font-size: 23px; }
+  .panel { padding: 18px; }
+  .welcome h2 { font-size: 22px; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="brand">WF <span>PUNDIT</span></div>
+  <p>FOOTBALL NEWS MANAGEMENT SYSTEM</p>
+</header>
+
+<main class="container">
+
+  <div class="welcome">
+    <h2>Welcome, Admin 👋</h2>
+    <p>Manage your football news and publish stories to your website.</p>
+  </div>
+
+  <section class="panel">
+
+    <h3>Create New Article</h3>
+    <p class="description">
+      Write, edit and publish your latest football stories.
+    </p>
+
+    <div class="token-box">
+      <p>ADMIN SECURITY</p>
+      <label for="token">Admin Token</label>
+      <input
+        type="password"
+        id="token"
+        placeholder="Enter your ADMIN_TOKEN value"
+        autocomplete="off"
+      >
+    </div>
+
+    <form id="articleForm">
+
+      <label for="title">Article Headline</label>
+      <input
+        id="title"
+        type="text"
+        placeholder="Enter article headline"
+        required
+      >
+
+      <label for="summary">Short Summary</label>
+      <textarea
+        id="summary"
+        placeholder="Write a short introduction..."
+      ></textarea>
+
+      <label for="content">Full Article</label>
+      <textarea
+        id="content"
+        placeholder="Write your football news story here..."
+      ></textarea>
+
+      <label for="image">Featured Image URL</label>
+      <input
+        id="image"
+        type="url"
+        placeholder="https://example.com/image.jpg"
+      >
+
+      <label for="category">Article Category</label>
+      <select id="category">
+        <option>Women's Football</option>
+        <option>Men's Football</option>
+        <option>Transfer News</option>
+        <option>Football News</option>
+        <option>Champions League</option>
+      </select>
+
+      <label for="author">Author</label>
+      <input
+        id="author"
+        type="text"
+        value="WF Pundit"
+      >
+
+      <label for="status">Publishing Status</label>
+      <select id="status">
+        <option value="draft">Save as Draft</option>
+        <option value="published">Publish Article</option>
+      </select>
+
+      <button type="submit" id="submitBtn">
+        PUBLISH ARTICLE →
+      </button>
+
+      <p id="message" role="status"></p>
+
+    </form>
+  </section>
+
+</main>
+
+<footer class="footer">
+  © 2026 WF Pundit. All Rights Reserved.
+</footer>
+
+<script>
+const form = document.getElementById("articleForm");
+const message = document.getElementById("message");
+const submitBtn = document.getElementById("submitBtn");
+
+form.addEventListener("submit", async function(event) {
+  event.preventDefault();
+
+  const token = document.getElementById("token").value.trim();
+
+  if (!token) {
+    message.textContent = "Please enter your admin token.";
+    return;
+  }
+
+  const article = {
+    title: document.getElementById("title").value.trim(),
+    summary: document.getElementById("summary").value.trim(),
+    content: document.getElementById("content").value.trim(),
+    image_url: document.getElementById("image").value.trim(),
+    category: document.getElementById("category").value,
+    author: document.getElementById("author").value.trim() || "WF Pundit",
+    status: document.getElementById("status").value
+  };
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = "SUBMITTING...";
+  message.textContent = "";
+
+  try {
+    const response = await fetch("/api/admins/article", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify(article)
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || "Article submission failed.");
+    }
+
+    message.textContent = "SUCCESS! Your article has been saved.";
+    form.reset();
+
+  } catch (error) {
+    message.textContent = "ERROR: " + error.message;
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = "PUBLISH ARTICLE →";
+  }
+});
+</script>
+
+</body>
+</html>
