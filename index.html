@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,11 +12,11 @@
 :root{
   --bg:#0b1220;--panel:#131e2e;--panel2:#1a293d;--line:#2a3a50;
   --text:#f5f7fb;--muted:#aab6c7;--blue:#3978c8;--cyan:#9fc5ed;
-  --red:#d85b68;--gold:#c9a96e;--max:1220px;
+  --gold:#c9a96e;--max:1220px
 }
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6}
 a{color:inherit;text-decoration:none}
 button,input{font:inherit}
 button{cursor:pointer}
@@ -32,7 +33,6 @@ header{position:sticky;top:0;z-index:20;background:rgba(11,18,32,.96);backdrop-f
 .brand .mark{color:#fff}
 .verified{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;background:#1689ff;color:#fff;font-size:11px;font-weight:900}
 nav{display:flex;align-items:center;gap:23px;color:#c4ccda;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.055em}
-nav a{transition:color .2s}
 nav a:hover,nav a.active{color:var(--cyan)}
 .navright{display:flex;align-items:center;gap:10px}
 .search{width:175px;background:#121e2e;border:1px solid #304158;color:white;padding:10px 12px;border-radius:8px;outline:none}
@@ -40,26 +40,27 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .theme-toggle,.menu{border:1px solid #405875;background:#19283c;color:#fff;padding:9px 12px;border-radius:8px;font-size:12px;font-weight:800;white-space:nowrap}
 .menu{display:none}
 
-.hero{padding:34px 0 24px}
+.hero{padding:32px 0 22px}
 .section-kicker{font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
 .section-kicker:before{content:"";width:24px;height:2px;background:var(--gold)}
-.hero-grid{display:grid;grid-template-columns:1.7fr 1fr;gap:17px;margin-top:16px}
-.lead{position:relative;min-height:440px;overflow:hidden;border-radius:14px;background:linear-gradient(0deg,rgba(3,8,16,.97),rgba(3,8,16,.06) 78%),url('https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=1500&q=85') center/cover;border:1px solid rgba(255,255,255,.1)}
-.lead:before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,rgba(34,75,125,.12),transparent 55%)}
-.lead-content{position:absolute;left:32px;right:32px;bottom:30px;max-width:700px}
-.tag{display:inline-block;background:var(--blue);color:white;padding:5px 10px;border-radius:4px;font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
-.lead h1{font-size:clamp(32px,4.4vw,56px);line-height:1.03;letter-spacing:-1.9px;margin:14px 0 12px}
-.lead p{color:#d1d9e5;margin:0;max-width:620px;font-size:14px}
-.byline{font-size:10px;color:#c0cada;margin-top:18px;font-weight:800;letter-spacing:.07em}
-.side-stories{display:grid;grid-template-rows:1fr 1fr;gap:17px}
-.side-card{position:relative;overflow:hidden;border-radius:13px;min-height:205px;background:linear-gradient(0deg,rgba(3,8,16,.96),rgba(3,8,16,.08) 85%),url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=900&q=80') center/cover;border:1px solid rgba(255,255,255,.08);transition:transform .25s,border-color .25s}
-.side-card:nth-child(2){background-image:linear-gradient(0deg,rgba(3,8,16,.96),rgba(3,8,16,.08) 85%),url('https://images.unsplash.com/photo-1574629810360-7efbb5b4f3d5?auto=format&fit=crop&w=900&q=80')}
-.side-card:hover{transform:translateY(-3px);border-color:#688bb6}
-.side-card .inside{position:absolute;left:20px;right:20px;bottom:18px}
-.side-card h2{font-size:20px;line-height:1.2;margin:9px 0 0;letter-spacing:-.4px}
+
+/* FIVE-PLAYER HERO BANNER */
+.player-banner{margin-top:16px;background:#101b2b;border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,.2)}
+.banner-heading{padding:23px 25px 19px;background:linear-gradient(110deg,#142943,#101b2b);display:flex;align-items:end;justify-content:space-between;gap:20px}
+.banner-heading h1{font-size:clamp(27px,4vw,46px);line-height:1.04;letter-spacing:-1.5px;margin:8px 0 0}
+.banner-heading p{max-width:340px;color:#b9c7d8;font-size:13px;margin:0}
+.player-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;background:#080e18}
+.player-card{position:relative;min-width:0;height:310px;overflow:hidden;background:#1b293c}
+.player-card img{width:100%;height:100%;display:block;object-fit:cover;object-position:center 25%;transition:transform .3s}
+.player-card:hover img{transform:scale(1.035)}
+.player-card:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(3,8,16,.92))}
+.player-label{position:absolute;z-index:1;left:13px;right:10px;bottom:14px;color:#fff;font-size:clamp(13px,1.5vw,18px);font-weight:900;line-height:1.2;text-shadow:0 2px 8px #000}
+.player-label small{display:block;color:#c7d6e8;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-top:5px}
+.photo-credits{padding:10px 14px;color:#9aabc0;font-size:10px;border-top:1px solid #26364b}
+.photo-credits a{color:var(--cyan);text-decoration:underline}
 
 .breaking{margin:10px 0 32px;background:var(--panel);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;overflow:hidden}
-.breaking strong{background:var(--red);padding:13px 17px;font-size:10px;letter-spacing:.12em;white-space:nowrap}
+.breaking strong{background:var(--blue);padding:13px 17px;font-size:10px;letter-spacing:.12em;white-space:nowrap}
 .breaking span{padding:0 16px;color:#d6deea;font-size:12px}
 
 .section{padding:25px 0 40px}
@@ -72,7 +73,6 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .filter{border:1px solid #34465e;background:#131e2e;color:#c0ccdc;padding:8px 14px;border-radius:30px;font-size:11px;font-weight:850;transition:all .2s}
 .filter.active,.filter:hover{background:var(--blue);border-color:var(--blue);color:#fff}
 
-/* LATEST NEWS CAROUSEL */
 .news-carousel{position:relative}
 .news-grid{display:flex;gap:17px;overflow-x:auto;overflow-y:hidden;padding:3px 2px 15px;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
 .news-grid::-webkit-scrollbar{display:none}
@@ -86,20 +86,23 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .news-body .date{font-size:10px;color:#8594a9;font-weight:800;letter-spacing:.05em}
 
 .carousel-controls{display:flex;justify-content:flex-end;align-items:center;gap:9px;margin:0 2px 12px}
-.carousel-button{width:34px;height:34px;display:grid;place-items:center;border:1px solid #405875;background:var(--panel);color:var(--text);border-radius:50%;font-size:17px;font-weight:800;transition:background .2s,border-color .2s,transform .2s}
-.carousel-button:hover{background:var(--blue);border-color:var(--blue);color:#fff;transform:translateY(-2px)}
-.carousel-button:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.carousel-button{width:34px;height:34px;display:grid;place-items:center;border:1px solid #405875;background:var(--panel);color:var(--text);border-radius:50%;font-size:17px;font-weight:800}
+.carousel-button:hover{background:var(--blue);border-color:var(--blue);color:#fff}
+.carousel-button:disabled{opacity:.35;cursor:not-allowed}
 .carousel-status{color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.08em;min-width:48px;text-align:center}
 .empty{display:none;padding:26px;color:var(--muted);text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:9px;margin-top:15px}
 
 /* FACEBOOK */
 .fb-section{padding-top:4px}
 .fb-panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:22px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
-.fb-panel h2{margin:5px 0 5px;font-size:23px;letter-spacing:-.5px}
-.fb-panel p{margin:0 0 17px;color:var(--muted);font-size:13px}
+.fb-heading{display:flex;align-items:center;gap:13px;margin-bottom:8px}
+.fb-mark{width:48px;height:48px;border-radius:10px;background:#142943;border:1px solid #405875;display:grid;place-items:center;font-size:12px;font-weight:950;line-height:1.1;text-align:center;color:#fff}
+.fb-panel h2{margin:5px 0;font-size:23px;letter-spacing:-.5px}
+.fb-panel p{margin:0 0 14px;color:var(--muted);font-size:13px}
+.fb-open{display:inline-block;margin-bottom:15px;color:var(--cyan);font-size:11px;font-weight:850;text-decoration:underline}
 .fb-frame{width:100%;max-width:100%;height:620px;border:0;display:block;background:#fff;border-radius:8px}
 
-/* MATCHDAY */
+/* MATCHDAY AND COMPETITIONS */
 .lower{display:grid;grid-template-columns:1.35fr .85fr;gap:18px}
 .panel{background:var(--panel);border:1px solid #29384c;border-radius:12px;padding:21px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
 .panel h2{font-size:21px;margin:0 0 16px}
@@ -108,7 +111,7 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .team{font-size:12px;font-weight:850}
 .team:last-child{text-align:right}
 .team small{display:block;color:#8998ad;font-size:10px;font-weight:600;margin-top:3px}
-.vs{color:var(--gold);font-size:10px;font-weight:900;letter-spacing:.07em}
+.vs{color:var(--gold);font-size:9px;font-weight:900;letter-spacing:.07em;white-space:nowrap}
 .standings{width:100%;border-collapse:collapse;font-size:11px}
 .standings th{text-align:left;color:#91a0b5;font-size:9px;text-transform:uppercase;letter-spacing:.1em;padding:8px 5px;border-bottom:1px solid #344258}
 .standings td{padding:11px 5px;border-bottom:1px solid #29384c}
@@ -131,7 +134,7 @@ footer{border-top:1px solid #263449;background:#070c14;padding:29px 0;color:#899
 .footlinks a:hover{color:var(--cyan)}
 
 /* LIGHT MODE */
-body.light-mode{--bg:#f1f4f8;--panel:#ffffff;--panel2:#edf2f7;--line:#dce3ec;--text:#1c2939;--muted:#66758a;background:var(--bg);color:var(--text)}
+body.light-mode{--bg:#f1f4f8;--panel:#fff;--panel2:#edf2f7;--line:#dce3ec;--text:#1c2939;--muted:#66758a;background:var(--bg);color:var(--text)}
 body.light-mode header{background:rgba(255,255,255,.97);border-color:#dce3ec}
 body.light-mode .brand .mark{color:#172438}
 body.light-mode nav{color:#42516a}
@@ -153,13 +156,15 @@ body.light-mode .breaking span{color:#42516a}
 body.light-mode .newsletter{background:radial-gradient(circle at 90% 15%,rgba(73,119,174,.1),transparent 34%),linear-gradient(115deg,#e5edf7,#fff 70%);border-color:#d4deea}
 body.light-mode .newsletter p{color:#66758a}
 body.light-mode .foot .brand{color:#1c2939}
+body.light-mode .banner-heading{background:linear-gradient(110deg,#e5edf7,#fff)}
+body.light-mode .banner-heading p{color:#526078}
+body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
 
 /* TABLET */
 @media(max-width:1000px){
   nav{gap:13px;font-size:11px}
   .search{width:140px}
-  .hero-grid{grid-template-columns:1.35fr 1fr}
-  .lead{min-height:400px}
+  .player-card{height:260px}
   .news-card{flex-basis:calc((100% - 17px)/2)}
 }
 
@@ -172,17 +177,15 @@ body.light-mode .foot .brand{color:#1c2939}
   nav{display:none;position:absolute;top:66px;left:0;right:0;background:#0d1727;border-bottom:1px solid var(--line);padding:17px 20px;flex-direction:column;align-items:flex-start;gap:17px}
   .nav.open nav{display:flex}
   body.light-mode nav{background:#fff}
-  .search{width:120px;padding:9px;font-size:11px}
+  .search{width:110px;padding:9px;font-size:11px}
   .menu{display:block;padding:8px 10px}
   .theme-toggle{padding:8px;font-size:10px}
-  .hero{padding-top:25px}
-  .hero-grid{grid-template-columns:1fr}
-  .lead{min-height:390px}
-  .side-stories{grid-template-columns:1fr 1fr;grid-template-rows:auto}
-  .side-card{min-height:180px}
-  .side-card h2{font-size:16px}
-  .lead-content{left:20px;right:20px;bottom:22px}
-  .lead h1{font-size:35px}
+  .hero{padding-top:24px}
+  .banner-heading{display:block;padding:19px}
+  .banner-heading p{margin-top:10px}
+  .player-strip{grid-template-columns:repeat(5,155px);overflow-x:auto;scroll-snap-type:x mandatory}
+  .player-card{height:245px;scroll-snap-align:start}
+  .player-label{font-size:15px}
   .breaking span{font-size:10px}
   .section-head h2{font-size:23px}
   .news-grid{gap:10px}
@@ -199,18 +202,14 @@ body.light-mode .foot .brand{color:#1c2939}
   .fb-panel{padding:15px}
   .fb-frame{height:560px}
 }
-
 @media(max-width:390px){
   .news-card{flex-basis:88%}
-  .side-stories{grid-template-columns:1fr}
-  .side-card{min-height:165px}
-  .search{width:100px}
+  .search{width:96px}
+  .player-strip{grid-template-columns:repeat(5,142px)}
 }
-
 @media(prefers-reduced-motion:reduce){
-  html{scroll-behavior:auto}
-  .news-grid{scroll-behavior:auto}
-  .news-card,.carousel-button{transition:none}
+  html,.news-grid{scroll-behavior:auto}
+  .news-card,.carousel-button,.player-card img{transition:none}
 }
 </style>
 </head>
@@ -246,37 +245,60 @@ body.light-mode .foot .brand{color:#1c2939}
 </header>
 
 <main id="home">
+
 <div class="wrap hero">
   <div class="section-kicker">The women's game. Every angle.</div>
-  <div class="hero-grid">
-    <a class="lead" href="#latest">
-      <div class="lead-content">
-        <span class="tag">Top story · Women's football</span>
-        <h1>THE GAME IS GROWING. THE STORIES ARE BIGGER.</h1>
-        <p>Your home for the latest women's football news, matchday moments, transfer moves and the voices shaping the game.</p>
-        <div class="byline">WF PUNDIT DESK &nbsp;·&nbsp; NEWS & ANALYSIS</div>
+
+  <section class="player-banner" aria-label="Featured women's football players">
+    <div class="banner-heading">
+      <div>
+        <div class="section-kicker">WF Pundit · Women's football</div>
+        <h1>THE WOMEN'S GAME.<br>FRONT AND CENTRE.</h1>
       </div>
-    </a>
-    <div class="side-stories">
-      <a class="side-card" href="#latest">
-        <div class="inside">
-          <span class="tag">Around the leagues</span>
-          <h2>From the WSL to the world stage — follow every moment.</h2>
-        </div>
-      </a>
-      <a class="side-card" href="#matchday">
-        <div class="inside">
-          <span class="tag">Matchday</span>
-          <h2>Big fixtures. Big performances. One destination.</h2>
-        </div>
-      </a>
+      <p>From the WSL to the world stage, celebrating the players shaping the game.</p>
     </div>
-  </div>
+
+    <div class="player-strip">
+      <div class="player-card">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/20260927-Alessia_Russo.jpg" alt="Alessia Russo" loading="eager">
+        <div class="player-label">Alessia Russo<small>WSL · England</small></div>
+      </div>
+
+      <div class="player-card">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/20250510-Hannah_Hampton.jpg" alt="Hannah Hampton" loading="lazy">
+        <div class="player-label">Hannah Hampton<small>WSL · England</small></div>
+      </div>
+
+      <div class="player-card">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Alexia_Putellas.jpg" alt="Alexia Putellas" loading="lazy">
+        <div class="player-label">Alexia Putellas<small>Spain · Barcelona</small></div>
+      </div>
+
+      <div class="player-card">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Trinity_Rodman.jpg" alt="Trinity Rodman" loading="lazy">
+        <div class="player-label">Trinity Rodman<small>NWSL · USA</small></div>
+      </div>
+
+      <div class="player-card">
+        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Klara_B%C3%BChl_20190505.jpg" alt="Klara Bühl" loading="lazy">
+        <div class="player-label">Klara Bühl<small>Germany · Bundesliga</small></div>
+      </div>
+    </div>
+
+    <div class="photo-credits">
+      Photos: <a href="https://commons.wikimedia.org/wiki/File:20260927-Alessia_Russo.jpg" target="_blank" rel="noopener">Alessia Russo</a> ·
+      <a href="https://commons.wikimedia.org/wiki/File:20250510-Hannah_Hampton.jpg" target="_blank" rel="noopener">Hannah Hampton</a> ·
+      <a href="https://commons.wikimedia.org/wiki/File:Alexia_Putellas.jpg" target="_blank" rel="noopener">Alexia Putellas</a> ·
+      <a href="https://commons.wikimedia.org/wiki/File:Trinity_Rodman.jpg" target="_blank" rel="noopener">Trinity Rodman</a> ·
+      <a href="https://commons.wikimedia.org/wiki/File:Klara_B%C3%BChl_20190505.jpg" target="_blank" rel="noopener">Klara Bühl</a>.
+      See each source page for its photographer and reuse licence.
+    </div>
+  </section>
 </div>
 
 <div class="wrap">
   <div class="breaking">
-    <strong>WF PUNDIT UPDATE</strong>
+    <strong>WF PUNDIT</strong>
     <span>Women's football news, features and match coverage — all in one place.</span>
   </div>
 </div>
@@ -312,12 +334,17 @@ body.light-mode .foot .brand{color:#1c2939}
   <div class="empty" id="empty">No published stories yet. New WF Pundit articles will appear here.</div>
 </section>
 
-<!-- FACEBOOK PAGE FEED -->
 <section class="wrap section fb-section" id="facebook">
   <div class="fb-panel">
-    <div class="section-kicker">Stay connected</div>
-    <h2>WF Pundit on Facebook</h2>
-    <p>Follow the page for more women's football updates and matchday coverage.</p>
+    <div class="fb-heading">
+      <div class="fb-mark">WF<br>PUNDIT</div>
+      <div>
+        <div class="section-kicker">Official page</div>
+        <h2>WF Pundit on Facebook</h2>
+      </div>
+    </div>
+    <p>Follow the page for women's football updates and matchday coverage.</p>
+    <a class="fb-open" href="https://www.facebook.com/wfpundit" target="_blank" rel="noopener">Visit the WF Pundit Facebook page ↗</a>
     <iframe
       class="fb-frame"
       title="WF Pundit Facebook Page"
@@ -335,39 +362,45 @@ body.light-mode .foot .brand{color:#1c2939}
     <div>
       <div class="section-kicker">Follow the action</div>
       <h2>Matchday centre</h2>
-      <p>A dedicated home for fixtures, results and competition updates.</p>
+      <p>Fixtures, results and competition updates.</p>
     </div>
   </div>
 
   <div class="lower">
     <div class="panel">
       <h2>Fixtures & results</h2>
+
       <div class="fixture">
         <div class="team">WSL clubs<small>Barclays Women's Super League</small></div>
-        <div class="vs">LIVE DATA</div>
+        <div class="vs">NOT CONNECTED</div>
         <div class="team">Match centre<small>England</small></div>
       </div>
+
       <div class="fixture">
         <div class="team">European clubs<small>UEFA Women's Champions League</small></div>
-        <div class="vs">LIVE DATA</div>
+        <div class="vs">NOT CONNECTED</div>
         <div class="team">Match centre<small>Europe</small></div>
       </div>
+
       <div class="fixture">
         <div class="team">Liga F clubs<small>Spanish women's league</small></div>
-        <div class="vs">LIVE DATA</div>
+        <div class="vs">NOT CONNECTED</div>
         <div class="team">Match centre<small>Spain</small></div>
       </div>
+
       <div class="fixture">
         <div class="team">NWSL clubs<small>National Women's Soccer League</small></div>
-        <div class="vs">LIVE DATA</div>
+        <div class="vs">NOT CONNECTED</div>
         <div class="team">Match centre<small>United States</small></div>
       </div>
+
       <div class="fixture">
         <div class="team">Frauen-Bundesliga<small>German women's league</small></div>
-        <div class="vs">LIVE DATA</div>
+        <div class="vs">NOT CONNECTED</div>
         <div class="team">Match centre<small>Germany</small></div>
       </div>
-      <p class="placeholder">Live scores and verified fixture information will appear here once a football data provider is connected.</p>
+
+      <p class="placeholder">Live scores and verified fixture information are not connected yet. No live results are displayed here.</p>
     </div>
 
     <div class="panel" id="competitions">
@@ -384,7 +417,7 @@ body.light-mode .foot .brand{color:#1c2939}
           <tr><td>Frauen-Bundesliga</td><td>Germany</td></tr>
         </tbody>
       </table>
-      <p class="placeholder">Competition tables and live standings require a verified football data feed.</p>
+      <p class="placeholder">Competition tables and live standings will be added when a verified football data feed is connected.</p>
     </div>
   </div>
 </section>
@@ -580,7 +613,6 @@ newsNext.addEventListener('click',()=>{
 });
 
 newsGrid.addEventListener('scroll',updateCarouselControls,{passive:true});
-
 newsGrid.addEventListener('pointerdown',pauseNewsAutoScroll);
 newsGrid.addEventListener('pointerup',()=>setTimeout(resumeNewsAutoScroll,2500));
 newsGrid.addEventListener('pointercancel',resumeNewsAutoScroll);
@@ -588,7 +620,6 @@ newsGrid.addEventListener('mouseenter',pauseNewsAutoScroll);
 newsGrid.addEventListener('mouseleave',resumeNewsAutoScroll);
 newsGrid.addEventListener('focusin',pauseNewsAutoScroll);
 newsGrid.addEventListener('focusout',resumeNewsAutoScroll);
-
 newsGrid.addEventListener('touchstart',pauseNewsAutoScroll,{passive:true});
 newsGrid.addEventListener('touchend',()=>setTimeout(resumeNewsAutoScroll,2500),{passive:true});
 
@@ -738,4 +769,4 @@ loadWFArticles();
 </script>
 
 </body>
-      </html>
+</html>
