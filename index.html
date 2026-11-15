@@ -309,16 +309,32 @@ nav a:hover,nav a.active{color:var(--cyan)}
   color:#fff;
 }
 
-.news-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:17px;
+/* LATEST NEWS CAROUSEL */
+.news-carousel{
+  position:relative;
 }
+.news-grid{
+  display:flex;
+  gap:17px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:3px 2px 15px;
+  scroll-snap-type:x mandatory;
+  scroll-behavior:smooth;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+}
+.news-grid::-webkit-scrollbar{display:none}
+
 .news-card{
+  flex:0 0 calc((100% - 34px)/3);
+  min-width:0;
   background:var(--panel);
   border:1px solid #29384c;
   border-radius:12px;
   overflow:hidden;
+  scroll-snap-align:start;
   transition:transform .22s,border-color .22s,box-shadow .22s;
   box-shadow:0 8px 24px rgba(0,0,0,.13);
 }
@@ -356,6 +372,47 @@ nav a:hover,nav a.active{color:var(--cyan)}
   color:#8594a9;
   font-weight:800;
   letter-spacing:.05em;
+}
+
+/* CAROUSEL CONTROLS */
+.carousel-controls{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:9px;
+  margin:0 2px 12px;
+}
+.carousel-button{
+  width:39px;
+  height:39px;
+  display:grid;
+  place-items:center;
+  border:1px solid #405875;
+  background:var(--panel);
+  color:var(--text);
+  border-radius:50%;
+  font-size:19px;
+  font-weight:800;
+  transition:background .2s,border-color .2s,transform .2s;
+}
+.carousel-button:hover{
+  background:var(--blue);
+  border-color:var(--blue);
+  color:#fff;
+  transform:translateY(-2px);
+}
+.carousel-button:disabled{
+  opacity:.35;
+  cursor:not-allowed;
+  transform:none;
+}
+.carousel-status{
+  color:var(--muted);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  min-width:48px;
+  text-align:center;
 }
 .empty{
   display:none;
@@ -554,7 +611,8 @@ body.light-mode .theme-toggle,body.light-mode .menu{
 body.light-mode .news-card,
 body.light-mode .panel,
 body.light-mode .empty,
-body.light-mode .fb-panel{
+body.light-mode .fb-panel,
+body.light-mode .carousel-button{
   background:#fff;
   color:#1c2939;
   border-color:#dce3ec;
@@ -603,7 +661,7 @@ body.light-mode .foot .brand{color:#1c2939}
   .search{width:140px}
   .hero-grid{grid-template-columns:1.35fr 1fr}
   .lead{min-height:400px}
-  .news-grid{grid-template-columns:repeat(2,1fr)}
+  .news-card{flex-basis:calc((100% - 17px)/2)}
 }
 
 /* MOBILE */
@@ -640,11 +698,13 @@ body.light-mode .foot .brand{color:#1c2939}
   .lead h1{font-size:35px}
   .breaking span{font-size:10px}
   .section-head h2{font-size:23px}
-  .news-grid{grid-template-columns:1fr 1fr;gap:10px}
-  .thumb{height:135px}
-  .news-body{padding:12px}
-  .news-body h3{font-size:15px}
+  .news-grid{gap:10px}
+  .news-card{flex-basis:82%}
+  .thumb{height:160px}
+  .news-body{padding:14px}
+  .news-body h3{font-size:16px}
   .news-body p{font-size:11px}
+  .carousel-button{width:36px;height:36px}
   .lower{grid-template-columns:1fr}
   .newsletter{
     align-items:flex-start;
@@ -658,10 +718,16 @@ body.light-mode .foot .brand{color:#1c2939}
 }
 
 @media(max-width:390px){
-  .news-grid{grid-template-columns:1fr}
+  .news-card{flex-basis:88%}
   .side-stories{grid-template-columns:1fr}
   .side-card{min-height:165px}
   .search{width:100px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .news-grid{scroll-behavior:auto}
+  .news-card,.carousel-button{transition:none}
 }
 </style>
 </head>
@@ -751,66 +817,74 @@ body.light-mode .foot .brand{color:#1c2939}
     <button class="filter" data-filter="analysis" type="button">Analysis</button>
   </div>
 
-  <div class="news-grid" id="newsGrid">
-    <article class="news-card" data-category="wsl analysis" data-search="women super league season spotlight clubs players">
-      <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=800&q=80')"></div>
-      <div class="news-body">
-        <div class="meta">WSL · Analysis</div>
-        <h3>The WSL talking points to watch this season</h3>
-        <p>A closer look at the teams, players and storylines shaping the campaign.</p>
-        <div class="date">FEATURE · WF PUNDIT</div>
-      </div>
-    </article>
+  <div class="news-carousel">
+    <div class="carousel-controls">
+      <button class="carousel-button" id="newsPrev" type="button" aria-label="Previous stories">‹</button>
+      <span class="carousel-status" id="carouselStatus">1 / 6</span>
+      <button class="carousel-button" id="newsNext" type="button" aria-label="Next stories">›</button>
+    </div>
 
-    <article class="news-card" data-category="uwcl" data-search="uefa women's champions league european nights">
-      <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1574629810360-7efbb5b4f3d5?auto=format&fit=crop&w=800&q=80')"></div>
-      <div class="news-body">
-        <div class="meta">UWCL · Europe</div>
-        <h3>European nights take centre stage in the UWCL</h3>
-        <p>Follow the latest developments from the biggest stage in women's club football.</p>
-        <div class="date">COMPETITION WATCH · WF PUNDIT</div>
-      </div>
-    </article>
+    <div class="news-grid" id="newsGrid" aria-label="Latest news stories">
+      <article class="news-card" data-category="wsl analysis" data-search="women super league season spotlight clubs players">
+        <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=800&q=80')"></div>
+        <div class="news-body">
+          <div class="meta">WSL · Analysis</div>
+          <h3>The WSL talking points to watch this season</h3>
+          <p>A closer look at the teams, players and storylines shaping the campaign.</p>
+          <div class="date">FEATURE · WF PUNDIT</div>
+        </div>
+      </article>
 
-    <article class="news-card" data-category="transfers" data-search="transfer window signings rumours contract news">
-      <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80')"></div>
-      <div class="news-body">
-        <div class="meta">Transfers · Latest</div>
-        <h3>Transfer centre: the moves making headlines</h3>
-        <p>Keep up with confirmed signings, contract news and developing transfer stories.</p>
-        <div class="date">TRANSFER DESK · WF PUNDIT</div>
-      </div>
-    </article>
+      <article class="news-card" data-category="uwcl" data-search="uefa women's champions league european nights">
+        <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1574629810360-7efbb5b4f3d5?auto=format&fit=crop&w=800&q=80')"></div>
+        <div class="news-body">
+          <div class="meta">UWCL · Europe</div>
+          <h3>European nights take centre stage in the UWCL</h3>
+          <p>Follow the latest developments from the biggest stage in women's club football.</p>
+          <div class="date">COMPETITION WATCH · WF PUNDIT</div>
+        </div>
+      </article>
 
-    <article class="news-card" data-category="international analysis" data-search="international football national teams world cup qualifiers">
-      <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=800&q=80')"></div>
-      <div class="news-body">
-        <div class="meta">International · News</div>
-        <h3>National teams prepare for the next big tests</h3>
-        <p>Squad updates, international fixtures and stories from the global game.</p>
-        <div class="date">INTERNATIONAL DESK · WF PUNDIT</div>
-      </div>
-    </article>
+      <article class="news-card" data-category="transfers" data-search="transfer window signings rumours contract news">
+        <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80')"></div>
+        <div class="news-body">
+          <div class="meta">Transfers · Latest</div>
+          <h3>Transfer centre: the moves making headlines</h3>
+          <p>Keep up with confirmed signings, contract news and developing transfer stories.</p>
+          <div class="date">TRANSFER DESK · WF PUNDIT</div>
+        </div>
+      </article>
 
-    <article class="news-card" data-category="wsl analysis" data-search="women's super league player performances tactical analysis">
-      <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80')"></div>
-      <div class="news-body">
-        <div class="meta">WSL · Analysis</div>
-        <h3>Players who are setting the standard</h3>
-        <p>Celebrating the performances and contributions moving the women's game forward.</p>
-        <div class="date">PLAYER WATCH · WF PUNDIT</div>
-      </div>
-    </article>
+      <article class="news-card" data-category="international analysis" data-search="international football national teams world cup qualifiers">
+        <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1518091043644-c1d4457512c6?auto=format&fit=crop&w=800&q=80')"></div>
+        <div class="news-body">
+          <div class="meta">International · News</div>
+          <h3>National teams prepare for the next big tests</h3>
+          <p>Squad updates, international fixtures and stories from the global game.</p>
+          <div class="date">INTERNATIONAL DESK · WF PUNDIT</div>
+        </div>
+      </article>
 
-    <article class="news-card" data-category="uwcl analysis" data-search="women's champions league tactics analysis club football">
-      <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=800&q=80')"></div>
-      <div class="news-body">
-        <div class="meta">UWCL · Analysis</div>
-        <h3>What makes the elite teams stand out?</h3>
-        <p>Breaking down the ideas, intensity and details behind top-level performances.</p>
-        <div class="date">TACTICAL VIEW · WF PUNDIT</div>
-      </div>
-    </article>
+      <article class="news-card" data-category="wsl analysis" data-search="women's super league player performances tactical analysis">
+        <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&w=800&q=80')"></div>
+        <div class="news-body">
+          <div class="meta">WSL · Analysis</div>
+          <h3>Players who are setting the standard</h3>
+          <p>Celebrating the performances and contributions moving the women's game forward.</p>
+          <div class="date">PLAYER WATCH · WF PUNDIT</div>
+        </div>
+      </article>
+
+      <article class="news-card" data-category="uwcl analysis" data-search="women's champions league tactics analysis club football">
+        <div class="thumb" style="background-image:url('https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=800&q=80')"></div>
+        <div class="news-body">
+          <div class="meta">UWCL · Analysis</div>
+          <h3>What makes the elite teams stand out?</h3>
+          <p>Breaking down the ideas, intensity and details behind top-level performances.</p>
+          <div class="date">TACTICAL VIEW · WF PUNDIT</div>
+        </div>
+      </article>
+    </div>
   </div>
 
   <div class="empty" id="empty">No stories match that search. Try another keyword or category.</div>
@@ -929,15 +1003,111 @@ body.light-mode .foot .brand{color:#1c2939}
 const filters=[...document.querySelectorAll('.filter')];
 const search=document.getElementById('search');
 const empty=document.getElementById('empty');
+const newsGrid=document.getElementById('newsGrid');
+const newsPrev=document.getElementById('newsPrev');
+const newsNext=document.getElementById('newsNext');
+const carouselStatus=document.getElementById('carouselStatus');
+
 let active='all';
+let newsAutoTimer=null;
+let newsPaused=false;
+let userInteracting=false;
+
+function visibleNewsCards(){
+  return [...newsGrid.querySelectorAll('.news-card')]
+    .filter(card=>card.style.display!=='none');
+}
+
+function getNewsStep(){
+  const cards=visibleNewsCards();
+  if(!cards.length)return 0;
+
+  const gap=parseFloat(getComputedStyle(newsGrid).gap)||17;
+  return cards[0].getBoundingClientRect().width+gap;
+}
+
+function updateCarouselControls(){
+  const cards=visibleNewsCards();
+  const count=cards.length;
+
+  if(count===0){
+    carouselStatus.textContent='0 / 0';
+    newsPrev.disabled=true;
+    newsNext.disabled=true;
+    return;
+  }
+
+  const step=getNewsStep();
+  const position=Math.round(newsGrid.scrollLeft/Math.max(step,1))+1;
+  const maxPosition=Math.max(1,count);
+
+  carouselStatus.textContent=Math.min(position,maxPosition)+' / '+maxPosition;
+  newsPrev.disabled=newsGrid.scrollLeft<=4;
+  newsNext.disabled=newsGrid.scrollLeft+newsGrid.clientWidth>=newsGrid.scrollWidth-8;
+}
+
+function moveNews(direction){
+  const step=getNewsStep();
+  if(!step)return;
+
+  const atEnd=newsGrid.scrollLeft+newsGrid.clientWidth>=newsGrid.scrollWidth-8;
+  const atStart=newsGrid.scrollLeft<=4;
+
+  if(direction>0&&atEnd){
+    newsGrid.scrollTo({left:0,behavior:'smooth'});
+  }else if(direction<0&&atStart){
+    newsGrid.scrollTo({left:newsGrid.scrollWidth,behavior:'smooth'});
+  }else{
+    newsGrid.scrollBy({left:step*direction,behavior:'smooth'});
+  }
+
+  updateCarouselControls();
+}
+
+function pauseNewsAutoScroll(){
+  newsPaused=true;
+  clearInterval(newsAutoTimer);
+}
+
+function startNewsAutoScroll(){
+  clearInterval(newsAutoTimer);
+
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    newsPaused=true;
+    return;
+  }
+
+  newsPaused=false;
+
+  newsAutoTimer=setInterval(()=>{
+    if(newsPaused||userInteracting||document.hidden)return;
+
+    const cards=visibleNewsCards();
+    if(cards.length<2)return;
+
+    const atEnd=newsGrid.scrollLeft+newsGrid.clientWidth>=newsGrid.scrollWidth-8;
+
+    if(atEnd){
+      newsGrid.scrollTo({left:0,behavior:'smooth'});
+    }else{
+      newsGrid.scrollBy({left:getNewsStep(),behavior:'smooth'});
+    }
+  },3500);
+}
+
+function resetNewsCarousel(){
+  newsGrid.scrollTo({left:0,behavior:'smooth'});
+  updateCarouselControls();
+  startNewsAutoScroll();
+}
 
 function update(){
   const q=search.value.trim().toLowerCase();
   let shown=0;
 
   document.querySelectorAll('.news-card').forEach(card=>{
-    const cats=(card.dataset.category || '').split(' ');
-    const hay=((card.dataset.search || '')+' '+card.innerText).toLowerCase();
+    const cats=(card.dataset.category||'').split(' ');
+    const hay=((card.dataset.search||'')+' '+card.innerText).toLowerCase();
     const categoryMatch=active==='all'||cats.includes(active);
     const searchMatch=!q||hay.includes(q);
     const visible=categoryMatch&&searchMatch;
@@ -947,6 +1117,7 @@ function update(){
   });
 
   empty.style.display=shown?'none':'block';
+  resetNewsCarousel();
 }
 
 filters.forEach(btn=>{
@@ -959,6 +1130,66 @@ filters.forEach(btn=>{
 });
 
 search.addEventListener('input',update);
+
+newsPrev.addEventListener('click',()=>{
+  pauseNewsAutoScroll();
+  moveNews(-1);
+  userInteracting=true;
+  setTimeout(()=>{
+    userInteracting=false;
+    startNewsAutoScroll();
+  },5000);
+});
+
+newsNext.addEventListener('click',()=>{
+  pauseNewsAutoScroll();
+  moveNews(1);
+  userInteracting=true;
+  setTimeout(()=>{
+    userInteracting=false;
+    startNewsAutoScroll();
+  },5000);
+});
+
+newsGrid.addEventListener('scroll',updateCarouselControls,{passive:true});
+
+newsGrid.addEventListener('touchstart',()=>{
+  pauseNewsAutoScroll();
+  userInteracting=true;
+},{passive:true});
+
+newsGrid.addEventListener('touchend',()=>{
+  setTimeout(()=>{
+    userInteracting=false;
+    startNewsAutoScroll();
+  },2500);
+},{passive:true});
+
+newsGrid.addEventListener('pointerdown',()=>{
+  pauseNewsAutoScroll();
+  userInteracting=true;
+});
+
+newsGrid.addEventListener('pointerup',()=>{
+  setTimeout(()=>{
+    userInteracting=false;
+    startNewsAutoScroll();
+  },2500);
+});
+
+newsGrid.addEventListener('mouseenter',pauseNewsAutoScroll);
+
+newsGrid.addEventListener('mouseleave',()=>{
+  userInteracting=false;
+  startNewsAutoScroll();
+});
+
+newsGrid.addEventListener('focusin',pauseNewsAutoScroll);
+
+newsGrid.addEventListener('focusout',()=>{
+  userInteracting=false;
+  startNewsAutoScroll();
+});
 
 /* MOBILE NAVIGATION */
 document.getElementById('menu').addEventListener('click',()=>{
@@ -989,28 +1220,32 @@ function applyTheme(theme){
 }
 
 let savedTheme='dark';
+
 try{
   savedTheme=localStorage.getItem('wf-theme')||'dark';
 }catch(error){}
+
 applyTheme(savedTheme);
 
 themeToggle.addEventListener('click',()=>{
   const newTheme=document.body.classList.contains('light-mode')?'dark':'light';
+
   try{
     localStorage.setItem('wf-theme',newTheme);
   }catch(error){}
+
   applyTheme(newTheme);
 });
 
 /* LOAD PUBLISHED ARTICLES FROM THE ADMIN DASHBOARD */
 async function loadWFArticles(){
-  const grid=document.getElementById('newsGrid');
-
   try{
     const response=await fetch('/api/articles');
+
     if(!response.ok)throw new Error('Could not load articles');
 
     const data=await response.json();
+
     if(!data.success||!Array.isArray(data.articles)){
       throw new Error('Invalid article response');
     }
@@ -1021,7 +1256,7 @@ async function loadWFArticles(){
       return;
     }
 
-    grid.innerHTML='';
+    newsGrid.innerHTML='';
 
     data.articles.forEach(article=>{
       const card=document.createElement('article');
@@ -1070,7 +1305,7 @@ async function loadWFArticles(){
 
       body.append(category,title,summary,date);
       card.append(thumb,body);
-      grid.appendChild(card);
+      newsGrid.appendChild(card);
     });
 
     update();
@@ -1081,6 +1316,19 @@ async function loadWFArticles(){
   }
 }
 
+/* PAUSE AUTOMATIC SLIDING WHEN THE PAGE IS HIDDEN */
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden){
+    pauseNewsAutoScroll();
+  }else{
+    startNewsAutoScroll();
+  }
+});
+
+window.addEventListener('resize',updateCarouselControls);
+
+updateCarouselControls();
+startNewsAutoScroll();
 loadWFArticles();
 </script>
 
