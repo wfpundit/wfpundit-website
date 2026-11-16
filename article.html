@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1220">
+<meta name="description" content="Read the latest women's football news from WF Pundit.">
+<title>WF Pundit | Article</title>
+<style>
+:root{--bg:#0b1220;--panel:#131e2e;--line:#2a3a50;--text:#f5f7fb;--muted:#aab6c7;--cyan:#9fc5ed}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.7}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(850px,calc(100% - 32px));margin:auto}
+header{border-bottom:1px solid var(--line);background:#0d1727;padding:18px 0}
+.brand{font-size:23px;font-weight:950;letter-spacing:-1px}
+.verified{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#1689ff;color:white;font-size:10px}
+main{padding:35px 0 60px}
+.back{display:inline-block;color:var(--cyan);font-size:12px;font-weight:800;margin-bottom:25px}
+.article{background:var(--panel);border:1px solid var(--line);border-radius:13px;overflow:hidden}
+.article-image{width:100%;max-height:470px;object-fit:cover;display:none}
+.article-content{padding:28px}
+.category{color:var(--cyan);font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:.1em}
+h1{font-size:clamp(27px,5vw,43px);line-height:1.15;letter-spacing:-1px;margin:12px 0}
+.summary{color:#c4d0df;font-size:16px;margin:0 0 18px}
+.meta{color:#8798ad;font-size:11px;margin-bottom:24px;border-bottom:1px solid var(--line);padding-bottom:18px}
+.content{color:#e0e6ef;font-size:15px;white-space:pre-wrap;overflow-wrap:anywhere}
+.message{text-align:center;color:var(--muted);padding:40px 15px}
+footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:11px;text-align:center}
+body.light-mode{--bg:#f1f4f8;--panel:#fff;--line:#dce3ec;--text:#1c2939;--muted:#66758a}
+body.light-mode header{background:#fff}
+body.light-mode .summary,body.light-mode .content{color:#34445a}
+@media(max-width:600px){.article-content{padding:19px}main{padding-top:24px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<a class="brand" href="/index.html">wf_pundit <span class="verified">✓</span></a>
+</div></header>
+<main class="wrap">
+<a class="back" href="/index.html#latest">← Back to latest news</a>
+<div id="message" class="message">Loading article...</div>
+<article class="article" id="article" hidden>
+<img class="article-image" id="articleImage" alt="">
+<div class="article-content">
+<div class="category" id="category"></div>
+<h1 id="title"></h1>
+<p class="summary" id="summary"></p>
+<div class="meta" id="meta"></div>
+<div class="content" id="content"></div>
+</div>
+</article>
+</main>
+<footer><div class="wrap">© <span id="year"></span> WF Pundit · Women's football. Every story matters.</div></footer>
+<script>
+document.getElementById("year").textContent=new Date().getFullYear();
+try{if(localStorage.getItem("wf-theme")==="light")document.body.classList.add("light-mode")}catch(error){}
+async function loadArticle(){
+const message=document.getElementById("message");
+const articleElement=document.getElementById("article");
+const id=new URLSearchParams(window.location.search).get("id");
+if(!id||!/^\d+$/.test(id)){message.textContent="This article link is invalid.";return}
+try{
+const response=await fetch("/api/article?id="+encodeURIComponent(id));
+const data=await response.json();
+if(!response.ok||!data.success||!data.article)throw new Error(data.error||"Article not found.");
+const article=data.article;
+document.title=(article.title||"Article")+" | WF Pundit";
+document.getElementById("title").textContent=article.title||"";
+document.getElementById("summary").textContent=article.summary||"";
+document.getElementById("category").textContent=article.category||"Women's Football";
+document.getElementById("content").textContent=article.content||"";
+const author=article.author||"WF Pundit";
+const date=article.created_at?new Date(article.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}):"";
+document.getElementById("meta").textContent="By "+author+(date?" · "+date:"");
+const image=document.getElementById("articleImage");
+if(article.image_url&&/^https:\/\//i.test(article.image_url)){image.src=article.image_url;image.alt=article.title||"Article image";image.style.display="block"}
+message.hidden=true;
+articleElement.hidden=false;
+}catch(error){console.error("Article loading error:",error);message.textContent=error.message||"Unable to load this article. Please try again."}
+}
+loadArticle();
+</script>
+</body>
+</html>
