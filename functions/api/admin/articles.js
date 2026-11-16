@@ -22,6 +22,29 @@ function makeSlug(title) {
     .replace(/^-|-$/g, "");
 }
 
+// LOAD ALL ARTICLES, INCLUDING DRAFTS
+export async function onRequestGet({ request, env }) {
+  if (!authorised(request, env)) {
+    return json({ error: "Unauthorised" }, 401);
+  }
+
+  try {
+    const result = await env.DB.prepare(`
+      SELECT * FROM articles
+      ORDER BY created_at DESC
+    `).all();
+
+    return json({
+      success: true,
+      articles: result.results || []
+    });
+
+  } catch (error) {
+    return json({ error: "Unable to load articles" }, 500);
+  }
+}
+
+// CREATE ARTICLE
 export async function onRequestPost({ request, env }) {
   if (!authorised(request, env)) {
     return json({ error: "Unauthorised" }, 401);
@@ -71,10 +94,13 @@ export async function onRequestPost({ request, env }) {
     }, 201);
 
   } catch (error) {
-    return json({ error: "Unable to create article. Check that its slug is unique." }, 500);
+    return json({
+      error: "Unable to create article. Check that its slug is unique."
+    }, 500);
   }
 }
 
+// UPDATE ARTICLE
 export async function onRequestPut({ request, env }) {
   if (!authorised(request, env)) {
     return json({ error: "Unauthorised" }, 401);
@@ -126,10 +152,13 @@ export async function onRequestPut({ request, env }) {
     return json({ success: true, message: "Article updated" });
 
   } catch (error) {
-    return json({ error: "Unable to update article. Check that its slug is unique." }, 500);
+    return json({
+      error: "Unable to update article. Check that its slug is unique."
+    }, 500);
   }
 }
 
+// DELETE ARTICLE
 export async function onRequestDelete({ request, env }) {
   if (!authorised(request, env)) {
     return json({ error: "Unauthorised" }, 401);
@@ -157,4 +186,3 @@ export async function onRequestDelete({ request, env }) {
     return json({ error: "Unable to delete article" }, 500);
   }
 }
-
