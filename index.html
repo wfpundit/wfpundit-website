@@ -37,13 +37,6 @@ button{cursor:pointer}
 @keyframes loaderReveal{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pageReveal{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 body.is-loaded .topline,body.is-loaded header,body.is-loaded main,body.is-loaded footer{animation:pageReveal .7s ease both}
-body.is-loaded .player-card{animation:pageReveal .7s ease both}
-body.is-loaded .player-card:nth-child(2){animation-delay:.08s}
-body.is-loaded .player-card:nth-child(3){animation-delay:.16s}
-body.is-loaded .player-card:nth-child(4){animation-delay:.24s}
-body.is-loaded .player-card:nth-child(5){animation-delay:.32s}
-body.is-loaded .player-card:nth-child(6){animation-delay:.40s}
-body.is-loaded .player-card:nth-child(7){animation-delay:.48s}
 
 .topline{background:#070c14;border-bottom:1px solid #202d40;color:#aab6c8;font-size:12px}
 .topline .wrap{display:flex;justify-content:space-between;gap:14px;padding:9px 0}
@@ -84,7 +77,7 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .banner-heading h1{font-size:clamp(27px,4vw,46px);line-height:1.04;letter-spacing:-1.5px;margin:8px 0 0}
 .banner-heading p{max-width:340px;color:#b9c7d8;font-size:13px;margin:0}
 
-/* PLAYER PORTRAIT SLIDER */
+/* PLAYER PORTRAIT SLIDER - STABLE, STEP-BY-STEP MOVEMENT */
 .player-strip{
   display:grid;
   grid-template-columns:repeat(7,220px);
@@ -96,6 +89,7 @@ nav a:hover,nav a.active{color:var(--cyan)}
   -webkit-overflow-scrolling:touch;
   overscroll-behavior-x:contain;
   padding:5px;
+  scroll-behavior:smooth;
 }
 .player-strip::-webkit-scrollbar{display:none}
 .player-card{
@@ -116,9 +110,11 @@ nav a:hover,nav a.active{color:var(--cyan)}
   display:block;
   object-fit:cover;
   object-position:center 25%;
-  transition:transform .6s ease;
+  opacity:1;
+  transition:transform .45s ease;
+  background:#1b293c;
 }
-.player-card:hover img{transform:scale(1.07)}
+.player-card:hover img{transform:scale(1.04)}
 .player-card:focus-visible{outline:3px solid var(--cyan);outline-offset:-3px}
 .player-card:after{
   content:"";
@@ -128,27 +124,11 @@ nav a:hover,nav a.active{color:var(--cyan)}
   pointer-events:none;
 }
 .player-label{
-  position:absolute;
-  z-index:1;
-  left:13px;
-  right:10px;
-  bottom:14px;
-  color:#fff;
-  font-size:16px;
-  font-weight:900;
-  line-height:1.2;
-  text-shadow:0 2px 8px #000;
-  pointer-events:none;
+  position:absolute;z-index:1;left:13px;right:10px;bottom:14px;color:#fff;
+  font-size:16px;font-weight:900;line-height:1.2;text-shadow:0 2px 8px #000;
+  pointer-events:none
 }
-.player-label small{
-  display:block;
-  color:#c7d6e8;
-  font-size:9px;
-  letter-spacing:.1em;
-  text-transform:uppercase;
-  margin-top:5px;
-  pointer-events:none;
-}
+.player-label small{display:block;color:#c7d6e8;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-top:5px}
 
 .breaking{margin:10px 0 32px;background:var(--panel);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;overflow:hidden}
 .breaking strong{background:var(--blue);padding:13px 17px;font-size:10px;letter-spacing:.12em;white-space:nowrap}
@@ -311,8 +291,8 @@ body.light-mode .banner-heading p{color:#526078}
   .language-select{max-width:72px;font-size:8px}
 }
 @media(prefers-reduced-motion:reduce){
-  html,.news-grid{scroll-behavior:auto}
-  .site-loader,.loader-content,.loader-line span,.topline,header,main,footer,.player-card,
+  html,.news-grid,.player-strip{scroll-behavior:auto}
+  .site-loader,.loader-content,.loader-line span,.topline,header,main,footer,
   .news-card,.carousel-button,.player-card img,.theme-toggle,.theme-thumb{
     animation:none!important;transition:none!important
   }
@@ -339,11 +319,7 @@ body.light-mode .banner-heading p{color:#526078}
 <header>
 <div class="wrap nav" id="nav">
   <button class="menu" id="menu" type="button" aria-label="Toggle menu" aria-expanded="false">☰</button>
-
-  <a class="brand" href="#home">
-    <span class="mark">wf_pundit</span>
-    <span class="verified">✓</span>
-  </a>
+  <a class="brand" href="#home"><span class="mark">wf_pundit</span><span class="verified">✓</span></a>
 
   <nav id="links">
     <a class="active" href="#home">Home</a>
@@ -356,7 +332,6 @@ body.light-mode .banner-heading p{color:#526078}
 
   <div class="navright">
     <input class="search" id="search" type="search" placeholder="Search stories…" aria-label="Search stories">
-
     <div class="language-box">
       <label for="languageSelect">LANGUAGE</label>
       <select class="language-select" id="languageSelect" aria-label="Translate website">
@@ -380,7 +355,6 @@ body.light-mode .banner-heading p{color:#526078}
         <option value="ru">🇷🇺 Russian</option>
       </select>
     </div>
-
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false">
       <span class="theme-track"><span class="theme-thumb" id="themeIcon">☀</span></span>
       <span class="theme-label" id="themeLabel">Light Mode</span>
@@ -402,42 +376,40 @@ body.light-mode .banner-heading p{color:#526078}
     </div>
 
     <div class="player-strip" id="playerStrip">
-
       <a class="player-card" href="https://www.arsenal.com/women/players/alessia-russo" target="_blank" rel="noopener noreferrer" aria-label="View Alessia Russo at Arsenal">
-        <img src="https://cdn.media.amplience.net/i/ArsenalDirect/Russo_2026_sbp?%24sbp-page-heroimage-small-6024%24=&fmt=jpg" alt="Alessia Russo of Arsenal" loading="eager">
+        <img src="https://cdn.media.amplience.net/i/ArsenalDirect/Russo_2026_sbp?%24sbp-page-heroimage-small-6024%24=&fmt=jpg" alt="Alessia Russo of Arsenal" loading="eager" decoding="async">
         <span class="player-label">Alessia Russo<small>Arsenal · England</small></span>
       </a>
 
       <a class="player-card" href="https://www.chelseafc.com/en/teams/profile/hannah-hampton" target="_blank" rel="noopener noreferrer" aria-label="View Hannah Hampton at Chelsea">
-        <img src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png" alt="Hannah Hampton of Chelsea" loading="lazy">
+        <img src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png" alt="Hannah Hampton of Chelsea" loading="eager" decoding="async">
         <span class="player-label">Hannah Hampton<small>Chelsea · England</small></span>
       </a>
 
       <a class="player-card" href="https://www.londoncitylionesses.com/squad/alexia-putellas" target="_blank" rel="noopener noreferrer" aria-label="View Alexia Putellas at London City Lionesses">
-        <img src="https://static.wixstatic.com/media/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg/v1/fill/w_640%2Ch_429%2Cal_t%2Cq_90/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg" alt="Alexia Putellas of London City Lionesses" loading="lazy">
+        <img src="https://static.wixstatic.com/media/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg/v1/fill/w_640%2Ch_429%2Cal_t%2Cq_90/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg" alt="Alexia Putellas of London City Lionesses" loading="eager" decoding="async">
         <span class="player-label">Alexia Putellas<small>London City Lionesses · Spain</small></span>
       </a>
 
       <a class="player-card" href="https://www.fcbarcelona.com/en/football/womens-football/players" target="_blank" rel="noopener noreferrer" aria-label="View Aitana Bonmatí at Barcelona">
-        <img src="https://www.fcbarcelona.com/photo-resources/2025/09/10/e09695b4-8d3c-411e-864a-0bc580d3aa81/14_Aitana.jpg?height=600&width=600" alt="Aitana Bonmatí of Barcelona" loading="lazy">
+        <img src="https://www.fcbarcelona.com/photo-resources/2025/09/10/e09695b4-8d3c-411e-864a-0bc580d3aa81/14_Aitana.jpg?height=600&width=600" alt="Aitana Bonmatí of Barcelona" loading="eager" decoding="async">
         <span class="player-label">Aitana Bonmatí<small>Barcelona · Spain</small></span>
       </a>
 
       <a class="player-card" href="https://www.realmadrid.com/en-US/football/womens-team/players/linda-caicedo-alegria" target="_blank" rel="noopener noreferrer" aria-label="View Linda Caicedo at Real Madrid">
-        <img src="https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/vaikl8nl7hdr4y9jj4jyb9ey/players/linda-caicedo-alegria/caritas-26-27/LINDA_EQUIPO_CARITA_550X650.png" alt="Linda Caicedo of Real Madrid" loading="lazy">
+        <img src="https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/vaikl8nl7hdr4y9jj4jyb9ey/players/linda-caicedo-alegria/caritas-26-27/LINDA_EQUIPO_CARITA_550X650.png" alt="Linda Caicedo of Real Madrid" loading="eager" decoding="async">
         <span class="player-label">Linda Caicedo<small>Real Madrid · Colombia</small></span>
       </a>
 
       <a class="player-card" href="https://washingtonspirit.com/team-member/trinity-rodman/" target="_blank" rel="noopener noreferrer" aria-label="View Trinity Rodman at Washington Spirit">
-        <img src="https://washingtonspirit.com/wp-content/uploads/2023/04/02192026_rodmantrinity_cc_0016_2_2x-1-1.webp" alt="Trinity Rodman of Washington Spirit" loading="lazy">
+        <img src="https://washingtonspirit.com/wp-content/uploads/2023/04/02192026_rodmantrinity_cc_0016_2_2x-1-1.webp" alt="Trinity Rodman of Washington Spirit" loading="eager" decoding="async">
         <span class="player-label">Trinity Rodman<small>Washington Spirit · USA</small></span>
       </a>
 
       <a class="player-card" href="https://fcbayern.com/frauen/en/teams/first-team/klara-buehl" target="_blank" rel="noopener noreferrer" aria-label="View Klara Bühl at Bayern Munich">
-        <img src="https://img.fcbayern.com/image/upload/f_auto/q_auto/ar_1%3A1%2Cc_fill%2Cg_custom%3Aface%2Cw_768/v1785329818/cms/public/images/fcbayern-com/spielerinnen/portrait/Profilbilder/Profilbild_B%C3%BChl_Klara.png" alt="Klara Bühl of Bayern Munich" loading="lazy">
+        <img src="https://assets.dfb.de/uploads/000/326/106/custom_style_1_Klara_Buehl.jpg?1762355634" alt="Klara Bühl of Bayern Munich" loading="eager" decoding="async">
         <span class="player-label">Klara Bühl<small>Bayern Munich · Germany</small></span>
       </a>
-
     </div>
   </section>
 </div>
@@ -659,7 +631,7 @@ function startNewsAutoScroll(){
     }else{
       newsGrid.scrollBy({left:step,behavior:'smooth'});
     }
-  },3500);
+  },5000);
 }
 
 function pauseNewsAutoScroll(){
@@ -713,7 +685,7 @@ filters.forEach(btn=>{
 });
 search.addEventListener('input',update);
 
-/* CAROUSEL ARROWS */
+/* NEWS CAROUSEL */
 newsPrev.addEventListener('click',()=>{
   moveNews(-1);
   pauseNewsAutoScroll();
@@ -755,17 +727,14 @@ document.querySelectorAll('#links a').forEach(link=>{
   });
 });
 
-/* FREE GOOGLE TRANSLATE LINK */
+/* FREE GOOGLE TRANSLATE */
 const languageSelect=document.getElementById('languageSelect');
-
 languageSelect.addEventListener('change',()=>{
   const language=languageSelect.value;
   if(language==='en')return;
-
   const currentPage=window.location.href;
   const translateURL='https://translate.google.com/translate?sl=auto&tl='+
     encodeURIComponent(language)+'&u='+encodeURIComponent(currentPage);
-
   window.open(translateURL,'_blank','noopener,noreferrer');
   languageSelect.value='en';
 });
@@ -791,16 +760,12 @@ function applyTheme(theme){
   themeLabel.textContent=isLight?'Dark Mode':'Light Mode';
   themeToggle.setAttribute('aria-pressed',String(isLight));
   themeToggle.setAttribute('aria-label',isLight?'Switch to dark mode':'Switch to light mode');
-
   const themeColor=document.querySelector('meta[name="theme-color"]');
   if(themeColor)themeColor.content=isLight?'#f1f4f8':'#0b1220';
 }
 
 let savedTheme='dark';
-try{
-  savedTheme=localStorage.getItem('wf-theme')||'dark';
-}catch(error){}
-
+try{savedTheme=localStorage.getItem('wf-theme')||'dark'}catch(error){}
 applyTheme(savedTheme);
 
 themeToggle.addEventListener('click',()=>{
@@ -809,7 +774,7 @@ themeToggle.addEventListener('click',()=>{
   applyTheme(newTheme);
 });
 
-/* LOAD PUBLISHED ARTICLES AND MAKE EACH CARD CLICKABLE */
+/* LOAD PUBLISHED ARTICLES */
 async function loadWFArticles(){
   try{
     const response=await fetch('/api/articles');
@@ -888,57 +853,82 @@ async function loadWFArticles(){
   }
 }
 
-/* AUTOMATIC PLAYER PORTRAIT SLIDER */
+/* PLAYER SLIDER - NO CONTINUOUS PIXEL MOVEMENT */
 const playerStrip=document.getElementById('playerStrip');
-let playerDirection=1;
-let playerTimer=null;
+let playerAutoTimer=null;
 let playerPaused=false;
+let playerIndex=0;
+
+function getPlayerStep(){
+  const firstCard=playerStrip.querySelector('.player-card');
+  if(!firstCard)return 0;
+  const gap=parseFloat(getComputedStyle(playerStrip).gap)||8;
+  return firstCard.getBoundingClientRect().width+gap;
+}
 
 function stopPlayerSlider(){
-  if(playerTimer){
-    clearInterval(playerTimer);
-    playerTimer=null;
+  if(playerAutoTimer){
+    clearInterval(playerAutoTimer);
+    playerAutoTimer=null;
   }
 }
 
 function startPlayerSlider(){
   stopPlayerSlider();
-
   if(!playerStrip)return;
   if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 
-  playerTimer=setInterval(()=>{
+  playerAutoTimer=setInterval(()=>{
     if(playerPaused||document.hidden)return;
 
+    const step=getPlayerStep();
     const maxScroll=playerStrip.scrollWidth-playerStrip.clientWidth;
 
     if(maxScroll<=0)return;
 
-    playerStrip.scrollLeft+=playerDirection*0.7;
-
-    if(playerStrip.scrollLeft>=maxScroll-1){
-      playerDirection=-1;
+    if(playerStrip.scrollLeft>=maxScroll-5){
+      playerIndex=0;
+    }else{
+      playerIndex++;
     }
 
-    if(playerStrip.scrollLeft<=1){
-      playerDirection=1;
-    }
-  },20);
+    playerStrip.scrollTo({
+      left:Math.min(playerIndex*step,maxScroll),
+      behavior:'smooth'
+    });
+  },4200);
+}
+
+function pausePlayerSlider(){
+  playerPaused=true;
+}
+
+function resumePlayerSlider(){
+  playerPaused=false;
 }
 
 if(playerStrip){
-  playerStrip.addEventListener('mouseenter',()=>playerPaused=true);
-  playerStrip.addEventListener('mouseleave',()=>playerPaused=false);
-  playerStrip.addEventListener('touchstart',()=>playerPaused=true,{passive:true});
-  playerStrip.addEventListener('touchend',()=>playerPaused=false,{passive:true});
-  playerStrip.addEventListener('focusin',()=>playerPaused=true);
-  playerStrip.addEventListener('focusout',()=>playerPaused=false);
+  playerStrip.addEventListener('mouseenter',pausePlayerSlider);
+  playerStrip.addEventListener('mouseleave',resumePlayerSlider);
+  playerStrip.addEventListener('touchstart',pausePlayerSlider,{passive:true});
+  playerStrip.addEventListener('touchend',resumePlayerSlider,{passive:true});
+  playerStrip.addEventListener('touchcancel',resumePlayerSlider,{passive:true});
+  playerStrip.addEventListener('pointerdown',pausePlayerSlider);
+  playerStrip.addEventListener('pointerup',resumePlayerSlider);
+  playerStrip.addEventListener('pointercancel',resumePlayerSlider);
+  playerStrip.addEventListener('focusin',pausePlayerSlider);
+  playerStrip.addEventListener('focusout',resumePlayerSlider);
+
+  playerStrip.addEventListener('scroll',()=>{
+    const step=getPlayerStep();
+    if(step>0)playerIndex=Math.round(playerStrip.scrollLeft/step);
+  },{passive:true});
 
   startPlayerSlider();
   window.addEventListener('resize',startPlayerSlider);
 }
 
-/* PAUSE AUTOMATIC SLIDING WHEN THE PAGE IS HIDDEN */
+/* PAUSE SLIDERS WHEN THE PAGE IS HIDDEN */
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){
     stopNewsAutoScroll();
@@ -967,8 +957,6 @@ function finishPageLoading(){
 window.addEventListener('load',()=>{
   setTimeout(finishPageLoading,450);
 });
-
-/* SAFETY FALLBACK: NEVER LEAVE THE LOADER ON SCREEN */
 setTimeout(finishPageLoading,3500);
 </script>
 </body>
