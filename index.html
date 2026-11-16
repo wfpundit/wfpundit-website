@@ -72,7 +72,7 @@ user-select:none;
 -webkit-user-select:none;
 cursor:grab;
 background:
-radial-gradient(ellipse at 50% 35%,rgba(49,105,163,.38) 0%,rgba(22,49,79,.28) 34%,transparent 72%),
+radial-gradient(ellipse at 50% 35%,rgba(49,105,163,.42) 0%,rgba(22,49,79,.3) 36%,transparent 74%),
 linear-gradient(135deg,#0c1929,#101d30 48%,#080f1b);
 }
 .player-strip.is-dragging{cursor:grabbing}
@@ -83,7 +83,7 @@ inset:0;
 pointer-events:none;
 background:
 linear-gradient(90deg,rgba(7,14,24,.35),transparent 18%,transparent 82%,rgba(7,14,24,.35)),
-radial-gradient(ellipse at center bottom,rgba(57,120,200,.13),transparent 68%);
+radial-gradient(ellipse at center bottom,rgba(57,120,200,.17),transparent 68%);
 z-index:1;
 }
 .player-card{
@@ -91,7 +91,7 @@ position:absolute;
 inset:9px;
 display:block;
 overflow:hidden;
-border:1px solid rgba(130,180,230,.16);
+border:1px solid rgba(130,180,230,.19);
 border-radius:9px;
 background:
 radial-gradient(ellipse at 50% 35%,#254b72 0%,#152b44 48%,#0b1422 100%);
@@ -100,13 +100,14 @@ isolation:isolate;
 opacity:0;
 visibility:hidden;
 pointer-events:none;
-transition:opacity .8s ease,visibility .8s ease;
+transition:opacity .65s ease,visibility 0s linear .65s;
 }
 .player-card.is-active{
 opacity:1;
 visibility:visible;
 pointer-events:auto;
 z-index:2;
+transition:opacity .65s ease,visibility 0s;
 }
 .player-card img{
 display:block;
@@ -115,7 +116,7 @@ height:100%;
 object-fit:contain;
 object-position:center center;
 background:transparent;
-filter:saturate(1.04) contrast(1.035);
+filter:saturate(1.05) contrast(1.04);
 backface-visibility:hidden;
 -webkit-backface-visibility:hidden;
 }
@@ -151,7 +152,7 @@ margin-top:5px;
 .player-controls{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:10px 14px;background:#080e18;color:#c7d6e8}
 .player-controls button{width:36px;height:36px;border:1px solid #49617d;border-radius:50%;background:#15263a;color:#fff;font-size:22px;line-height:1}
 .player-controls button:hover{background:var(--blue)}
-.player-status{font-size:10px;font-weight:850;min-width:38px;text-align:center;letter-spacing:.08em}
+.player-status{font-size:10px;font-weight:850;min-width:48px;text-align:center;letter-spacing:.08em}
 .player-card:focus-visible{outline:3px solid var(--cyan);outline-offset:-3px}
 
 .breaking{margin:10px 0 32px;background:var(--panel);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;overflow:hidden}
@@ -390,44 +391,81 @@ html,.news-grid{scroll-behavior:auto}
 
 <a class="player-card is-active" href="https://www.arsenal.com/women/players/alessia-russo" target="_blank" rel="noopener noreferrer" aria-label="View Alessia Russo at Arsenal">
 <img src="https://cdn.media.amplience.net/i/ArsenalDirect/Russo_2026_sbp?%24sbp-page-heroimage-small-6024%24=&fmt=jpg" alt="Alessia Russo" loading="eager" decoding="async">
-<span class="player-label">Alessia Russo<small>Arsenal · England</small></span>
+<span class="player-label">Alessia Russo<small>Arsenal · WSL · England</small></span>
 </a>
 
 <a class="player-card" href="https://www.chelseafc.com/en/teams/profile/hannah-hampton" target="_blank" rel="noopener noreferrer" aria-label="View Hannah Hampton at Chelsea" tabindex="-1">
 <img src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png" alt="Hannah Hampton" loading="eager" decoding="async">
-<span class="player-label">Hannah Hampton<small>Chelsea · England</small></span>
+<span class="player-label">Hannah Hampton<small>Chelsea · WSL · England</small></span>
 </a>
 
 <a class="player-card" href="https://www.londoncitylionesses.com/squad/alexia-putellas" target="_blank" rel="noopener noreferrer" aria-label="View Alexia Putellas at London City Lionesses" tabindex="-1">
 <img src="https://static.wixstatic.com/media/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg" alt="Alexia Putellas" loading="eager" decoding="async">
-<span class="player-label">Alexia Putellas<small>London City Lionesses · Spain</small></span>
+<span class="player-label">Alexia Putellas<small>London City Lionesses · WSL · Spain</small></span>
 </a>
 
 <a class="player-card" href="https://www.fcbarcelona.com/en/football/womens-football/players" target="_blank" rel="noopener noreferrer" aria-label="View Aitana Bonmatí at Barcelona" tabindex="-1">
 <img src="https://www.fcbarcelona.com/photo-resources/2025/09/10/e09695b4-8d3c-411e-864a-0bc580d3aa81/14_Aitana.jpg?height=600&width=600" alt="Aitana Bonmatí" loading="eager" decoding="async">
-<span class="player-label">Aitana Bonmatí<small>Barcelona · Spain</small></span>
+<span class="player-label">Aitana Bonmatí<small>Barcelona · Liga F · Spain</small></span>
 </a>
 
 <a class="player-card" href="https://www.realmadrid.com/en-US/football/womens-team/players/linda-caicedo-alegria" target="_blank" rel="noopener noreferrer" aria-label="View Linda Caicedo at Real Madrid" tabindex="-1">
 <img src="https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/vaikl8nl7hdr4y9jj4jyb9ey/players/linda-caicedo-alegria/caritas-26-27/LINDA_EQUIPO_CARITA_550X650.png" alt="Linda Caicedo" loading="eager" decoding="async">
-<span class="player-label">Linda Caicedo<small>Real Madrid · Colombia</small></span>
+<span class="player-label">Linda Caicedo<small>Real Madrid · Liga F · Colombia</small></span>
 </a>
 
 <a class="player-card" href="https://washingtonspirit.com/team-member/trinity-rodman/" target="_blank" rel="noopener noreferrer" aria-label="View Trinity Rodman at Washington Spirit" tabindex="-1">
 <img src="https://washingtonspirit.com/wp-content/uploads/2023/04/02192026_rodmantrinity_cc_0016_2_2x-1-1.webp" alt="Trinity Rodman" loading="eager" decoding="async">
-<span class="player-label">Trinity Rodman<small>Washington Spirit · USA</small></span>
+<span class="player-label">Trinity Rodman<small>Washington Spirit · NWSL · USA</small></span>
 </a>
 
 <div class="player-card" aria-label="Pernille Harder of Bayern Munich">
 <img src="https://assets.dfb.de/uploads/000/313/152/custom_style_1_Pernille_Harder.jpg?1732630816=" alt="Pernille Harder" loading="eager" decoding="async">
-<span class="player-label">Pernille Harder<small>Bayern Munich · Denmark</small></span>
+<span class="player-label">Pernille Harder<small>Bayern Munich · Bundesliga · Denmark</small></span>
+</div>
+
+<!-- Seven additional official player portraits -->
+
+<a class="player-card" href="https://www.juventus.com/en/teams/first-team-women/squad/chiara-beccari" target="_blank" rel="noopener noreferrer" aria-label="View Chiara Beccari at Juventus" tabindex="-1">
+<img src="https://www.juventus.com/images/image/private/t_portrait_mobile/f_png/dev/tk1bbezvrc2lxtqiuium.png" alt="Chiara Beccari" loading="eager" decoding="async">
+<span class="player-label">Chiara Beccari<small>Juventus · Serie A Women · Italy</small></span>
+</a>
+
+<a class="player-card" href="https://www.juventus.com/en/teams/first-team-women/squad/larissa-rusek" target="_blank" rel="noopener noreferrer" aria-label="View Larissa Rusek at Juventus" tabindex="-1">
+<img src="https://www.juventus.com/images/image/private/t_portrait_mobile/f_png/dev/iufeh7pby6yshqclxf8l.png" alt="Larissa Rusek" loading="eager" decoding="async">
+<span class="player-label">Larissa Rusek<small>Juventus · Serie A Women · Austria</small></span>
+</a>
+
+<a class="player-card" href="https://www.juventus.com/en/teams/first-team-women/squad/martina-rosucci" target="_blank" rel="noopener noreferrer" aria-label="View Martina Rosucci at Juventus" tabindex="-1">
+<img src="https://www.juventus.com/images/image/private/t_portrait_mobile/f_png/dev/riarjdwbxcetuet3y972.png" alt="Martina Rosucci" loading="eager" decoding="async">
+<span class="player-label">Martina Rosucci<small>Juventus · Serie A Women · Italy</small></span>
+</a>
+
+<a class="player-card" href="https://washingtonspirit.com/team-member/sofia-cantore/" target="_blank" rel="noopener noreferrer" aria-label="View Sofia Cantore at Washington Spirit" tabindex="-1">
+<img src="https://washingtonspirit.com/wp-content/uploads/2026/02/02192026_cantoresofia_cc_0051_1_2x.webp" alt="Sofia Cantore" loading="eager" decoding="async">
+<span class="player-label">Sofia Cantore<small>Washington Spirit · NWSL · Italy</small></span>
+</a>
+
+<a class="player-card" href="https://washingtonspirit.com/team-member/rosemonde-kouassi/" target="_blank" rel="noopener noreferrer" aria-label="View Rosemonde Kouassi at Washington Spirit" tabindex="-1">
+<img src="https://washingtonspirit.com/wp-content/uploads/2024/07/02182026_kouassirosemonde_cc_0040_1_2x-1.webp" alt="Rosemonde Kouassi" loading="eager" decoding="async">
+<span class="player-label">Rosemonde Kouassi<small>Washington Spirit · NWSL · Côte d'Ivoire</small></span>
+</a>
+
+<a class="player-card" href="https://washingtonspirit.com/team-member/ashley-hatch/" target="_blank" rel="noopener noreferrer" aria-label="View Ashley Hatch at Washington Spirit" tabindex="-1">
+<img src="https://washingtonspirit.com/wp-content/uploads/2026/02/02192026_hatchashley_cc_0043_1_2x-1.webp" alt="Ashley Hatch" loading="eager" decoding="async">
+<span class="player-label">Ashley Hatch<small>Washington Spirit · NWSL · USA</small></span>
+</a>
+
+<div class="player-card" aria-label="Giulia Gwinn of Bayern Munich">
+<img src="https://img.fcbayern.com/image/upload/f_auto/q_auto/ar_1%3A1%2Cc_fill%2Cg_custom%3Aface%2Cw_768/v1785324982/cms/public/images/fcbayern-com/spielerinnen/portrait/Profilbilder/Profilbild_Gwinn_Giulia.png" alt="Giulia Gwinn" loading="eager" decoding="async">
+<span class="player-label">Giulia Gwinn<small>Bayern Munich · Bundesliga · Germany</small></span>
 </div>
 
 </div>
 
 <div class="player-controls" aria-label="Player photo controls">
 <button id="playerPrev" type="button" aria-label="Previous player">‹</button>
-<span class="player-status" id="playerStatus">1 / 7</span>
+<span class="player-status" id="playerStatus">1 / 14</span>
 <button id="playerNext" type="button" aria-label="Next player">›</button>
 </div>
 </section>
@@ -794,7 +832,7 @@ applyTheme(t);
 
 /* PLAYER PORTRAIT CAROUSEL */
 const playerStrip=$('#playerStrip');
-const playerCards=[...document.querySelectorAll('.player-card')];
+const playerCards=[...playerStrip.querySelectorAll('.player-card')];
 const playerPrev=$('#playerPrev');
 const playerNext=$('#playerNext');
 const playerStatus=$('#playerStatus');
@@ -807,6 +845,7 @@ let pointerStartY=0;
 let pointerDown=false;
 let dragged=false;
 let resumePlayerTimer=null;
+let dragResetTimer=null;
 
 function showPlayer(index){
 if(!playerCards.length)return;
@@ -877,7 +916,7 @@ pausePlayerFade();
 resumePlayerAfterInteraction();
 });
 
-/* Swipe and drag support */
+/* Smooth swipe and drag support */
 playerStrip.addEventListener('pointerdown',e=>{
 if(e.pointerType==='mouse'&&e.button!==0)return;
 
@@ -886,8 +925,13 @@ dragged=false;
 pointerStartX=e.clientX;
 pointerStartY=e.clientY;
 
+clearTimeout(dragResetTimer);
 pausePlayerFade();
 playerStrip.classList.add('is-dragging');
+
+try{
+playerStrip.setPointerCapture(e.pointerId);
+}catch(err){}
 });
 
 playerStrip.addEventListener('pointerup',e=>{
@@ -902,6 +946,10 @@ const dy=e.clientY-pointerStartY;
 if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)*1.15){
 dragged=true;
 showPlayer(activePlayer+(dx<0?1:-1));
+
+dragResetTimer=setTimeout(()=>{
+dragged=false;
+},450);
 }
 
 resumePlayerAfterInteraction();
@@ -911,6 +959,14 @@ playerStrip.addEventListener('pointercancel',()=>{
 pointerDown=false;
 playerStrip.classList.remove('is-dragging');
 resumePlayerAfterInteraction();
+});
+
+playerStrip.addEventListener('lostpointercapture',()=>{
+if(pointerDown){
+pointerDown=false;
+playerStrip.classList.remove('is-dragging');
+resumePlayerAfterInteraction();
+}
 });
 
 playerStrip.addEventListener('click',e=>{
@@ -932,25 +988,17 @@ resumePlayerFade();
 playerStrip.addEventListener('focusin',pausePlayerFade);
 playerStrip.addEventListener('focusout',resumePlayerFade);
 
-document.addEventListener('visibilitychange',()=>{
-if(document.hidden){
-pausePlayerFade();
-}else{
-resumePlayerFade();
-}
+/* Hide broken portraits without showing broken-image symbols */
+playerStrip.querySelectorAll('img').forEach(img=>{
+img.addEventListener('error',()=>{
+img.style.display='none';
+img.parentElement.style.background='radial-gradient(ellipse at center,#254b72 0%,#152b44 48%,#0b1422 100%)';
+},{once:true});
 });
 
 /* Start with the first player */
 showPlayer(0);
 startPlayerFade();
-
-/* Hide broken portraits without showing a broken-image icon */
-document.querySelectorAll('.player-card img').forEach(img=>{
-img.addEventListener('error',()=>{
-img.style.visibility='hidden';
-img.parentElement.style.background='radial-gradient(ellipse at center,#254b72 0%,#152b44 48%,#0b1422 100%)';
-},{once:true});
-});
 
 /* NEWS ARTICLE FEED */
 async function loadWFArticles(){
