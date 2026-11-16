@@ -61,7 +61,7 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .banner-heading h1{font-size:clamp(27px,4vw,46px);line-height:1.04;letter-spacing:-1.5px;margin:8px 0 0}
 .banner-heading p{max-width:340px;color:#b9c7d8;font-size:13px;margin:0}
 
-/* Player portrait carousel */
+/* Large FIFA-inspired circular player carousel */
 .player-strip{
 position:relative;
 height:460px;
@@ -72,7 +72,7 @@ user-select:none;
 -webkit-user-select:none;
 cursor:grab;
 background:
-radial-gradient(ellipse at 50% 35%,rgba(49,105,163,.42) 0%,rgba(22,49,79,.3) 36%,transparent 74%),
+radial-gradient(ellipse at 50% 42%,rgba(49,105,163,.45) 0%,rgba(22,49,79,.3) 42%,transparent 76%),
 linear-gradient(135deg,#0c1929,#101d30 48%,#080f1b);
 }
 .player-strip.is-dragging{cursor:grabbing}
@@ -82,8 +82,8 @@ position:absolute;
 inset:0;
 pointer-events:none;
 background:
-linear-gradient(90deg,rgba(7,14,24,.35),transparent 18%,transparent 82%,rgba(7,14,24,.35)),
-radial-gradient(ellipse at center bottom,rgba(57,120,200,.17),transparent 68%);
+linear-gradient(90deg,rgba(7,14,24,.25),transparent 18%,transparent 82%,rgba(7,14,24,.25)),
+radial-gradient(ellipse at center bottom,rgba(57,120,200,.22),transparent 68%);
 z-index:1;
 }
 .player-card{
@@ -91,69 +91,94 @@ position:absolute;
 inset:9px;
 display:block;
 overflow:hidden;
-border:1px solid rgba(130,180,230,.19);
-border-radius:9px;
+border:1px solid rgba(130,180,230,.12);
+border-radius:12px;
 background:
-radial-gradient(ellipse at 50% 35%,#254b72 0%,#152b44 48%,#0b1422 100%);
+radial-gradient(ellipse at 50% 42%,rgba(36,75,114,.55),rgba(15,31,50,.96) 65%,#0b1422 100%);
 color:#fff;
 isolation:isolate;
 opacity:0;
 visibility:hidden;
 pointer-events:none;
-transition:opacity .65s ease,visibility 0s linear .65s;
+transition:opacity .7s ease,visibility 0s linear .7s;
 }
 .player-card.is-active{
 opacity:1;
 visibility:visible;
 pointer-events:auto;
 z-index:2;
-transition:opacity .65s ease,visibility 0s;
+transition:opacity .7s ease,visibility 0s;
 }
+
+/* Big circular portrait */
 .player-card img{
+position:absolute;
 display:block;
-width:100%;
-height:100%;
-object-fit:contain;
-object-position:center center;
-background:transparent;
-filter:saturate(1.05) contrast(1.04);
+width:clamp(260px,29vw,340px);
+height:clamp(260px,29vw,340px);
+left:50%;
+top:45%;
+transform:translate(-50%,-50%);
+object-fit:cover;
+object-position:center 25%;
+border-radius:50%;
+border:6px solid rgba(151,201,255,.9);
+background:#142943;
+box-shadow:
+0 0 0 5px rgba(57,120,200,.22),
+0 0 24px rgba(57,120,200,.55),
+0 0 65px rgba(57,120,200,.25),
+inset 0 0 15px rgba(255,255,255,.12);
+filter:saturate(1.08) contrast(1.04);
 backface-visibility:hidden;
 -webkit-backface-visibility:hidden;
 }
-.player-card:after{
+
+/* Subtle decorative glow behind the portrait */
+.player-card:before{
 content:"";
 position:absolute;
-z-index:1;
-inset:48% 0 0;
-background:linear-gradient(transparent,rgba(3,8,16,.16) 34%,rgba(3,8,16,.88) 100%);
+width:clamp(280px,31vw,360px);
+height:clamp(280px,31vw,360px);
+left:50%;
+top:45%;
+transform:translate(-50%,-50%);
+border-radius:50%;
+border:1px solid rgba(125,185,245,.2);
+box-shadow:0 0 45px rgba(57,120,200,.16);
 pointer-events:none;
 }
+.player-card:after{display:none}
+
 .player-label{
 position:absolute;
 z-index:2;
-left:22px;
-right:15px;
-bottom:20px;
+left:12px;
+right:12px;
+bottom:18px;
 color:#fff;
-font-size:20px;
-font-weight:900;
+font-size:21px;
+font-weight:950;
 line-height:1.2;
-text-shadow:0 2px 8px #000;
+text-align:center;
+text-shadow:0 2px 12px #000;
 pointer-events:none;
 }
 .player-label small{
 display:block;
-color:#d4e0ef;
+color:#bcd8f5;
 font-size:10px;
-letter-spacing:.1em;
+font-weight:850;
+letter-spacing:.12em;
 text-transform:uppercase;
-margin-top:5px;
+margin-top:7px;
 }
-.player-controls{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:10px 14px;background:#080e18;color:#c7d6e8}
-.player-controls button{width:36px;height:36px;border:1px solid #49617d;border-radius:50%;background:#15263a;color:#fff;font-size:22px;line-height:1}
-.player-controls button:hover{background:var(--blue)}
-.player-status{font-size:10px;font-weight:850;min-width:48px;text-align:center;letter-spacing:.08em}
 .player-card:focus-visible{outline:3px solid var(--cyan);outline-offset:-3px}
+
+.player-controls{display:flex;align-items:center;justify-content:center;gap:14px;padding:11px 14px;background:#080e18;color:#c7d6e8}
+.player-controls button{width:39px;height:39px;border:1px solid #49617d;border-radius:50%;background:#15263a;color:#fff;font-size:24px;line-height:1}
+.player-controls button:hover{background:var(--blue);box-shadow:0 0 15px #3978c877}
+.player-status{font-size:11px;font-weight:900;min-width:55px;text-align:center;letter-spacing:.08em}
 
 .breaking{margin:10px 0 32px;background:var(--panel);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;overflow:hidden}
 .breaking strong{background:var(--blue);padding:13px 17px;font-size:10px;letter-spacing:.12em;white-space:nowrap}
@@ -275,7 +300,9 @@ body.light-mode .nav nav{background:#fff}
 .banner-heading p{margin-top:10px}
 .player-strip{height:370px}
 .player-card{inset:6px}
-.player-label{font-size:17px;left:16px;bottom:17px}
+.player-card img{width:260px;height:260px;top:44%}
+.player-card:before{width:278px;height:278px;top:44%}
+.player-label{font-size:18px;left:10px;right:10px;bottom:17px}
 .breaking span{font-size:10px}
 .section-head h2{font-size:23px}
 .news-grid{gap:10px}
@@ -297,6 +324,10 @@ body.light-mode .nav nav{background:#fff}
 .verified{width:15px;height:15px;font-size:10px}
 .search{width:72px;padding:8px 5px}
 .player-strip{height:335px}
+.player-card img{width:225px;height:225px;top:43%}
+.player-card:before{width:243px;height:243px;top:43%}
+.player-label{font-size:16px;bottom:14px}
+.player-label small{font-size:9px}
 .theme-toggle{padding:5px 5px 5px 4px;gap:4px}
 .theme-label{font-size:7px;min-width:36px}
 .theme-track{width:33px}
@@ -424,8 +455,6 @@ html,.news-grid{scroll-behavior:auto}
 <span class="player-label">Pernille Harder<small>Bayern Munich · Bundesliga · Denmark</small></span>
 </div>
 
-<!-- Seven additional official player portraits -->
-
 <a class="player-card" href="https://www.juventus.com/en/teams/first-team-women/squad/chiara-beccari" target="_blank" rel="noopener noreferrer" aria-label="View Chiara Beccari at Juventus" tabindex="-1">
 <img src="https://www.juventus.com/images/image/private/t_portrait_mobile/f_png/dev/tk1bbezvrc2lxtqiuium.png" alt="Chiara Beccari" loading="eager" decoding="async">
 <span class="player-label">Chiara Beccari<small>Juventus · Serie A Women · Italy</small></span>
@@ -457,7 +486,7 @@ html,.news-grid{scroll-behavior:auto}
 </a>
 
 <div class="player-card" aria-label="Giulia Gwinn of Bayern Munich">
-<img src="https://img.fcbayern.com/image/upload/f_auto/q_auto/ar_1%3A1%2Cc_fill%2Cg_custom%3Aface%2Cw_768/v1785324982/cms/public/images/fcbayern-com/spielerinnen/portrait/Profilbilder/Profilbild_Gwinn_Giulia.png" alt="Giulia Gwinn" loading="eager" decoding="async">
+<img src="https://assets.dfb.de/uploads/000/326/113/custom_style_1_Giulia_Gwinn.jpg?1762355673=" alt="Giulia Gwinn" loading="eager" decoding="async">
 <span class="player-label">Giulia Gwinn<small>Bayern Munich · Bundesliga · Germany</small></span>
 </div>
 
@@ -900,7 +929,9 @@ playerPaused=false;
 function resumePlayerAfterInteraction(){
 clearTimeout(resumePlayerTimer);
 resumePlayerTimer=setTimeout(()=>{
+if(!document.hidden&&!pointerDown){
 resumePlayerFade();
+}
 },3000);
 }
 
@@ -986,7 +1017,11 @@ resumePlayerFade();
 });
 
 playerStrip.addEventListener('focusin',pausePlayerFade);
-playerStrip.addEventListener('focusout',resumePlayerFade);
+playerStrip.addEventListener('focusout',()=>{
+if(!playerStrip.matches(':hover')&&!pointerDown){
+resumePlayerFade();
+}
+});
 
 /* Hide broken portraits without showing broken-image symbols */
 playerStrip.querySelectorAll('img').forEach(img=>{
@@ -1088,7 +1123,10 @@ stopNewsAuto();
 pausePlayerFade();
 }else{
 startNewsAuto();
+
+if(!playerStrip.matches(':hover')&&!playerStrip.contains(document.activeElement)){
 resumePlayerFade();
+}
 }
 });
 
