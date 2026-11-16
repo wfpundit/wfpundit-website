@@ -38,6 +38,9 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .search{width:175px;background:#121e2e;border:1px solid #304158;color:white;padding:10px 12px;border-radius:8px;outline:none}
 .search:focus{border-color:var(--cyan)}
 
+/* MENU BUTTON */
+.menu{display:none;border:1px solid #405875;background:#19283c;color:#fff;padding:9px 12px;border-radius:8px;font-size:22px;font-weight:800;line-height:1;white-space:nowrap}
+
 /* LANGUAGE TRANSLATOR */
 .language-box{display:flex;align-items:center;gap:7px}
 .language-box label{font-size:10px;font-weight:900;color:var(--cyan);letter-spacing:.07em}
@@ -70,7 +73,6 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .theme-thumb{position:absolute;left:3px;top:3px;display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:linear-gradient(145deg,#fff,#c8ddf4);color:#1a4779;font-size:12px;line-height:1;box-shadow:0 2px 7px rgba(0,0,0,.3);transition:transform .35s cubic-bezier(.2,.8,.2,1),background .3s,color .3s}
 .theme-toggle[aria-pressed="true"] .theme-thumb{transform:translateX(21px);background:linear-gradient(145deg,#e5f0ff,#a9c9ed);color:#253f65}
 .theme-label{font-size:11px;min-width:57px;text-align:left}
-.menu{display:none;border:1px solid #405875;background:#19283c;color:#fff;padding:9px 12px;border-radius:8px;font-size:12px;font-weight:800;white-space:nowrap}
 
 .hero{padding:32px 0 22px}
 .section-kicker{font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
@@ -202,22 +204,59 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
 @media(max-width:720px){
   .wrap{width:min(100% - 24px,var(--max))}
   .topline .wrap{font-size:9px}
-  .nav{min-height:66px}
-  .brand{font-size:21px}
-  nav{display:none;position:absolute;top:66px;left:0;right:0;background:#0d1727;border-bottom:1px solid var(--line);padding:17px 20px;flex-direction:column;align-items:flex-start;gap:17px}
+
+  /* MENU LEFT, BRAND NEXT, CONTROLS RIGHT */
+  .nav{
+    min-height:66px;
+    justify-content:flex-start;
+    gap:9px;
+    flex-wrap:nowrap;
+  }
+  .menu{
+    display:block;
+    order:0;
+    flex-shrink:0;
+    padding:8px 10px;
+  }
+  .brand{
+    order:1;
+    font-size:19px;
+    flex-shrink:0;
+  }
+  .navright{
+    order:2;
+    margin-left:auto;
+    gap:5px;
+    flex-wrap:nowrap;
+    min-width:0;
+  }
+
+  nav{
+    display:none;
+    position:absolute;
+    top:66px;
+    left:0;
+    right:0;
+    background:#0d1727;
+    border-bottom:1px solid var(--line);
+    padding:17px 20px;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:17px;
+  }
   .nav.open nav{display:flex}
   body.light-mode nav{background:#fff}
-  .navright{gap:6px}
-  .search{width:110px;padding:9px;font-size:11px}
-  .menu{display:block;padding:8px 10px}
+
+  .search{width:95px;padding:8px 6px;font-size:10px}
   .language-box{gap:4px}
   .language-box label{display:none}
-  .language-select{max-width:105px;padding:8px 5px;font-size:10px}
-  .theme-toggle{padding:5px 9px 5px 5px;gap:7px;min-height:37px}
-  .theme-track{width:42px;height:24px}
-  .theme-thumb{width:16px;height:16px}
-  .theme-toggle[aria-pressed="true"] .theme-thumb{transform:translateX(17px)}
-  .theme-label{font-size:9px;min-width:48px}
+  .language-select{max-width:83px;padding:8px 4px;font-size:9px}
+  .theme-toggle{padding:5px 7px 5px 5px;gap:5px;min-height:35px}
+  .theme-track{width:37px;height:23px}
+  .theme-thumb{width:15px;height:15px}
+  .theme-toggle[aria-pressed="true"] .theme-thumb{transform:translateX(13px)}
+  .theme-label{font-size:8px;min-width:42px}
+
   .hero{padding-top:24px}
   .banner-heading{display:block;padding:19px}
   .banner-heading p{margin-top:10px}
@@ -240,14 +279,20 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
   .fb-panel{padding:15px}
   .fb-frame{height:560px}
 }
+
 @media(max-width:390px){
-  .news-card{flex-basis:88%}
-  .search{width:96px}
+  .nav{gap:6px}
+  .brand{font-size:17px;gap:5px}
+  .verified{width:15px;height:15px;font-size:10px}
+  .search{width:75px;padding:8px 5px}
   .player-strip{grid-template-columns:repeat(5,142px)}
-  .theme-toggle{padding:5px 7px 5px 4px}
-  .theme-label{font-size:8px;min-width:43px}
-  .language-select{max-width:90px}
+  .theme-toggle{padding:5px 5px 5px 4px;gap:4px}
+  .theme-label{font-size:7px;min-width:36px}
+  .theme-track{width:33px}
+  .theme-toggle[aria-pressed="true"] .theme-thumb{transform:translateX(9px)}
+  .language-select{max-width:72px;font-size:8px}
 }
+
 @media(prefers-reduced-motion:reduce){
   html,.news-grid{scroll-behavior:auto}
   .news-card,.carousel-button,.player-card img,.theme-toggle,.theme-thumb{transition:none}
@@ -265,6 +310,10 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
 
 <header>
 <div class="wrap nav" id="nav">
+
+  <!-- MENU BUTTON MOVED TO THE EXTREME LEFT -->
+  <button class="menu" id="menu" type="button" aria-label="Toggle menu" aria-expanded="false">☰</button>
+
   <a class="brand" href="#home">
     <span class="mark">wf_pundit</span>
     <span class="verified">✓</span>
@@ -279,10 +328,10 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
     <a href="#about">About</a>
   </nav>
 
+  <!-- SEARCH, TRANSLATOR AND THEME SWITCH STAY ON THE RIGHT -->
   <div class="navright">
     <input class="search" id="search" type="search" placeholder="Search stories…" aria-label="Search stories">
 
-    <!-- FREE WEBSITE TRANSLATOR -->
     <div class="language-box">
       <label for="languageSelect">LANGUAGE</label>
       <select class="language-select" id="languageSelect" aria-label="Translate website">
@@ -313,8 +362,6 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
       </span>
       <span class="theme-label" id="themeLabel">Light Mode</span>
     </button>
-
-    <button class="menu" id="menu" type="button" aria-label="Toggle menu">☰</button>
   </div>
 </div>
 </header>
@@ -660,12 +707,22 @@ newsGrid.addEventListener('touchstart',pauseNewsAutoScroll,{passive:true});
 newsGrid.addEventListener('touchend',()=>setTimeout(resumeNewsAutoScroll,2500),{passive:true});
 
 /* MOBILE NAVIGATION */
-document.getElementById('menu').addEventListener('click',()=>{
-  document.getElementById('nav').classList.toggle('open');
+const menuButton=document.getElementById('menu');
+const navigation=document.getElementById('nav');
+
+menuButton.addEventListener('click',()=>{
+  const isOpen=navigation.classList.toggle('open');
+  menuButton.setAttribute('aria-expanded',String(isOpen));
+  menuButton.setAttribute('aria-label',isOpen?'Close navigation menu':'Open navigation menu');
+  menuButton.textContent=isOpen?'✕':'☰';
 });
+
 document.querySelectorAll('#links a').forEach(link=>{
   link.addEventListener('click',()=>{
-    document.getElementById('nav').classList.remove('open');
+    navigation.classList.remove('open');
+    menuButton.setAttribute('aria-expanded','false');
+    menuButton.setAttribute('aria-label','Open navigation menu');
+    menuButton.textContent='☰';
   });
 });
 
@@ -675,7 +732,6 @@ const languageSelect=document.getElementById('languageSelect');
 languageSelect.addEventListener('change',()=>{
   const language=languageSelect.value;
 
-  /* English is the original website language */
   if(language==='en'){
     languageSelect.value='en';
     return;
@@ -686,8 +742,6 @@ languageSelect.addEventListener('change',()=>{
     encodeURIComponent(language)+'&u='+encodeURIComponent(currentPage);
 
   window.open(translateURL,'_blank','noopener,noreferrer');
-
-  /* Reset selector so another language can be selected */
   languageSelect.value='en';
 });
 
