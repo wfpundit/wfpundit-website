@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080f20">
+  <title>Reader Account | WF Pundit</title>
+  <style>
+    :root {
+      --bg: #080f20;
+      --panel: #101b32;
+      --panel-light: #15233e;
+      --blue: #3285ff;
+      --blue-light: #69aaff;
+      --text: #f4f7ff;
+      --muted: #9eacc4;
+      --border: rgba(255,255,255,.09);
+      --danger: #ff7777;
+      --success: #62d9a0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 15% 0%, rgba(50,133,255,.16), transparent 38%),
+        var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .topbar {
+      min-height: 76px;
+      padding: 18px 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,15,32,.88);
+    }
+
+    .brand {
+      font-size: 23px;
+      font-weight: 900;
+      letter-spacing: -1px;
+    }
+
+    .brand span { color: var(--blue-light); }
+
+    .back-link {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .back-link:hover { color: white; }
+
+    main {
+      width: min(100% - 32px, 1040px);
+      margin: 55px auto;
+    }
+
+    .intro {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .eyebrow {
+      color: var(--blue-light);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: clamp(30px, 6vw, 44px);
+      margin: 12px 0;
+      letter-spacing: -1.5px;
+    }
+
+    .intro p {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+      margin: 0;
+    }
+
+    .account-card {
+      max-width: 470px;
+      margin: 0 auto;
+      padding: 30px;
+      background: linear-gradient(145deg, var(--panel), #0d172b);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      box-shadow: 0 24px 70px rgba(0,0,0,.25);
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      padding: 5px;
+      background: #091326;
+      border-radius: 11px;
+      margin-bottom: 25px;
+    }
+
+    .tab {
+      border: 0;
+      padding: 12px;
+      color: var(--muted);
+      background: transparent;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      color: white;
+      background: var(--panel-light);
+      box-shadow: 0 3px 12px rgba(0,0,0,.2);
+    }
+
+    .form-title {
+      font-size: 21px;
+      margin: 0 0 7px;
+    }
+
+    .form-description {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin: 0 0 23px;
+    }
+
+    .field { margin-bottom: 17px; }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #dce6f7;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px 15px;
+      color: white;
+      background: #091326;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      font-size: 14px;
+    }
+
+    input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(50,133,255,.13);
+    }
+
+    input::placeholder { color: #71809a; }
+
+    .password-note {
+      color: var(--muted);
+      font-size: 11px;
+      margin-top: 7px;
+      line-height: 1.5;
+    }
+
+    .submit-btn {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      padding: 15px;
+      margin-top: 5px;
+      background: linear-gradient(100deg, #2876ee, #469aff);
+      color: white;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: opacity .2s, transform .2s;
+    }
+
+    .submit-btn:hover {
+      opacity: .93;
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:disabled {
+      opacity: .6;
+      cursor: wait;
+      transform: none;
+    }
+
+    .message {
+      display: none;
+      padding: 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      line-height: 1.5;
+      margin-bottom: 17px;
+    }
+
+    .message.error {
+      display: block;
+      color: var(--danger);
+      background: rgba(255,119,119,.09);
+      border: 1px solid rgba(255,119,119,.2);
+    }
+
+    .message.success {
+      display: block;
+      color: var(--success);
+      background: rgba(98,217,160,.08);
+      border: 1px solid rgba(98,217,160,.2);
+    }
+
+    .privacy-note {
+      color: var(--muted);
+      text-align: center;
+      font-size: 11px;
+      line-height: 1.7;
+      margin: 22px 0 0;
+    }
+
+    .privacy-note strong { color: #dce6f7; }
+
+    .account-view { text-align: center; }
+
+    .avatar {
+      width: 66px;
+      height: 66px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 17px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2876ee, #75b6ff);
+      color: white;
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .account-view h2 { margin: 0 0 8px; }
+
+    .account-email {
+      color: var(--muted);
+      font-size: 13px;
+      overflow-wrap: anywhere;
+    }
+
+    .account-status {
+      display: inline-block;
+      margin: 18px 0 24px;
+      padding: 8px 12px;
+      color: var(--success);
+      background: rgba(98,217,160,.08);
+      border-radius: 30px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .signout-btn {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: white;
+      background: var(--panel-light);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    footer {
+      text-align: center;
+      color: #71809a;
+      font-size: 11px;
+      padding: 10px 20px 35px;
+    }
+
+    [hidden] { display: none !important; }
+
+    @media (max-width: 520px) {
+      main { margin: 35px auto; }
+      .account-card { padding: 23px 19px; }
+      .topbar { padding: 17px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="topbar">
+    <a class="brand" href="/">WF <span>PUNDIT</span></a>
+    <a class="back-link" href="/">← Back to homepage</a>
+  </header>
+
+  <main>
+    <section class="intro">
+      <div class="eyebrow">The WF Pundit community</div>
+      <h1>Your football. Your account.</h1>
+      <p>Create an account or sign in to access your reader profile.</p>
+    </section>
+
+    <section class="account-card">
+      <div id="authView">
+        <div class="tabs">
+          <button class="tab active" id="loginTab" type="button">Sign in</button>
+          <button class="tab" id="registerTab" type="button">Create account</button>
+        </div>
+
+        <div id="message" class="message" role="status" aria-live="polite"></div>
+
+        <form id="loginForm">
+          <h2 class="form-title">Welcome back</h2>
+          <p class="form-description">Sign in to your WF Pundit reader account.</p>
+
+          <div class="field">
+            <label for="loginEmail">Email address</label>
+            <input id="loginEmail" type="email" autocomplete="email"
+              placeholder="you@example.com" maxlength="254" required>
+          </div>
+
+          <div class="field">
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" type="password"
+              autocomplete="current-password" maxlength="128" required>
+          </div>
+
+          <button class="submit-btn" type="submit">Sign in to your account</button>
+        </form>
+
+        <form id="registerForm" hidden>
+          <h2 class="form-title">Join the community</h2>
+          <p class="form-description">Create your reader account to get started.</p>
+
+          <div class="field">
+            <label for="registerName">Display name</label>
+            <input id="registerName" type="text" autocomplete="name"
+              placeholder="Your name" minlength="2" maxlength="50" required>
+          </div>
+
+          <div class="field">
+            <label for="registerEmail">Email address</label>
+            <input id="registerEmail" type="email" autocomplete="email"
+              placeholder="you@example.com" maxlength="254" required>
+          </div>
+
+          <div class="field">
+            <label for="registerPassword">Create password</label>
+            <input id="registerPassword" type="password"
+              autocomplete="new-password" minlength="12" maxlength="128" required>
+            <div class="password-note">Use at least 12 characters. Choose a password you don't use on another site.</div>
+          </div>
+
+          <button class="submit-btn" type="submit">Create my account</button>
+        </form>
+
+        <p class="privacy-note">
+          <strong>Your password is protected.</strong><br>
+          WF Pundit stores a secure password hash, not your readable password.
+        </p>
+      </div>
+
+      <div id="accountView" class="account-view" hidden>
+        <div class="avatar" id="avatar">W</div>
+        <h2 id="welcomeName">Welcome</h2>
+        <div class="account-email" id="accountEmail"></div>
+        <div class="account-status">Reader account active</div>
+        <div id="accountMessage" class="message" role="status"></div>
+        <button class="signout-btn" id="logoutButton" type="button">Sign out</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>© <span id="year"></span> WF Pundit. All rights reserved.</footer>
+
+  <script>
+    const authView = document.getElementById("authView");
+    const accountView = document.getElementById("accountView");
+    const loginForm = document.getElementById("loginForm");
+    const registerForm = document.getElementById("registerForm");
+    const loginTab = document.getElementById("loginTab");
+    const registerTab = document.getElementById("registerTab");
+    const message = document.getElementById("message");
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    function showMessage(text, type = "error") {
+      message.textContent = text;
+      message.className = "message " + type;
+    }
+
+    function clearMessage() {
+      message.textContent = "";
+      message.className = "message";
+    }
+
+    function showLogin() {
+      clearMessage();
+      loginForm.hidden = false;
+      registerForm.hidden = true;
+      loginTab.classList.add("active");
+      registerTab.classList.remove("active");
+    }
+
+    function showRegister() {
+      clearMessage();
+      loginForm.hidden = true;
+      registerForm.hidden = false;
+      loginTab.classList.remove("active");
+      registerTab.classList.add("active");
+    }
+
+    loginTab.addEventListener("click", showLogin);
+    registerTab.addEventListener("click", showRegister);
+
+    async function sendRequest(url, data) {
+      const response = await fetch(url, {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Something went wrong. Please try again.");
+      }
+      return result;
+    }
+
+    function showAccount(user) {
+      authView.hidden = true;
+      accountView.hidden = false;
+
+      const name = user.displayName || "Reader";
+      document.getElementById("welcomeName").textContent = "Welcome, " + name;
+      document.getElementById("accountEmail").textContent = user.email || "";
+      document.getElementById("avatar").textContent = name.charAt(0).toUpperCase();
+    }
+
+    function setLoading(form, loading, originalText) {
+      const button = form.querySelector("button[type='submit']");
+      button.disabled = loading;
+      button.textContent = loading ? "Please wait..." : originalText;
+    }
+
+    loginForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      clearMessage();
+      setLoading(loginForm, true, "Sign in to your account");
+
+      try {
+        const result = await sendRequest("/api/login", {
+          email: document.getElementById("loginEmail").value,
+          password: document.getElementById("loginPassword").value
+        });
+        showAccount(result.user);
+      } catch (error) {
+        showMessage(error.message);
+      } finally {
+        setLoading(loginForm, false, "Sign in to your account");
+      }
+    });
+
+    registerForm.addEventListener("submit", async event => {
+      event.preventDefault();
+      clearMessage();
+      setLoading(registerForm, true, "Create my account");
+
+      try {
+        const result = await sendRequest("/api/register", {
+          displayName: document.getElementById("registerName").value,
+          email: document.getElementById("registerEmail").value,
+          password: document.getElementById("registerPassword").value
+        });
+        showAccount(result.user);
+      } catch (error) {
+        showMessage(error.message);
+      } finally {
+        setLoading(registerForm, false, "Create my account");
+      }
+    });
+
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+      const button = document.getElementById("logoutButton");
+      button.disabled = true;
+      button.textContent = "Signing out...";
+
+      try {
+        await sendRequest("/api/logout", {});
+        accountView.hidden = true;
+        authView.hidden = false;
+        loginForm.reset();
+        registerForm.reset();
+        showLogin();
+      } catch (error) {
+        const accountMessage = document.getElementById("accountMessage");
+        accountMessage.textContent = error.message;
+        accountMessage.className = "message error";
+      } finally {
+        button.disabled = false;
+        button.textContent = "Sign out";
+      }
+    });
+
+    async function checkSession() {
+      try {
+        const response = await fetch("/api/me", {
+          credentials: "same-origin",
+          cache: "no-store"
+        });
+        const result = await response.json();
+        if (result.success && result.user) showAccount(result.user);
+      } catch {
+        // The sign-in form remains available if the session check fails.
+      }
+    }
+
+    checkSession();
+  </script>
+</body>
+</html>
