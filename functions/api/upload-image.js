@@ -60,9 +60,12 @@ export async function onRequestPost({ request, env }) {
       }, 400);
     }
 
-    if (file.size > 4 * 1024 * 1024) {
+    // Maximum upload size: 24 MB
+    const MAX_FILE_SIZE = 24 * 1024 * 1024;
+
+    if (file.size > MAX_FILE_SIZE) {
       return json({
-        error: "Please choose an image smaller than 4 MB."
+        error: "Please choose an image smaller than 24 MB."
       }, 400);
     }
 
