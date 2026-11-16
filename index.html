@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,957 +6,127 @@
 <meta name="description" content="WF Pundit — women's football news, match coverage, transfers and analysis.">
 <meta name="theme-color" content="#0b1220">
 <title>WF Pundit | Women's Football, Unfiltered</title>
-
 <style>
-:root{
-  --bg:#0b1220;--panel:#131e2e;--panel2:#1a293d;--line:#2a3a50;
-  --text:#f5f7fb;--muted:#aab6c7;--blue:#3978c8;--cyan:#9fc5ed;
-  --gold:#c9a96e;--max:1220px
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6;transition:background .3s,color .3s}
-a{color:inherit;text-decoration:none}
-button,input,select{font:inherit}
-button{cursor:pointer}
-.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
+:root{--bg:#0b1220;--panel:#131e2e;--line:#2a3a50;--text:#f5f7fb;--muted:#aab6c7;--blue:#3978c8;--cyan:#9fc5ed;--gold:#c9a96e;--max:1220px}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.6;transition:background .3s,color .3s}a{color:inherit;text-decoration:none}button,input,select{font:inherit}button{cursor:pointer}.wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
 
-/* LOADING SCREEN */
-.site-loader{
-  position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
-  background:#080f1c;transition:opacity .65s ease,visibility .65s ease
-}
-.site-loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
-.loader-content{width:min(340px,80%);text-align:center;animation:loaderReveal .8s ease both}
-.loader-brand{font-size:34px;font-weight:950;letter-spacing:-1.5px;color:#fff}
-.loader-line{height:3px;margin:22px 0 14px;overflow:hidden;background:#263a53;border-radius:10px}
-.loader-line span{display:block;width:40%;height:100%;background:linear-gradient(90deg,#3978c8,#9fc5ed);animation:loaderProgress 1.2s ease-in-out infinite}
-.loader-content p{color:#aab6c7;font-size:9px;font-weight:850;letter-spacing:2px}
-@keyframes loaderProgress{0%{transform:translateX(-110%)}100%{transform:translateX(280%)}}
-@keyframes loaderReveal{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
-@keyframes pageReveal{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-body.is-loaded .topline,body.is-loaded header,body.is-loaded main,body.is-loaded footer{animation:pageReveal .7s ease both}
+/* Loading screen */
+.site-loader{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;background:#080f1c;transition:opacity .5s ease,visibility .5s ease}.site-loader.hidden{opacity:0;visibility:hidden;pointer-events:none}.loader-content{width:min(340px,80%);text-align:center}.loader-brand{font-size:34px;font-weight:950;letter-spacing:-1.5px}.loader-line{height:3px;margin:22px 0 14px;overflow:hidden;background:#263a53;border-radius:10px}.loader-line span{display:block;width:40%;height:100%;background:linear-gradient(90deg,#3978c8,#9fc5ed);animation:loadbar 1.2s ease-in-out infinite}@keyframes loadbar{from{transform:translateX(-110%)}to{transform:translateX(280%)}}.loader-content p{color:var(--muted);font-size:9px;font-weight:850;letter-spacing:2px}.verified{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;background:#1689ff;color:#fff;font-size:11px;font-weight:900;flex:none}
+.topline{background:#070c14;border-bottom:1px solid #202d40;color:#aab6c8;font-size:12px}.topline .wrap{display:flex;justify-content:space-between;gap:14px;padding:9px 0}.ticker{color:#fff}.ticker b{color:var(--gold);letter-spacing:.13em;margin-right:8px}
+header{position:sticky;top:0;z-index:20;background:rgba(11,18,32,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);box-shadow:0 8px 25px #0002}.nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{display:flex;align-items:center;gap:9px;font-weight:950;font-size:25px;letter-spacing:-1.3px;white-space:nowrap}.brand .mark{color:#fff}nav{display:flex;align-items:center;gap:23px;color:#c4ccda;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.055em}nav a:hover,nav a.active{color:var(--cyan)}.navright{display:flex;align-items:center;gap:10px}.search{width:175px;background:#121e2e;border:1px solid #304158;color:white;padding:10px 12px;border-radius:8px;outline:none}.search:focus{border-color:var(--cyan)}.menu{display:none;border:1px solid #405875;background:#19283c;color:#fff;padding:9px 12px;border-radius:8px;font-size:22px;line-height:1}
+.language-box{display:flex;align-items:center;gap:7px}.language-box label{font-size:10px;font-weight:900;color:var(--cyan)}.language-select{max-width:130px;background:#121e2e;color:#fff;border:1px solid #405875;border-radius:8px;padding:9px 8px;font-size:11px;font-weight:800}
+.theme-toggle{display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:6px 14px 6px 7px;border:1px solid #7ea9da59;border-radius:40px;background:linear-gradient(135deg,#254267,#0d1b2e);color:#fff;font-size:11px;font-weight:850;white-space:nowrap}.theme-track{position:relative;display:flex;width:48px;height:27px;padding:3px;border-radius:30px;background:#091522;border:1px solid #9fc5ed40;flex-shrink:0}.theme-thumb{position:absolute;left:3px;top:3px;display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:#fff;color:#1a4779;font-size:12px;transition:transform .3s}.theme-toggle[aria-pressed=true] .theme-thumb{transform:translateX(21px)}.theme-label{min-width:57px}
+.hero{padding:32px 0 22px}.section-kicker{font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}.section-kicker:before{content:"";width:24px;height:2px;background:var(--gold)}
+.player-banner{margin-top:16px;background:#101b2b;border:1px solid #ffffff1f;border-radius:14px;overflow:hidden;box-shadow:0 14px 36px #0003}.banner-heading{padding:23px 25px 19px;background:linear-gradient(110deg,#142943,#101b2b);display:flex;align-items:end;justify-content:space-between;gap:20px}.banner-heading h1{font-size:clamp(27px,4vw,46px);line-height:1.04;letter-spacing:-1.5px;margin:8px 0 0}.banner-heading p{max-width:340px;color:#b9c7d8;font-size:13px;margin:0}
 
-.topline{background:#070c14;border-bottom:1px solid #202d40;color:#aab6c8;font-size:12px}
-.topline .wrap{display:flex;justify-content:space-between;gap:14px;padding:9px 0}
-.ticker{color:#fff}
-.ticker b{color:var(--gold);letter-spacing:.13em;margin-right:8px}
-
-header{position:sticky;top:0;z-index:20;background:rgba(11,18,32,.96);backdrop-filter:blur(16px);border-bottom:1px solid var(--line);box-shadow:0 8px 25px rgba(0,0,0,.12);transition:background .3s,border-color .3s}
-.nav{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px}
-.brand{display:flex;align-items:center;gap:9px;font-weight:950;font-size:25px;letter-spacing:-1.3px;white-space:nowrap}
-.brand .mark{color:#fff}
-.verified{display:inline-grid;place-items:center;width:17px;height:17px;border-radius:50%;background:#1689ff;color:#fff;font-size:11px;font-weight:900}
-nav{display:flex;align-items:center;gap:23px;color:#c4ccda;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.055em}
-nav a:hover,nav a.active{color:var(--cyan)}
-.navright{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-.search{width:175px;background:#121e2e;border:1px solid #304158;color:white;padding:10px 12px;border-radius:8px;outline:none}
-.search:focus{border-color:var(--cyan)}
-.menu{display:none;border:1px solid #405875;background:#19283c;color:#fff;padding:9px 12px;border-radius:8px;font-size:22px;font-weight:800;line-height:1;white-space:nowrap}
-
-/* TRANSLATOR */
-.language-box{display:flex;align-items:center;gap:7px}
-.language-box label{font-size:10px;font-weight:900;color:var(--cyan);letter-spacing:.07em}
-.language-select{max-width:130px;background:#121e2e;color:#fff;border:1px solid #405875;border-radius:8px;padding:9px 8px;font-size:11px;font-weight:800;outline:none}
-.language-select:focus{border-color:var(--cyan)}
-
-/* THEME SWITCH */
-.theme-toggle{position:relative;display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:6px 14px 6px 7px;border:1px solid rgba(126,169,218,.35);border-radius:40px;background:linear-gradient(135deg,rgba(37,66,103,.95),rgba(13,27,46,.98));color:#fff;font-size:11px;font-weight:850;letter-spacing:.035em;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.08);transition:background .3s,border-color .3s,box-shadow .3s,transform .25s}
-.theme-toggle:hover{border-color:#75baff;box-shadow:0 0 0 3px rgba(57,120,200,.13),0 6px 22px rgba(57,120,200,.22);transform:translateY(-2px)}
-.theme-track{position:relative;display:flex;align-items:center;width:48px;height:27px;padding:3px;border-radius:30px;background:#091522;border:1px solid rgba(159,197,237,.25);box-shadow:inset 0 2px 5px rgba(0,0,0,.35);flex-shrink:0}
-.theme-thumb{position:absolute;left:3px;top:3px;display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:linear-gradient(145deg,#fff,#c8ddf4);color:#1a4779;font-size:12px;line-height:1;box-shadow:0 2px 7px rgba(0,0,0,.3);transition:transform .35s cubic-bezier(.2,.8,.2,1),background .3s,color .3s}
-.theme-toggle[aria-pressed="true"] .theme-thumb{transform:translateX(21px);background:linear-gradient(145deg,#e5f0ff,#a9c9ed);color:#253f65}
-.theme-label{font-size:11px;min-width:57px;text-align:left}
-
-.hero{padding:32px 0 22px}
-.section-kicker{font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
-.section-kicker:before{content:"";width:24px;height:2px;background:var(--gold)}
-.player-banner{margin-top:16px;background:#101b2b;border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,.2)}
-.banner-heading{padding:23px 25px 19px;background:linear-gradient(110deg,#142943,#101b2b);display:flex;align-items:end;justify-content:space-between;gap:20px}
-.banner-heading h1{font-size:clamp(27px,4vw,46px);line-height:1.04;letter-spacing:-1.5px;margin:8px 0 0}
-.banner-heading p{max-width:340px;color:#b9c7d8;font-size:13px;margin:0}
-
-/* PLAYER PORTRAIT SLIDER - STABLE, STEP-BY-STEP MOVEMENT */
-.player-strip{
-  display:grid;
-  grid-template-columns:repeat(7,220px);
-  gap:8px;
-  background:#080e18;
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;
-  overscroll-behavior-x:contain;
-  padding:5px;
-  scroll-behavior:smooth;
-}
-.player-strip::-webkit-scrollbar{display:none}
-.player-card{
-  display:block;
-  position:relative;
-  min-width:0;
-  height:310px;
-  overflow:hidden;
-  background:#1b293c;
-  scroll-snap-align:start;
-  color:#fff;
-  text-decoration:none;
-  cursor:pointer;
-}
-.player-card img{
-  width:100%;
-  height:100%;
-  display:block;
-  object-fit:cover;
-  object-position:center 25%;
-  opacity:1;
-  transition:transform .45s ease;
-  background:#1b293c;
-}
-.player-card:hover img{transform:scale(1.04)}
+/* Player portrait carousel: cross-fade between portraits; touch and mouse gestures remain enabled. */
+.player-strip{position:relative;height:370px;padding:8px;background:#080e18;overflow:hidden;touch-action:pan-y;user-select:none;-webkit-user-select:none;cursor:grab}
+.player-strip.is-dragging{cursor:grabbing}
+.player-card{position:absolute;inset:8px;display:block;overflow:hidden;background:#1b293c;color:#fff;isolation:isolate;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .85s ease,visibility .85s ease}
+.player-card.is-active{opacity:1;visibility:visible;pointer-events:auto;z-index:2}
+.player-card img{display:block;width:100%;height:100%;object-fit:cover;object-position:center 22%;opacity:1;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.player-card:after{content:"";position:absolute;z-index:1;inset:35% 0 0;background:linear-gradient(transparent,rgba(3,8,16,.92));pointer-events:none}
+.player-label{position:absolute;z-index:2;left:20px;right:15px;bottom:20px;color:#fff;font-size:19px;font-weight:900;line-height:1.2;text-shadow:0 2px 8px #000;pointer-events:none}.player-label small{display:block;color:#d4e0ef;font-size:10px;letter-spacing:.1em;text-transform:uppercase;margin-top:5px}
+.player-controls{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:10px 14px;background:#080e18;color:#c7d6e8}
+.player-controls button{width:34px;height:34px;border:1px solid #49617d;border-radius:50%;background:#15263a;color:#fff;font-size:21px;line-height:1}
+.player-controls button:hover{background:var(--blue)}.player-status{font-size:10px;font-weight:850;min-width:38px;text-align:center;letter-spacing:.08em}
 .player-card:focus-visible{outline:3px solid var(--cyan);outline-offset:-3px}
-.player-card:after{
-  content:"";
-  position:absolute;
-  inset:35% 0 0;
-  background:linear-gradient(transparent,rgba(3,8,16,.92));
-  pointer-events:none;
-}
-.player-label{
-  position:absolute;z-index:1;left:13px;right:10px;bottom:14px;color:#fff;
-  font-size:16px;font-weight:900;line-height:1.2;text-shadow:0 2px 8px #000;
-  pointer-events:none
-}
-.player-label small{display:block;color:#c7d6e8;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-top:5px}
-
-.breaking{margin:10px 0 32px;background:var(--panel);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;overflow:hidden}
-.breaking strong{background:var(--blue);padding:13px 17px;font-size:10px;letter-spacing:.12em;white-space:nowrap}
-.breaking span{padding:0 16px;color:#d6deea;font-size:12px}
-
-.section{padding:25px 0 40px}
-.section-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:19px}
-.section-head h2{font-size:26px;letter-spacing:-.8px;margin:4px 0 0}
-.section-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
-.text-link{font-size:11px;color:var(--cyan);font-weight:900;text-transform:uppercase;letter-spacing:.09em}
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:19px}
-.filter{border:1px solid #34465e;background:#131e2e;color:#c0ccdc;padding:8px 14px;border-radius:30px;font-size:11px;font-weight:850;transition:all .2s}
-.filter.active,.filter:hover{background:var(--blue);border-color:var(--blue);color:#fff}
-
-.news-carousel{position:relative}
-.news-grid{display:flex;gap:17px;overflow-x:auto;overflow-y:hidden;padding:3px 2px 15px;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
-.news-grid::-webkit-scrollbar{display:none}
-.news-card{display:block;color:inherit;text-decoration:none;flex:0 0 calc((100% - 34px)/3);min-width:0;background:var(--panel);border:1px solid #29384c;border-radius:12px;overflow:hidden;scroll-snap-align:start;transition:transform .22s,border-color .22s,box-shadow .22s;box-shadow:0 8px 24px rgba(0,0,0,.13);cursor:pointer}
-.news-card:hover{transform:translateY(-3px);border-color:#668ab7;box-shadow:0 14px 30px rgba(0,0,0,.2)}
-.news-card:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
-.thumb{height:190px;background:#1b293c center/cover}
-.news-body{padding:17px}
-.news-body .meta{font-size:10px;color:var(--cyan);font-weight:900;letter-spacing:.1em;text-transform:uppercase}
-.news-body h3{font-size:18px;line-height:1.25;margin:9px 0;color:#f5f7fb;letter-spacing:-.3px}
-.news-body p{font-size:12px;color:var(--muted);margin:0 0 15px}
-.news-body .date{font-size:10px;color:#8594a9;font-weight:800;letter-spacing:.05em}
-.carousel-controls{display:flex;justify-content:flex-end;align-items:center;gap:9px;margin:0 2px 12px}
-.carousel-button{width:34px;height:34px;display:grid;place-items:center;border:1px solid #405875;background:var(--panel);color:var(--text);border-radius:50%;font-size:17px;font-weight:800}
-.carousel-button:hover{background:var(--blue);border-color:var(--blue);color:#fff}
-.carousel-button:disabled{opacity:.35;cursor:not-allowed}
-.carousel-status{color:var(--muted);font-size:10px;font-weight:800;letter-spacing:.08em;min-width:48px;text-align:center}
-.empty{display:none;padding:26px;color:var(--muted);text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:9px;margin-top:15px}
-
-.fb-section{padding-top:4px}
-.fb-panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:22px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
-.fb-heading{display:flex;align-items:center;gap:13px;margin-bottom:8px}
-.fb-mark{width:48px;height:48px;border-radius:10px;background:#142943;border:1px solid #405875;display:grid;place-items:center;font-size:12px;font-weight:950;line-height:1.1;text-align:center;color:#fff}
-.fb-panel h2{margin:5px 0;font-size:23px;letter-spacing:-.5px}
-.fb-panel p{margin:0 0 14px;color:var(--muted);font-size:13px}
-.fb-open{display:inline-block;margin-bottom:15px;color:var(--cyan);font-size:11px;font-weight:850;text-decoration:underline}
-.fb-frame{width:100%;max-width:100%;height:620px;border:0;display:block;background:#fff;border-radius:8px}
-
-.lower{display:grid;grid-template-columns:1.35fr .85fr;gap:18px}
-.panel{background:var(--panel);border:1px solid #29384c;border-radius:12px;padding:21px;box-shadow:0 8px 24px rgba(0,0,0,.12)}
-.panel h2{font-size:21px;margin:0 0 16px}
-.fixture{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid #2b394d}
-.fixture:last-child{border:0}
-.team{font-size:12px;font-weight:850}
-.team:last-child{text-align:right}
-.team small{display:block;color:#8998ad;font-size:10px;font-weight:600;margin-top:3px}
-.vs{color:var(--gold);font-size:9px;font-weight:900;letter-spacing:.07em;white-space:nowrap}
-.standings{width:100%;border-collapse:collapse;font-size:11px}
-.standings th{text-align:left;color:#91a0b5;font-size:9px;text-transform:uppercase;letter-spacing:.1em;padding:8px 5px;border-bottom:1px solid #344258}
-.standings td{padding:11px 5px;border-bottom:1px solid #29384c}
-.standings td:last-child,.standings th:last-child{text-align:right}
-.placeholder{color:#94a2b6;font-size:12px;line-height:1.65;margin-top:16px}
-
-.newsletter{margin:28px 0 46px;padding:30px;border-radius:13px;border:1px solid #354e6c;background:radial-gradient(circle at 90% 15%,rgba(95,142,196,.18),transparent 34%),linear-gradient(115deg,#142a45,#111c2c 70%);display:flex;align-items:center;justify-content:space-between;gap:24px}
-.newsletter h2{margin:5px 0;font-size:24px}
-.newsletter p{margin:0;color:#b7c4d5;font-size:12px}
-.signup{display:flex;gap:8px;min-width:330px}
-.signup input{min-width:0;flex:1;background:#0b1422;border:1px solid #3a506b;color:white;border-radius:7px;padding:11px 12px;outline:none}
-.signup button{border:0;background:var(--blue);color:#fff;border-radius:7px;padding:0 16px;font-weight:900;font-size:10px}
-
-footer{border-top:1px solid #263449;background:#070c14;padding:29px 0;color:#8998ad;font-size:11px}
-.foot{display:flex;justify-content:space-between;gap:18px;align-items:center}
-.foot .brand{font-size:20px;color:#fff}
-.footlinks{display:flex;gap:18px;flex-wrap:wrap}
-.footlinks a:hover{color:var(--cyan)}
-
-/* LIGHT MODE */
-body.light-mode{--bg:#f1f4f8;--panel:#fff;--panel2:#edf2f7;--line:#dce3ec;--text:#1c2939;--muted:#66758a;background:var(--bg);color:var(--text)}
-body.light-mode header{background:rgba(255,255,255,.97);border-color:#dce3ec}
-body.light-mode .brand .mark{color:#172438}
-body.light-mode nav{color:#42516a}
-body.light-mode nav a:hover,body.light-mode nav a.active{color:#245d9d}
-body.light-mode .topline,body.light-mode footer{background:#e7edf4;color:#526078;border-color:#d4dce6}
-body.light-mode .ticker{color:#1c2939}
-body.light-mode .search,body.light-mode .signup input{background:#fff;color:#1c2939;border-color:#cbd5e1}
-body.light-mode .language-select{background:#fff;color:#25374d;border-color:#cbd5e1}
-body.light-mode .theme-toggle,body.light-mode .menu{background:linear-gradient(135deg,#fff,#edf3fa);color:#25374d;border-color:#cbd5e1}
-body.light-mode .theme-track{background:#dce9f8;border-color:#b9cce3}
-body.light-mode .theme-thumb{background:linear-gradient(145deg,#fff,#d5e6fa);color:#245d9d}
-body.light-mode .news-card,body.light-mode .panel,body.light-mode .empty,body.light-mode .fb-panel,body.light-mode .carousel-button{background:#fff;color:#1c2939;border-color:#dce3ec;box-shadow:0 6px 20px rgba(30,48,70,.07)}
-body.light-mode .news-body h3,body.light-mode .section-head h2,body.light-mode .panel h2,body.light-mode .fb-panel h2{color:#1c2939}
-body.light-mode .news-body p,body.light-mode .section-head p,body.light-mode .placeholder,body.light-mode .fb-panel p{color:#66758a}
-body.light-mode .news-body .date{color:#78869a}
-body.light-mode .fixture,body.light-mode .standings td{border-color:#e3e8ef}
-body.light-mode .standings th{border-color:#dce3ec;color:#78869a}
-body.light-mode .filter{background:#fff;color:#42516a;border-color:#d3dce7}
-body.light-mode .filter.active,body.light-mode .filter:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
-body.light-mode .breaking{background:#fff;border-color:#dce3ec}
-body.light-mode .breaking span{color:#42516a}
-body.light-mode .newsletter{background:radial-gradient(circle at 90% 15%,rgba(73,119,174,.1),transparent 34%),linear-gradient(115deg,#e5edf7,#fff 70%);border-color:#d4deea}
-body.light-mode .newsletter p{color:#66758a}
-body.light-mode .foot .brand{color:#1c2939}
-body.light-mode .banner-heading{background:linear-gradient(110deg,#e5edf7,#fff)}
-body.light-mode .banner-heading p{color:#526078}
-
-/* TABLET */
-@media(max-width:1000px){
-  nav{gap:13px;font-size:11px}
-  .search{width:140px}
-  .player-card{height:260px}
-  .news-card{flex-basis:calc((100% - 17px)/2)}
-}
-
-/* MOBILE */
-@media(max-width:720px){
-  .wrap{width:min(100% - 24px,var(--max))}
-  .topline .wrap{font-size:9px}
-  .nav{min-height:66px;justify-content:flex-start;gap:9px;flex-wrap:nowrap}
-  .menu{display:block;order:0;flex-shrink:0;padding:8px 10px}
-  .brand{order:1;font-size:19px;flex-shrink:0}
-  .navright{order:2;margin-left:auto;gap:5px;flex-wrap:nowrap;min-width:0}
-  nav{display:none;position:absolute;top:66px;left:0;right:0;background:#0d1727;border-bottom:1px solid var(--line);padding:17px 20px;flex-direction:column;align-items:flex-start;gap:17px}
-  .nav.open nav{display:flex}
-  body.light-mode nav{background:#fff}
-  .search{width:95px;padding:8px 6px;font-size:10px}
-  .language-box{gap:4px}
-  .language-box label{display:none}
-  .language-select{max-width:83px;padding:8px 4px;font-size:9px}
-  .theme-toggle{padding:5px 7px 5px 5px;gap:5px;min-height:35px}
-  .theme-track{width:37px;height:23px}
-  .theme-thumb{width:15px;height:15px}
-  .theme-toggle[aria-pressed="true"] .theme-thumb{transform:translateX(13px)}
-  .theme-label{font-size:8px;min-width:42px}
-  .hero{padding-top:24px}
-  .banner-heading{display:block;padding:19px}
-  .banner-heading p{margin-top:10px}
-  .player-strip{grid-template-columns:repeat(7,155px)}
-  .player-card{height:245px}
-  .player-label{font-size:15px}
-  .breaking span{font-size:10px}
-  .section-head h2{font-size:23px}
-  .news-grid{gap:10px}
-  .news-card{flex-basis:82%}
-  .thumb{height:160px}
-  .news-body{padding:14px}
-  .news-body h3{font-size:16px}
-  .news-body p{font-size:11px}
-  .carousel-button{width:32px;height:32px}
-  .lower{grid-template-columns:1fr}
-  .newsletter{align-items:flex-start;flex-direction:column;padding:22px}
-  .signup{width:100%;min-width:0}
-  .foot{align-items:flex-start;flex-direction:column}
-  .fb-panel{padding:15px}
-  .fb-frame{height:560px}
-}
-@media(max-width:390px){
-  .nav{gap:6px}
-  .brand{font-size:17px;gap:5px}
-  .verified{width:15px;height:15px;font-size:10px}
-  .search{width:75px;padding:8px 5px}
-  .player-strip{grid-template-columns:repeat(7,142px)}
-  .theme-toggle{padding:5px 5px 5px 4px;gap:4px}
-  .theme-label{font-size:7px;min-width:36px}
-  .theme-track{width:33px}
-  .theme-toggle[aria-pressed="true"] .theme-thumb{transform:translateX(9px)}
-  .language-select{max-width:72px;font-size:8px}
-}
-@media(prefers-reduced-motion:reduce){
-  html,.news-grid,.player-strip{scroll-behavior:auto}
-  .site-loader,.loader-content,.loader-line span,.topline,header,main,footer,
-  .news-card,.carousel-button,.player-card img,.theme-toggle,.theme-thumb{
-    animation:none!important;transition:none!important
-  }
-}
+.breaking{margin:10px 0 32px;background:var(--panel);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;overflow:hidden}.breaking strong{background:var(--blue);padding:13px 17px;font-size:10px;letter-spacing:.12em;white-space:nowrap}.breaking span{padding:0 16px;color:#d6deea;font-size:12px}
+.section{padding:25px 0 40px}.section-head{display:flex;align-items:end;justify-content:space-between;gap:18px;margin-bottom:19px}.section-head h2{font-size:26px;letter-spacing:-.8px;margin:4px 0 0}.section-head p{margin:4px 0 0;color:var(--muted);font-size:13px}.text-link{font-size:11px;color:var(--cyan);font-weight:900;text-transform:uppercase;letter-spacing:.09em}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:19px}.filter{border:1px solid #34465e;background:#131e2e;color:#c0ccdc;padding:8px 14px;border-radius:30px;font-size:11px;font-weight:850}.filter.active,.filter:hover{background:var(--blue);border-color:var(--blue);color:#fff}
+.news-grid{display:flex;gap:17px;overflow-x:auto;overflow-y:hidden;padding:3px 2px 15px;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch}.news-grid::-webkit-scrollbar{display:none}.news-card{display:block;flex:0 0 calc((100% - 34px)/3);min-width:0;background:var(--panel);border:1px solid #29384c;border-radius:12px;overflow:hidden;scroll-snap-align:start;transition:transform .2s,border-color .2s;box-shadow:0 8px 24px #0002}.news-card:hover{transform:translateY(-3px);border-color:#668ab7}.news-card:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}.thumb{height:190px;background:#1b293c center/cover}.news-body{padding:17px}.news-body .meta{font-size:10px;color:var(--cyan);font-weight:900;letter-spacing:.1em;text-transform:uppercase}.news-body h3{font-size:18px;line-height:1.25;margin:9px 0;color:#f5f7fb}.news-body p{font-size:12px;color:var(--muted);margin:0 0 15px}.news-body .date{font-size:10px;color:#8594a9;font-weight:800}.carousel-controls{display:flex;justify-content:flex-end;align-items:center;gap:9px;margin:0 2px 12px}.carousel-button{width:34px;height:34px;display:grid;place-items:center;border:1px solid #405875;background:var(--panel);color:var(--text);border-radius:50%;font-size:17px;font-weight:800}.carousel-button:hover{background:var(--blue);color:#fff}.carousel-button:disabled{opacity:.35;cursor:not-allowed}.carousel-status{color:var(--muted);font-size:10px;font-weight:800;min-width:48px;text-align:center}.empty{display:none;padding:26px;color:var(--muted);text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:9px;margin-top:15px}
+.fb-panel,.panel{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:22px;box-shadow:0 8px 24px #0002}.fb-heading{display:flex;align-items:center;gap:13px;margin-bottom:8px}.fb-mark{width:48px;height:48px;border-radius:10px;background:#142943;border:1px solid #405875;display:grid;place-items:center;font-size:12px;font-weight:950;line-height:1.1;text-align:center}.fb-panel h2{margin:5px 0;font-size:23px}.fb-panel p{margin:0 0 14px;color:var(--muted);font-size:13px}.fb-open{display:inline-block;margin-bottom:15px;color:var(--cyan);font-size:11px;font-weight:850;text-decoration:underline}.fb-frame{width:100%;height:620px;border:0;display:block;background:#fff;border-radius:8px}
+.lower{display:grid;grid-template-columns:1.35fr .85fr;gap:18px}.panel h2{font-size:21px;margin:0 0 16px}.fixture{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:14px 0;border-bottom:1px solid #2b394d}.fixture:last-child{border:0}.team{font-size:12px;font-weight:850}.team:last-child{text-align:right}.team small{display:block;color:#8998ad;font-size:10px;font-weight:600;margin-top:3px}.vs{color:var(--gold);font-size:9px;font-weight:900;white-space:nowrap}.standings{width:100%;border-collapse:collapse;font-size:11px}.standings th{text-align:left;color:#91a0b5;font-size:9px;text-transform:uppercase;padding:8px 5px;border-bottom:1px solid #344258}.standings td{padding:11px 5px;border-bottom:1px solid #29384c}.standings td:last-child,.standings th:last-child{text-align:right}.placeholder{color:#94a2b6;font-size:12px;line-height:1.65;margin-top:16px}
+.newsletter{margin:28px 0 46px;padding:30px;border-radius:13px;border:1px solid #354e6c;background:linear-gradient(115deg,#142a45,#111c2c 70%);display:flex;align-items:center;justify-content:space-between;gap:24px}.newsletter h2{margin:5px 0;font-size:24px}.newsletter p{margin:0;color:#b7c4d5;font-size:12px}.signup{display:flex;gap:8px;min-width:330px}.signup input{min-width:0;flex:1;background:#0b1422;border:1px solid #3a506b;color:white;border-radius:7px;padding:11px 12px}.signup button{border:0;background:var(--blue);color:#fff;border-radius:7px;padding:0 16px;font-weight:900;font-size:10px}
+footer{border-top:1px solid #263449;background:#070c14;padding:29px 0;color:#8998ad;font-size:11px}.foot{display:flex;justify-content:space-between;gap:18px;align-items:center}.foot .brand{font-size:20px;color:#fff}.footlinks{display:flex;gap:18px;flex-wrap:wrap}.footlinks a:hover{color:var(--cyan)}
+/* Light theme */
+body.light-mode{--bg:#f1f4f8;--panel:#fff;--line:#dce3ec;--text:#1c2939;--muted:#66758a;background:var(--bg);color:var(--text)}body.light-mode header{background:#fffffff7;border-color:#dce3ec}body.light-mode .brand .mark{color:#172438}body.light-mode nav{color:#42516a}body.light-mode .topline,body.light-mode footer{background:#e7edf4;color:#526078}body.light-mode .ticker{color:#1c2939}body.light-mode .search,body.light-mode .signup input,body.light-mode .language-select{background:#fff;color:#1c2939;border-color:#cbd5e1}body.light-mode .theme-toggle,body.light-mode .menu{background:linear-gradient(135deg,#fff,#edf3fa);color:#25374d;border-color:#cbd5e1}body.light-mode .theme-track{background:#dce9f8}body.light-mode .theme-thumb{background:#fff;color:#245d9d}body.light-mode .news-card,body.light-mode .panel,body.light-mode .empty,body.light-mode .fb-panel,body.light-mode .carousel-button{background:#fff;color:#1c2939;border-color:#dce3ec}body.light-mode .news-body h3,body.light-mode .section-head h2,body.light-mode .panel h2,body.light-mode .fb-panel h2{color:#1c2939}body.light-mode .news-body p,body.light-mode .section-head p,body.light-mode .placeholder,body.light-mode .fb-panel p{color:#66758a}body.light-mode .fixture,body.light-mode .standings td{border-color:#e3e8ef}body.light-mode .standings th{border-color:#dce3ec;color:#78869a}body.light-mode .filter{background:#fff;color:#42516a;border-color:#d3dce7}body.light-mode .filter.active{background:var(--blue);color:#fff}body.light-mode .breaking{background:#fff}body.light-mode .breaking span{color:#42516a}body.light-mode .newsletter{background:linear-gradient(115deg,#e5edf7,#fff 70%);border-color:#d4deea}body.light-mode .newsletter p{color:#66758a}body.light-mode .foot .brand{color:#1c2939}body.light-mode .banner-heading{background:linear-gradient(110deg,#e5edf7,#fff)}body.light-mode .banner-heading p{color:#526078}
+@media(max-width:1000px){nav{gap:13px;font-size:11px}.search{width:140px}.news-card{flex-basis:calc((100% - 17px)/2)}}
+@media(max-width:720px){.wrap{width:calc(100% - 24px)}.topline .wrap{font-size:9px}.nav{min-height:66px;justify-content:flex-start;gap:9px}.menu{display:block;flex-shrink:0}.brand{font-size:19px;flex-shrink:0}.navright{margin-left:auto;gap:5px;min-width:0}.nav nav{display:none;position:absolute;top:66px;left:0;right:0;background:#0d1727;border-bottom:1px solid var(--line);padding:17px 20px;flex-direction:column;align-items:flex-start;gap:17px}.nav.open nav{display:flex}body.light-mode .nav nav{background:#fff}.search{width:90px;padding:8px 6px;font-size:10px}.language-box label{display:none}.language-select{max-width:78px;padding:8px 4px;font-size:9px}.theme-toggle{padding:5px 7px 5px 5px;gap:5px;min-height:35px}.theme-track{width:37px;height:23px}.theme-thumb{width:15px;height:15px}.theme-toggle[aria-pressed=true] .theme-thumb{transform:translateX(13px)}.theme-label{font-size:8px;min-width:42px}.hero{padding-top:24px}.banner-heading{display:block;padding:19px}.banner-heading p{margin-top:10px}.player-strip{height:285px}.player-card{inset:6px}.player-label{font-size:17px}.breaking span{font-size:10px}.section-head h2{font-size:23px}.news-grid{gap:10px}.news-card{flex-basis:82%}.thumb{height:160px}.news-body{padding:14px}.news-body h3{font-size:16px}.news-body p{font-size:11px}.lower{grid-template-columns:1fr}.newsletter{align-items:flex-start;flex-direction:column;padding:22px}.signup{width:100%;min-width:0}.foot{align-items:flex-start;flex-direction:column}.fb-panel{padding:15px}.fb-frame{height:560px}}
+@media(max-width:390px){.nav{gap:6px}.brand{font-size:17px;gap:5px}.verified{width:15px;height:15px;font-size:10px}.search{width:72px;padding:8px 5px}.player-strip{height:260px}.theme-toggle{padding:5px 5px 5px 4px;gap:4px}.theme-label{font-size:7px;min-width:36px}.theme-track{width:33px}.theme-toggle[aria-pressed=true] .theme-thumb{transform:translateX(9px)}.language-select{max-width:68px;font-size:8px}}
+@media(prefers-reduced-motion:reduce){html,.news-grid{scroll-behavior:auto}.loader-line span{animation:none}.news-card,.theme-thumb,.player-card{transition:none}}
 </style>
 </head>
-
 <body>
-<div class="site-loader" id="siteLoader">
-  <div class="loader-content">
-    <div class="loader-brand">wf_pundit <span class="verified">✓</span></div>
-    <div class="loader-line"><span></span></div>
-    <p>THE WOMEN'S GAME. EVERY STORY MATTERS.</p>
-  </div>
-</div>
-
-<div class="topline">
-  <div class="wrap">
-    <div class="ticker"><b>WF PUNDIT</b> THE HOME OF WOMEN'S FOOTBALL</div>
-    <div>NEWS · TRANSFERS · MATCHDAY · ANALYSIS</div>
-  </div>
-</div>
-
-<header>
-<div class="wrap nav" id="nav">
-  <button class="menu" id="menu" type="button" aria-label="Toggle menu" aria-expanded="false">☰</button>
-  <a class="brand" href="#home"><span class="mark">wf_pundit</span><span class="verified">✓</span></a>
-
-  <nav id="links">
-    <a class="active" href="#home">Home</a>
-    <a href="#latest">Latest news</a>
-    <a href="#facebook">Facebook</a>
-    <a href="#competitions">Competitions</a>
-    <a href="#matchday">Matchday</a>
-    <a href="#about">About</a>
-  </nav>
-
-  <div class="navright">
-    <input class="search" id="search" type="search" placeholder="Search stories…" aria-label="Search stories">
-    <div class="language-box">
-      <label for="languageSelect">LANGUAGE</label>
-      <select class="language-select" id="languageSelect" aria-label="Translate website">
-        <option value="en">🌐 English</option>
-        <option value="fr">🇫🇷 French</option>
-        <option value="es">🇪🇸 Spanish</option>
-        <option value="pt">🇵🇹 Portuguese</option>
-        <option value="de">🇩🇪 German</option>
-        <option value="it">🇮🇹 Italian</option>
-        <option value="nl">🇳🇱 Dutch</option>
-        <option value="ar">🇸🇦 Arabic</option>
-        <option value="ha">Hausa</option>
-        <option value="yo">Yoruba</option>
-        <option value="ig">Igbo</option>
-        <option value="sw">Swahili</option>
-        <option value="zh-CN">🇨🇳 Chinese</option>
-        <option value="ja">🇯🇵 Japanese</option>
-        <option value="ko">🇰🇷 Korean</option>
-        <option value="hi">Hindi</option>
-        <option value="tr">🇹🇷 Turkish</option>
-        <option value="ru">🇷🇺 Russian</option>
-      </select>
-    </div>
-    <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false">
-      <span class="theme-track"><span class="theme-thumb" id="themeIcon">☀</span></span>
-      <span class="theme-label" id="themeLabel">Light Mode</span>
-    </button>
-  </div>
-</div>
-</header>
-
+<div class="site-loader" id="siteLoader"><div class="loader-content"><div class="loader-brand">wf_pundit <span class="verified">✓</span></div><div class="loader-line"><span></span></div><p>THE WOMEN'S GAME. EVERY STORY MATTERS.</p></div></div>
+<div class="topline"><div class="wrap"><div class="ticker"><b>WF PUNDIT</b> THE HOME OF WOMEN'S FOOTBALL</div><div>NEWS · TRANSFERS · MATCHDAY · ANALYSIS</div></div></div>
+<header><div class="wrap nav" id="nav">
+<button class="menu" id="menu" type="button" aria-label="Open navigation menu" aria-expanded="false">☰</button>
+<a class="brand" href="#home"><span class="mark">wf_pundit</span><span class="verified">✓</span></a>
+<nav id="links"><a class="active" href="#home">Home</a><a href="#latest">Latest news</a><a href="#facebook">Facebook</a><a href="#competitions">Competitions</a><a href="#matchday">Matchday</a><a href="#about">About</a></nav>
+<div class="navright"><input class="search" id="search" type="search" placeholder="Search stories…" aria-label="Search stories">
+<div class="language-box"><label for="languageSelect">LANGUAGE</label><select class="language-select" id="languageSelect" aria-label="Translate website">
+<option value="en">🌐 English</option><option value="fr">🇫🇷 French</option><option value="es">🇪🇸 Spanish</option><option value="pt">🇵🇹 Portuguese</option><option value="de">🇩🇪 German</option><option value="it">🇮🇹 Italian</option><option value="nl">🇳🇱 Dutch</option><option value="ar">🇸🇦 Arabic</option><option value="ha">Hausa</option><option value="yo">Yoruba</option><option value="ig">Igbo</option><option value="sw">Swahili</option><option value="zh-CN">🇨🇳 Chinese</option><option value="ja">🇯🇵 Japanese</option><option value="ko">🇰🇷 Korean</option><option value="hi">Hindi</option><option value="tr">🇹🇷 Turkish</option><option value="ru">🇷🇺 Russian</option></select></div>
+<button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false"><span class="theme-track"><span class="theme-thumb" id="themeIcon">☀</span></span><span class="theme-label" id="themeLabel">Light Mode</span></button>
+</div></div></header>
 <main id="home">
-<div class="wrap hero">
-  <div class="section-kicker">The women's game. Every angle.</div>
-  <section class="player-banner" aria-label="Featured women's football players">
-    <div class="banner-heading">
-      <div>
-        <div class="section-kicker">WF Pundit · Women's football</div>
-        <h1>THE WOMEN'S GAME.<br>FRONT AND CENTRE.</h1>
-      </div>
-      <p>From the WSL to the world stage, celebrating the players shaping the game.</p>
-    </div>
-
-    <div class="player-strip" id="playerStrip">
-      <a class="player-card" href="https://www.arsenal.com/women/players/alessia-russo" target="_blank" rel="noopener noreferrer" aria-label="View Alessia Russo at Arsenal">
-        <img src="https://cdn.media.amplience.net/i/ArsenalDirect/Russo_2026_sbp?%24sbp-page-heroimage-small-6024%24=&fmt=jpg" alt="Alessia Russo of Arsenal" loading="eager" decoding="async">
-        <span class="player-label">Alessia Russo<small>Arsenal · England</small></span>
-      </a>
-
-      <a class="player-card" href="https://www.chelseafc.com/en/teams/profile/hannah-hampton" target="_blank" rel="noopener noreferrer" aria-label="View Hannah Hampton at Chelsea">
-        <img src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png" alt="Hannah Hampton of Chelsea" loading="eager" decoding="async">
-        <span class="player-label">Hannah Hampton<small>Chelsea · England</small></span>
-      </a>
-
-      <a class="player-card" href="https://www.londoncitylionesses.com/squad/alexia-putellas" target="_blank" rel="noopener noreferrer" aria-label="View Alexia Putellas at London City Lionesses">
-        <img src="https://static.wixstatic.com/media/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg/v1/fill/w_640%2Ch_429%2Cal_t%2Cq_90/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg" alt="Alexia Putellas of London City Lionesses" loading="eager" decoding="async">
-        <span class="player-label">Alexia Putellas<small>London City Lionesses · Spain</small></span>
-      </a>
-
-      <a class="player-card" href="https://www.fcbarcelona.com/en/football/womens-football/players" target="_blank" rel="noopener noreferrer" aria-label="View Aitana Bonmatí at Barcelona">
-        <img src="https://www.fcbarcelona.com/photo-resources/2025/09/10/e09695b4-8d3c-411e-864a-0bc580d3aa81/14_Aitana.jpg?height=600&width=600" alt="Aitana Bonmatí of Barcelona" loading="eager" decoding="async">
-        <span class="player-label">Aitana Bonmatí<small>Barcelona · Spain</small></span>
-      </a>
-
-      <a class="player-card" href="https://www.realmadrid.com/en-US/football/womens-team/players/linda-caicedo-alegria" target="_blank" rel="noopener noreferrer" aria-label="View Linda Caicedo at Real Madrid">
-        <img src="https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/vaikl8nl7hdr4y9jj4jyb9ey/players/linda-caicedo-alegria/caritas-26-27/LINDA_EQUIPO_CARITA_550X650.png" alt="Linda Caicedo of Real Madrid" loading="eager" decoding="async">
-        <span class="player-label">Linda Caicedo<small>Real Madrid · Colombia</small></span>
-      </a>
-
-      <a class="player-card" href="https://washingtonspirit.com/team-member/trinity-rodman/" target="_blank" rel="noopener noreferrer" aria-label="View Trinity Rodman at Washington Spirit">
-        <img src="https://washingtonspirit.com/wp-content/uploads/2023/04/02192026_rodmantrinity_cc_0016_2_2x-1-1.webp" alt="Trinity Rodman of Washington Spirit" loading="eager" decoding="async">
-        <span class="player-label">Trinity Rodman<small>Washington Spirit · USA</small></span>
-      </a>
-
-      <a class="player-card" href="https://fcbayern.com/frauen/en/teams/first-team/klara-buehl" target="_blank" rel="noopener noreferrer" aria-label="View Klara Bühl at Bayern Munich">
-        <img src="https://assets.dfb.de/uploads/000/326/106/custom_style_1_Klara_Buehl.jpg?1762355634" alt="Klara Bühl of Bayern Munich" loading="eager" decoding="async">
-        <span class="player-label">Klara Bühl<small>Bayern Munich · Germany</small></span>
-      </a>
-    </div>
-  </section>
-</div>
-
-<div class="wrap">
-  <div class="breaking">
-    <strong>WF PUNDIT</strong>
-    <span>Women's football news, features and match coverage — all in one place.</span>
-  </div>
-</div>
-
-<section class="wrap section" id="latest">
-  <div class="section-head">
-    <div>
-      <div class="section-kicker">Stay in the know</div>
-      <h2>Latest women's football news</h2>
-      <p>Published stories from the WF Pundit newsroom.</p>
-    </div>
-    <a class="text-link" href="#latest">All stories ↗</a>
-  </div>
-
-  <div class="filters" id="filters">
-    <button class="filter active" data-filter="all" type="button">All stories</button>
-    <button class="filter" data-filter="wsl" type="button">WSL</button>
-    <button class="filter" data-filter="uwcl" type="button">UWCL</button>
-    <button class="filter" data-filter="transfers" type="button">Transfers</button>
-    <button class="filter" data-filter="international" type="button">International</button>
-    <button class="filter" data-filter="analysis" type="button">Analysis</button>
-  </div>
-
-  <div class="news-carousel">
-    <div class="carousel-controls">
-      <button class="carousel-button" id="newsPrev" type="button" aria-label="Previous stories">‹</button>
-      <span class="carousel-status" id="carouselStatus">0 / 0</span>
-      <button class="carousel-button" id="newsNext" type="button" aria-label="Next stories">›</button>
-    </div>
-    <div class="news-grid" id="newsGrid" aria-label="Latest published news stories"></div>
-  </div>
-  <div class="empty" id="empty">No published stories yet. New WF Pundit articles will appear here.</div>
-</section>
-
-<section class="wrap section fb-section" id="facebook">
-  <div class="fb-panel">
-    <div class="fb-heading">
-      <div class="fb-mark">WF<br>PUNDIT</div>
-      <div>
-        <div class="section-kicker">Official page</div>
-        <h2>WF Pundit on Facebook</h2>
-      </div>
-    </div>
-    <p>Follow the page for women's football updates and matchday coverage.</p>
-    <a class="fb-open" href="https://www.facebook.com/wfpundit" target="_blank" rel="noopener">Visit the WF Pundit Facebook page ↗</a>
-    <iframe class="fb-frame" title="WF Pundit Facebook Page" src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fwfpundit&tabs=timeline&width=500&height=620&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true" scrolling="no" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen="true"></iframe>
-  </div>
-</section>
-
-<section class="wrap section" id="matchday">
-  <div class="section-head">
-    <div>
-      <div class="section-kicker">Follow the action</div>
-      <h2>Matchday centre</h2>
-      <p>Fixtures, results and competition updates.</p>
-    </div>
-  </div>
-
-  <div class="lower">
-    <div class="panel">
-      <h2>Fixtures & results</h2>
-      <div class="fixture">
-        <div class="team">WSL clubs<small>Barclays Women's Super League</small></div>
-        <div class="vs">NOT CONNECTED</div>
-        <div class="team">Match centre<small>England</small></div>
-      </div>
-      <div class="fixture">
-        <div class="team">European clubs<small>UEFA Women's Champions League</small></div>
-        <div class="vs">NOT CONNECTED</div>
-        <div class="team">Match centre<small>Europe</small></div>
-      </div>
-      <div class="fixture">
-        <div class="team">Liga F clubs<small>Spanish women's league</small></div>
-        <div class="vs">NOT CONNECTED</div>
-        <div class="team">Match centre<small>Spain</small></div>
-      </div>
-      <div class="fixture">
-        <div class="team">NWSL clubs<small>National Women's Soccer League</small></div>
-        <div class="vs">NOT CONNECTED</div>
-        <div class="team">Match centre<small>United States</small></div>
-      </div>
-      <div class="fixture">
-        <div class="team">Frauen-Bundesliga<small>German women's league</small></div>
-        <div class="vs">NOT CONNECTED</div>
-        <div class="team">Match centre<small>Germany</small></div>
-      </div>
-      <p class="placeholder">Live scores and verified fixture information are not connected yet. No live results are displayed here.</p>
-    </div>
-
-    <div class="panel" id="competitions">
-      <h2>Competitions</h2>
-      <table class="standings">
-        <thead><tr><th>Competition</th><th>Country</th></tr></thead>
-        <tbody>
-          <tr><td>Barclays WSL</td><td>England</td></tr>
-          <tr><td>UEFA Women's Champions League</td><td>Europe</td></tr>
-          <tr><td>Liga F</td><td>Spain</td></tr>
-          <tr><td>NWSL</td><td>USA</td></tr>
-          <tr><td>Frauen-Bundesliga</td><td>Germany</td></tr>
-        </tbody>
-      </table>
-      <p class="placeholder">Competition tables and live standings will be added when a verified football data feed is connected.</p>
-    </div>
-  </div>
-</section>
-
-<div class="wrap">
-  <section class="newsletter" id="about">
-    <div>
-      <div class="section-kicker">Stay connected</div>
-      <h2>Women's football, straight to your feed.</h2>
-      <p>WF Pundit brings you the stories, updates and moments that matter.</p>
-    </div>
-    <form class="signup" id="signup">
-      <input type="email" placeholder="Email address" aria-label="Email address" required>
-      <button type="submit">COMING SOON</button>
-    </form>
-  </section>
-</div>
+<div class="wrap hero"><div class="section-kicker">The women's game. Every angle.</div>
+<section class="player-banner" aria-label="Featured women's football players">
+<div class="banner-heading"><div><div class="section-kicker">WF Pundit · Women's football</div><h1>THE WOMEN'S GAME.<br>FRONT AND CENTRE.</h1></div><p>From the WSL to the world stage, celebrating the players shaping the game.</p></div>
+<div class="player-strip" id="playerStrip" aria-label="Featured player portraits">
+<a class="player-card" href="https://www.arsenal.com/women/players/alessia-russo" target="_blank" rel="noopener noreferrer" aria-label="View Alessia Russo at Arsenal"><img src="https://cdn.media.amplience.net/i/ArsenalDirect/Russo_2026_sbp?%24sbp-page-heroimage-small-6024%24=&fmt=jpg" alt="Alessia Russo" loading="eager" decoding="async"><span class="player-label">Alessia Russo<small>Arsenal · England</small></span></a>
+<a class="player-card" href="https://www.chelseafc.com/en/teams/profile/hannah-hampton" target="_blank" rel="noopener noreferrer" aria-label="View Hannah Hampton at Chelsea"><img src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png" alt="Hannah Hampton" loading="eager" decoding="async"><span class="player-label">Hannah Hampton<small>Chelsea · England</small></span></a>
+<a class="player-card" href="https://www.londoncitylionesses.com/squad/alexia-putellas" target="_blank" rel="noopener noreferrer" aria-label="View Alexia Putellas at London City Lionesses"><img src="https://static.wixstatic.com/media/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg/v1/fill/w_640%2Ch_429%2Cal_t%2Cq_90/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg" alt="Alexia Putellas" loading="eager" decoding="async"><span class="player-label">Alexia Putellas<small>London City Lionesses · Spain</small></span></a>
+<a class="player-card" href="https://www.fcbarcelona.com/en/football/womens-football/players" target="_blank" rel="noopener noreferrer" aria-label="View Aitana Bonmatí at Barcelona"><img src="https://www.fcbarcelona.com/photo-resources/2025/09/10/e09695b4-8d3c-411e-864a-0bc580d3aa81/14_Aitana.jpg?height=600&width=600" alt="Aitana Bonmatí" loading="eager" decoding="async"><span class="player-label">Aitana Bonmatí<small>Barcelona · Spain</small></span></a>
+<a class="player-card" href="https://www.realmadrid.com/en-US/football/womens-team/players/linda-caicedo-alegria" target="_blank" rel="noopener noreferrer" aria-label="View Linda Caicedo at Real Madrid"><img src="https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/vaikl8nl7hdr4y9jj4jyb9ey/players/linda-caicedo-alegria/caritas-26-27/LINDA_EQUIPO_CARITA_550X650.png" alt="Linda Caicedo" loading="eager" decoding="async"><span class="player-label">Linda Caicedo<small>Real Madrid · Colombia</small></span></a>
+<a class="player-card" href="https://washingtonspirit.com/team-member/trinity-rodman/" target="_blank" rel="noopener noreferrer" aria-label="View Trinity Rodman at Washington Spirit"><img src="https://washingtonspirit.com/wp-content/uploads/2023/04/02192026_rodmantrinity_cc_0016_2_2x-1-1.webp" alt="Trinity Rodman" loading="eager" decoding="async"><span class="player-label">Trinity Rodman<small>Washington Spirit · USA</small></span></a>
+<a class="player-card" href="https://fcbayern.com/frauen/en/teams/first-team/pernille-harder" target="_blank" rel="noopener noreferrer" aria-label="View Pernille Harder at Bayern Munich"><img src="https://img.fcbayern.com/image/upload/f_auto/q_auto/ar_1%3A1%2Cc_fill%2Cg_custom%3Aface%2Cw_768/v1785325962/cms/public/images/fcbayern-com/spielerinnen/portrait/Profilbilder/Profilbild_Harder_Pernille.png" alt="Pernille Harder of Bayern Munich" loading="eager" decoding="async"><span class="player-label">Pernille Harder<small>Bayern Munich · Denmark</small></span></a>
+</div><div class="player-controls" aria-label="Player photo controls"><button id="playerPrev" type="button" aria-label="Previous player">‹</button><span class="player-status" id="playerStatus">1 / 7</span><button id="playerNext" type="button" aria-label="Next player">›</button></div></section></div>
+<div class="wrap"><div class="breaking"><strong>WF PUNDIT</strong><span>Women's football news, features and match coverage — all in one place.</span></div></div>
+<section class="wrap section" id="latest"><div class="section-head"><div><div class="section-kicker">Stay in the know</div><h2>Latest women's football news</h2><p>Published stories from the WF Pundit newsroom.</p></div><a class="text-link" href="#latest">All stories ↗</a></div>
+<div class="filters" id="filters"><button class="filter active" data-filter="all" type="button">All stories</button><button class="filter" data-filter="wsl" type="button">WSL</button><button class="filter" data-filter="uwcl" type="button">UWCL</button><button class="filter" data-filter="transfers" type="button">Transfers</button><button class="filter" data-filter="international" type="button">International</button><button class="filter" data-filter="analysis" type="button">Analysis</button></div>
+<div class="carousel-controls"><button class="carousel-button" id="newsPrev" type="button" aria-label="Previous stories">‹</button><span class="carousel-status" id="carouselStatus">0 / 0</span><button class="carousel-button" id="newsNext" type="button" aria-label="Next stories">›</button></div><div class="news-grid" id="newsGrid" aria-label="Latest published news stories"></div><div class="empty" id="empty">No published stories yet. New WF Pundit articles will appear here.</div></section>
+<section class="wrap section" id="facebook"><div class="fb-panel"><div class="fb-heading"><div class="fb-mark">WF<br>PUNDIT</div><div><div class="section-kicker">Official page</div><h2>WF Pundit on Facebook</h2></div></div><p>Follow the page for women's football updates and matchday coverage.</p><a class="fb-open" href="https://www.facebook.com/wfpundit" target="_blank" rel="noopener">Visit the WF Pundit Facebook page ↗</a><iframe class="fb-frame" title="WF Pundit Facebook Page" src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2Fwfpundit&tabs=timeline&width=500&height=620&small_header=false&adapt_container_width=true&hide_cover=false&show_facepile=true" scrolling="no" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen="true"></iframe></div></section>
+<section class="wrap section" id="matchday"><div class="section-head"><div><div class="section-kicker">Follow the action</div><h2>Matchday centre</h2><p>Fixtures, results and competition updates.</p></div></div><div class="lower">
+<div class="panel"><h2>Fixtures & results</h2><div class="fixture"><div class="team">WSL clubs<small>Barclays Women's Super League</small></div><div class="vs">NOT CONNECTED</div><div class="team">Match centre<small>England</small></div></div><div class="fixture"><div class="team">European clubs<small>UEFA Women's Champions League</small></div><div class="vs">NOT CONNECTED</div><div class="team">Match centre<small>Europe</small></div></div><div class="fixture"><div class="team">Liga F clubs<small>Spanish women's league</small></div><div class="vs">NOT CONNECTED</div><div class="team">Match centre<small>Spain</small></div></div><div class="fixture"><div class="team">NWSL clubs<small>National Women's Soccer League</small></div><div class="vs">NOT CONNECTED</div><div class="team">Match centre<small>United States</small></div></div><div class="fixture"><div class="team">Frauen-Bundesliga<small>German women's league</small></div><div class="vs">NOT CONNECTED</div><div class="team">Match centre<small>Germany</small></div></div><p class="placeholder">Live scores and verified fixture information are not connected yet. No live results are displayed here.</p></div>
+<div class="panel" id="competitions"><h2>Competitions</h2><table class="standings"><thead><tr><th>Competition</th><th>Country</th></tr></thead><tbody><tr><td>Barclays WSL</td><td>England</td></tr><tr><td>UEFA Women's Champions League</td><td>Europe</td></tr><tr><td>Liga F</td><td>Spain</td></tr><tr><td>NWSL</td><td>USA</td></tr><tr><td>Frauen-Bundesliga</td><td>Germany</td></tr></tbody></table><p class="placeholder">Competition tables and live standings will be added when a verified football data feed is connected.</p></div></div></section>
+<div class="wrap"><section class="newsletter" id="about"><div><div class="section-kicker">Stay connected</div><h2>Women's football, straight to your feed.</h2><p>WF Pundit brings you the stories, updates and moments that matter.</p></div><form class="signup" id="signup"><input type="email" placeholder="Email address" aria-label="Email address" required><button type="submit">COMING SOON</button></form></section></div>
 </main>
-
-<footer>
-  <div class="wrap foot">
-    <div>
-      <div class="brand"><span>wf_pundit</span><span class="verified">✓</span></div>
-      <div style="margin-top:7px">Women's football. Every story matters.</div>
-    </div>
-    <div class="footlinks">
-      <a href="#latest">News</a>
-      <a href="#facebook">Facebook</a>
-      <a href="#competitions">Competitions</a>
-      <a href="#matchday">Matchday</a>
-      <a href="#about">About</a>
-    </div>
-    <div>© <span id="year"></span> WF Pundit</div>
-  </div>
-</footer>
-
+<footer><div class="wrap foot"><div><div class="brand"><span>wf_pundit</span><span class="verified">✓</span></div><div style="margin-top:7px">Women's football. Every story matters.</div></div><div class="footlinks"><a href="#latest">News</a><a href="#facebook">Facebook</a><a href="#competitions">Competitions</a><a href="#matchday">Matchday</a><a href="#about">About</a></div><div>© <span id="year"></span> WF Pundit</div></div></footer>
 <script>
-const filters=[...document.querySelectorAll('.filter')];
-const search=document.getElementById('search');
-const empty=document.getElementById('empty');
-const newsGrid=document.getElementById('newsGrid');
-const newsPrev=document.getElementById('newsPrev');
-const newsNext=document.getElementById('newsNext');
-const carouselStatus=document.getElementById('carouselStatus');
+const $=s=>document.querySelector(s);
+const filters=[...document.querySelectorAll('.filter')],search=$('#search'),empty=$('#empty'),newsGrid=$('#newsGrid'),newsPrev=$('#newsPrev'),newsNext=$('#newsNext'),carouselStatus=$('#carouselStatus');
+let active='all',newsAutoTimer=null,userInteracting=false,feedMessage='No published stories yet. New WF Pundit articles will appear here.';
+function visibleNewsCards(){return [...newsGrid.querySelectorAll('.news-card')].filter(c=>c.style.display!=='none')}
+function newsStep(){const c=visibleNewsCards();return c.length?c[0].getBoundingClientRect().width+(parseFloat(getComputedStyle(newsGrid).gap)||17):0}
+function updateCarouselControls(){const c=visibleNewsCards(),n=c.length;if(!n){carouselStatus.textContent='0 / 0';newsPrev.disabled=newsNext.disabled=true;return}carouselStatus.textContent=Math.min(Math.round(newsGrid.scrollLeft/Math.max(newsStep(),1))+1,n)+' / '+n;newsPrev.disabled=newsNext.disabled=n<2}
+function moveNews(d){const step=newsStep(),cards=visibleNewsCards();if(!step||cards.length<2)return;const max=newsGrid.scrollWidth-newsGrid.clientWidth;if(d>0&&newsGrid.scrollLeft>=max-8)newsGrid.scrollTo({left:0,behavior:'smooth'});else if(d<0&&newsGrid.scrollLeft<=4)newsGrid.scrollTo({left:max,behavior:'smooth'});else newsGrid.scrollBy({left:step*d,behavior:'smooth'})}
+function stopNewsAuto(){clearInterval(newsAutoTimer)}
+function startNewsAuto(){stopNewsAuto();if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;newsAutoTimer=setInterval(()=>{if(userInteracting||document.hidden)return;const c=visibleNewsCards();if(c.length<2)return;const max=newsGrid.scrollWidth-newsGrid.clientWidth;if(newsGrid.scrollLeft>=max-8)newsGrid.scrollTo({left:0,behavior:'smooth'});else newsGrid.scrollBy({left:newsStep(),behavior:'smooth'})},4500)}
+function pauseNews(){userInteracting=true;stopNewsAuto()}function resumeNews(){userInteracting=false;startNewsAuto()}
+function update(){const cards=newsGrid.querySelectorAll('.news-card'),q=search.value.trim().toLowerCase();let shown=0;if(!cards.length){empty.textContent=feedMessage;empty.style.display='block';newsGrid.scrollLeft=0;updateCarouselControls();return}cards.forEach(card=>{const cats=(card.dataset.category||'').split(' '),hay=((card.dataset.search||'')+' '+card.innerText).toLowerCase(),ok=(active==='all'||cats.includes(active))&&(!q||hay.includes(q));card.style.display=ok?'':'none';if(ok)shown++});empty.textContent='No published stories match that search. Try another keyword or category.';empty.style.display=shown?'none':'block';newsGrid.scrollTo({left:0,behavior:'auto'});updateCarouselControls();startNewsAuto()}
+filters.forEach(b=>b.addEventListener('click',()=>{filters.forEach(x=>x.classList.remove('active'));b.classList.add('active');active=b.dataset.filter;update()}));search.addEventListener('input',update);
+newsPrev.addEventListener('click',()=>{moveNews(-1);pauseNews();setTimeout(resumeNews,3500)});newsNext.addEventListener('click',()=>{moveNews(1);pauseNews();setTimeout(resumeNews,3500)});newsGrid.addEventListener('scroll',updateCarouselControls,{passive:true});newsGrid.addEventListener('pointerdown',pauseNews);newsGrid.addEventListener('pointerup',()=>setTimeout(resumeNews,2200));newsGrid.addEventListener('mouseenter',pauseNews);newsGrid.addEventListener('mouseleave',resumeNews);newsGrid.addEventListener('focusin',pauseNews);newsGrid.addEventListener('focusout',resumeNews);
+const menuButton=$('#menu'),navigation=$('#nav');menuButton.addEventListener('click',()=>{const open=navigation.classList.toggle('open');menuButton.setAttribute('aria-expanded',String(open));menuButton.textContent=open?'✕':'☰'});document.querySelectorAll('#links a').forEach(a=>a.addEventListener('click',()=>{navigation.classList.remove('open');menuButton.setAttribute('aria-expanded','false');menuButton.textContent='☰'}));
+$('#languageSelect').addEventListener('change',e=>{const lang=e.target.value;if(lang==='en')return;const url='https://translate.google.com/translate?sl=auto&tl='+encodeURIComponent(lang)+'&u='+encodeURIComponent(location.href);window.open(url,'_blank','noopener,noreferrer');e.target.value='en'});
+$('#signup').addEventListener('submit',e=>{e.preventDefault();alert('Thanks for your interest! Newsletter sign-up will be enabled when the site is connected to an email service.')});
+$('#year').textContent=new Date().getFullYear();
+const themeToggle=$('#themeToggle'),themeIcon=$('#themeIcon'),themeLabel=$('#themeLabel');function applyTheme(t){const light=t==='light';document.body.classList.toggle('light-mode',light);themeIcon.textContent=light?'☾':'☀';themeLabel.textContent=light?'Dark Mode':'Light Mode';themeToggle.setAttribute('aria-pressed',String(light));themeToggle.setAttribute('aria-label',light?'Switch to dark mode':'Switch to light mode');$('meta[name="theme-color"]').content=light?'#f1f4f8':'#0b1220'}let saved='dark';try{saved=localStorage.getItem('wf-theme')||'dark'}catch(e){}applyTheme(saved);themeToggle.addEventListener('click',()=>{const t=document.body.classList.contains('light-mode')?'dark':'light';try{localStorage.setItem('wf-theme',t)}catch(e){}applyTheme(t)});
 
-let active='all';
-let newsAutoTimer=null;
-let userInteracting=false;
-let feedMessage='No published stories yet. New WF Pundit articles will appear here.';
-
-function visibleNewsCards(){
-  return [...newsGrid.querySelectorAll('.news-card')].filter(card=>card.style.display!=='none');
-}
-
-function getNewsStep(){
-  const cards=visibleNewsCards();
-  if(!cards.length)return 0;
-  const gap=parseFloat(getComputedStyle(newsGrid).gap)||17;
-  return cards[0].getBoundingClientRect().width+gap;
-}
-
-function updateCarouselControls(){
-  const cards=visibleNewsCards();
-  const count=cards.length;
-  if(count===0){
-    carouselStatus.textContent='0 / 0';
-    newsPrev.disabled=true;
-    newsNext.disabled=true;
-    return;
-  }
-  const step=getNewsStep();
-  const position=Math.round(newsGrid.scrollLeft/Math.max(step,1))+1;
-  carouselStatus.textContent=Math.min(position,count)+' / '+count;
-  newsPrev.disabled=count<2;
-  newsNext.disabled=count<2;
-}
-
-function moveNews(direction){
-  const step=getNewsStep();
-  const cards=visibleNewsCards();
-  if(!step||cards.length<2)return;
-  const maxScroll=newsGrid.scrollWidth-newsGrid.clientWidth;
-  const atEnd=newsGrid.scrollLeft>=maxScroll-8;
-  const atStart=newsGrid.scrollLeft<=4;
-  if(direction>0&&atEnd){
-    newsGrid.scrollTo({left:0,behavior:'smooth'});
-  }else if(direction<0&&atStart){
-    newsGrid.scrollTo({left:maxScroll,behavior:'smooth'});
-  }else{
-    newsGrid.scrollBy({left:step*direction,behavior:'smooth'});
-  }
-}
-
-function stopNewsAutoScroll(){
-  clearInterval(newsAutoTimer);
-}
-
-function startNewsAutoScroll(){
-  stopNewsAutoScroll();
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  newsAutoTimer=setInterval(()=>{
-    if(userInteracting||document.hidden)return;
-    const cards=visibleNewsCards();
-    if(cards.length<2)return;
-    const step=getNewsStep();
-    const maxScroll=newsGrid.scrollWidth-newsGrid.clientWidth;
-    const atEnd=newsGrid.scrollLeft>=maxScroll-8;
-    if(atEnd){
-      newsGrid.scrollTo({left:0,behavior:'smooth'});
-    }else{
-      newsGrid.scrollBy({left:step,behavior:'smooth'});
-    }
-  },5000);
-}
-
-function pauseNewsAutoScroll(){
-  userInteracting=true;
-  stopNewsAutoScroll();
-}
-
-function resumeNewsAutoScroll(){
-  userInteracting=false;
-  startNewsAutoScroll();
-}
-
-function update(){
-  const cards=newsGrid.querySelectorAll('.news-card');
-  const q=search.value.trim().toLowerCase();
-  let shown=0;
-
-  if(cards.length===0){
-    empty.textContent=feedMessage;
-    empty.style.display='block';
-    newsGrid.scrollLeft=0;
-    updateCarouselControls();
-    return;
-  }
-
-  cards.forEach(card=>{
-    const cats=(card.dataset.category||'').split(' ');
-    const hay=((card.dataset.search||'')+' '+card.innerText).toLowerCase();
-    const categoryMatch=active==='all'||cats.includes(active);
-    const searchMatch=!q||hay.includes(q);
-    const visible=categoryMatch&&searchMatch;
-    card.style.display=visible?'':'none';
-    if(visible)shown++;
-  });
-
-  empty.textContent='No published stories match that search. Try another keyword or category.';
-  empty.style.display=shown?'none':'block';
-  newsGrid.scrollTo({left:0,behavior:'smooth'});
-  updateCarouselControls();
-  startNewsAutoScroll();
-}
-
-/* CATEGORY FILTERS */
-filters.forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    filters.forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    active=btn.dataset.filter;
-    update();
-  });
-});
-search.addEventListener('input',update);
-
-/* NEWS CAROUSEL */
-newsPrev.addEventListener('click',()=>{
-  moveNews(-1);
-  pauseNewsAutoScroll();
-  setTimeout(resumeNewsAutoScroll,4000);
-});
-newsNext.addEventListener('click',()=>{
-  moveNews(1);
-  pauseNewsAutoScroll();
-  setTimeout(resumeNewsAutoScroll,4000);
-});
-newsGrid.addEventListener('scroll',updateCarouselControls,{passive:true});
-newsGrid.addEventListener('pointerdown',pauseNewsAutoScroll);
-newsGrid.addEventListener('pointerup',()=>setTimeout(resumeNewsAutoScroll,2500));
-newsGrid.addEventListener('pointercancel',resumeNewsAutoScroll);
-newsGrid.addEventListener('mouseenter',pauseNewsAutoScroll);
-newsGrid.addEventListener('mouseleave',resumeNewsAutoScroll);
-newsGrid.addEventListener('focusin',pauseNewsAutoScroll);
-newsGrid.addEventListener('focusout',resumeNewsAutoScroll);
-newsGrid.addEventListener('touchstart',pauseNewsAutoScroll,{passive:true});
-newsGrid.addEventListener('touchend',()=>setTimeout(resumeNewsAutoScroll,2500),{passive:true});
-
-/* MOBILE NAVIGATION */
-const menuButton=document.getElementById('menu');
-const navigation=document.getElementById('nav');
-
-menuButton.addEventListener('click',()=>{
-  const isOpen=navigation.classList.toggle('open');
-  menuButton.setAttribute('aria-expanded',String(isOpen));
-  menuButton.setAttribute('aria-label',isOpen?'Close navigation menu':'Open navigation menu');
-  menuButton.textContent=isOpen?'✕':'☰';
-});
-
-document.querySelectorAll('#links a').forEach(link=>{
-  link.addEventListener('click',()=>{
-    navigation.classList.remove('open');
-    menuButton.setAttribute('aria-expanded','false');
-    menuButton.setAttribute('aria-label','Open navigation menu');
-    menuButton.textContent='☰';
-  });
-});
-
-/* FREE GOOGLE TRANSLATE */
-const languageSelect=document.getElementById('languageSelect');
-languageSelect.addEventListener('change',()=>{
-  const language=languageSelect.value;
-  if(language==='en')return;
-  const currentPage=window.location.href;
-  const translateURL='https://translate.google.com/translate?sl=auto&tl='+
-    encodeURIComponent(language)+'&u='+encodeURIComponent(currentPage);
-  window.open(translateURL,'_blank','noopener,noreferrer');
-  languageSelect.value='en';
-});
-
-/* NEWSLETTER PLACEHOLDER */
-document.getElementById('signup').addEventListener('submit',event=>{
-  event.preventDefault();
-  alert('Thanks for your interest! Newsletter sign-up will be enabled when the site is connected to an email service.');
-});
-
-/* FOOTER YEAR */
-document.getElementById('year').textContent=new Date().getFullYear();
-
-/* DARK AND LIGHT MODE */
-const themeToggle=document.getElementById('themeToggle');
-const themeIcon=document.getElementById('themeIcon');
-const themeLabel=document.getElementById('themeLabel');
-
-function applyTheme(theme){
-  const isLight=theme==='light';
-  document.body.classList.toggle('light-mode',isLight);
-  themeIcon.textContent=isLight?'☾':'☀';
-  themeLabel.textContent=isLight?'Dark Mode':'Light Mode';
-  themeToggle.setAttribute('aria-pressed',String(isLight));
-  themeToggle.setAttribute('aria-label',isLight?'Switch to dark mode':'Switch to light mode');
-  const themeColor=document.querySelector('meta[name="theme-color"]');
-  if(themeColor)themeColor.content=isLight?'#f1f4f8':'#0b1220';
-}
-
-let savedTheme='dark';
-try{savedTheme=localStorage.getItem('wf-theme')||'dark'}catch(error){}
-applyTheme(savedTheme);
-
-themeToggle.addEventListener('click',()=>{
-  const newTheme=document.body.classList.contains('light-mode')?'dark':'light';
-  try{localStorage.setItem('wf-theme',newTheme)}catch(error){}
-  applyTheme(newTheme);
-});
-
-/* LOAD PUBLISHED ARTICLES */
-async function loadWFArticles(){
-  try{
-    const response=await fetch('/api/articles');
-    if(!response.ok)throw new Error('Could not load articles');
-    const data=await response.json();
-
-    if(!data.success||!Array.isArray(data.articles)){
-      throw new Error('Invalid article response');
-    }
-
-    newsGrid.innerHTML='';
-
-    if(data.articles.length===0){
-      feedMessage='No published stories yet. New WF Pundit articles will appear here.';
-      update();
-      return;
-    }
-
-    data.articles.forEach(article=>{
-      const card=document.createElement('a');
-      card.className='news-card';
-      card.href='/article.html?id='+encodeURIComponent(article.id);
-      card.setAttribute('aria-label','Read article: '+(article.title||''));
-
-      const categoryText=String(article.category||"Women's Football");
-      const normalized=categoryText.toLowerCase();
-      const categories=[];
-
-      if(normalized.includes('wsl')||normalized.includes("women's super league"))categories.push('wsl');
-      if(normalized.includes('uwcl')||normalized.includes('champions league'))categories.push('uwcl');
-      if(normalized.includes('transfer'))categories.push('transfers');
-      if(normalized.includes('international')||normalized.includes('national team'))categories.push('international');
-      if(normalized.includes('analysis'))categories.push('analysis');
-
-      card.dataset.category=categories.join(' ');
-      card.dataset.search=[article.title,article.summary,categoryText].filter(Boolean).join(' ').toLowerCase();
-
-      const thumb=document.createElement('div');
-      thumb.className='thumb';
-
-      if(article.image_url&&/^https:\/\//i.test(article.image_url)){
-        const safeImageURL=article.image_url.replace(/["\\]/g,'');
-        thumb.style.backgroundImage='url("'+safeImageURL+'")';
-      }
-
-      const body=document.createElement('div');
-      body.className='news-body';
-
-      const category=document.createElement('div');
-      category.className='meta';
-      category.textContent=categoryText;
-
-      const title=document.createElement('h3');
-      title.textContent=article.title||'';
-
-      const summary=document.createElement('p');
-      summary.textContent=article.summary||'';
-
-      const date=document.createElement('div');
-      date.className='date';
-      date.textContent='WF PUNDIT · READ STORY ↗';
-
-      body.append(category,title,summary,date);
-      card.append(thumb,body);
-      newsGrid.appendChild(card);
-    });
-
-    feedMessage='No published stories match that search. Try another keyword or category.';
-    update();
-
-  }catch(error){
-    console.error('WF Pundit article feed:',error);
-    newsGrid.innerHTML='';
-    feedMessage='The news feed is temporarily unavailable. Please check back later.';
-    update();
-  }
-}
-
-/* PLAYER SLIDER - NO CONTINUOUS PIXEL MOVEMENT */
-const playerStrip=document.getElementById('playerStrip');
-let playerAutoTimer=null;
-let playerPaused=false;
-let playerIndex=0;
-
-function getPlayerStep(){
-  const firstCard=playerStrip.querySelector('.player-card');
-  if(!firstCard)return 0;
-  const gap=parseFloat(getComputedStyle(playerStrip).gap)||8;
-  return firstCard.getBoundingClientRect().width+gap;
-}
-
-function stopPlayerSlider(){
-  if(playerAutoTimer){
-    clearInterval(playerAutoTimer);
-    playerAutoTimer=null;
-  }
-}
-
-function startPlayerSlider(){
-  stopPlayerSlider();
-  if(!playerStrip)return;
-  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-
-  playerAutoTimer=setInterval(()=>{
-    if(playerPaused||document.hidden)return;
-
-    const step=getPlayerStep();
-    const maxScroll=playerStrip.scrollWidth-playerStrip.clientWidth;
-
-    if(maxScroll<=0)return;
-
-    if(playerStrip.scrollLeft>=maxScroll-5){
-      playerIndex=0;
-    }else{
-      playerIndex++;
-    }
-
-    playerStrip.scrollTo({
-      left:Math.min(playerIndex*step,maxScroll),
-      behavior:'smooth'
-    });
-  },4200);
-}
-
-function pausePlayerSlider(){
-  playerPaused=true;
-}
-
-function resumePlayerSlider(){
-  playerPaused=false;
-}
-
-if(playerStrip){
-  playerStrip.addEventListener('mouseenter',pausePlayerSlider);
-  playerStrip.addEventListener('mouseleave',resumePlayerSlider);
-  playerStrip.addEventListener('touchstart',pausePlayerSlider,{passive:true});
-  playerStrip.addEventListener('touchend',resumePlayerSlider,{passive:true});
-  playerStrip.addEventListener('touchcancel',resumePlayerSlider,{passive:true});
-  playerStrip.addEventListener('pointerdown',pausePlayerSlider);
-  playerStrip.addEventListener('pointerup',resumePlayerSlider);
-  playerStrip.addEventListener('pointercancel',resumePlayerSlider);
-  playerStrip.addEventListener('focusin',pausePlayerSlider);
-  playerStrip.addEventListener('focusout',resumePlayerSlider);
-
-  playerStrip.addEventListener('scroll',()=>{
-    const step=getPlayerStep();
-    if(step>0)playerIndex=Math.round(playerStrip.scrollLeft/step);
-  },{passive:true});
-
-  startPlayerSlider();
-  window.addEventListener('resize',startPlayerSlider);
-}
-
-/* PAUSE SLIDERS WHEN THE PAGE IS HIDDEN */
-document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){
-    stopNewsAutoScroll();
-    stopPlayerSlider();
-  }else{
-    startNewsAutoScroll();
-    startPlayerSlider();
-  }
-});
-
-window.addEventListener('resize',updateCarouselControls);
-updateCarouselControls();
-startNewsAutoScroll();
-loadWFArticles();
-
-/* LOADING SCREEN */
-function finishPageLoading(){
-  document.body.classList.add('is-loaded');
-  const loader=document.getElementById('siteLoader');
-  if(loader){
-    loader.classList.add('hidden');
-    setTimeout(()=>loader.remove(),700);
-  }
-}
-
-window.addEventListener('load',()=>{
-  setTimeout(finishPageLoading,450);
-});
-setTimeout(finishPageLoading,3500);
+/* Player portraits: automatic cross-fade plus manual swipe/drag and arrow controls. */
+const playerStrip=$('#playerStrip');
+const playerCards=[...document.querySelectorAll('.player-card')];
+const playerPrev=$('#playerPrev'),playerNext=$('#playerNext'),playerStatus=$('#playerStatus');
+let activePlayer=0,playerTimer=null,playerPaused=false,pointerStartX=0,pointerStartY=0,pointerDown=false,dragged=false;
+function showPlayer(index){if(!playerCards.length)return;activePlayer=(index+playerCards.length)%playerCards.length;playerCards.forEach((card,i)=>{const active=i===activePlayer;card.classList.toggle('is-active',active);card.setAttribute('aria-hidden',String(!active));if(active)card.removeAttribute('tabindex');else card.setAttribute('tabindex','-1')});playerStatus.textContent=(activePlayer+1)+' / '+playerCards.length;}
+function stopPlayerFade(){if(playerTimer){clearInterval(playerTimer);playerTimer=null}}
+function startPlayerFade(){stopPlayerFade();if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;playerTimer=setInterval(()=>{if(!playerPaused&&!document.hidden)showPlayer(activePlayer+1)},5200)}
+function pausePlayerFade(){playerPaused=true}
+function resumePlayerFade(){playerPaused=false}
+playerPrev.addEventListener('click',()=>{showPlayer(activePlayer-1);pausePlayerFade();setTimeout(resumePlayerFade,4200)});
+playerNext.addEventListener('click',()=>{showPlayer(activePlayer+1);pausePlayerFade();setTimeout(resumePlayerFade,4200)});
+playerStrip.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointerDown=true;dragged=false;pointerStartX=e.clientX;pointerStartY=e.clientY;pausePlayerFade();playerStrip.classList.add('is-dragging')});
+playerStrip.addEventListener('pointerup',e=>{if(!pointerDown)return;pointerDown=false;playerStrip.classList.remove('is-dragging');const dx=e.clientX-pointerStartX,dy=e.clientY-pointerStartY;if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)*1.15){dragged=true;showPlayer(activePlayer+(dx<0?1:-1))}setTimeout(resumePlayerFade,2600)});
+playerStrip.addEventListener('pointercancel',()=>{pointerDown=false;playerStrip.classList.remove('is-dragging');setTimeout(resumePlayerFade,1600)});
+playerStrip.addEventListener('click',e=>{if(dragged){e.preventDefault();e.stopPropagation();dragged=false}},true);
+playerStrip.addEventListener('mouseenter',pausePlayerFade);playerStrip.addEventListener('mouseleave',()=>{if(!pointerDown)resumePlayerFade()});
+playerStrip.addEventListener('focusin',pausePlayerFade);playerStrip.addEventListener('focusout',resumePlayerFade);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)pausePlayerFade();else resumePlayerFade()});
+showPlayer(0);startPlayerFade();
+/* If a remote portrait fails, keep the card clean and readable rather than flashing a broken image. */
+document.querySelectorAll('.player-card img').forEach(img=>{img.addEventListener('error',()=>{img.style.display='none';img.parentElement.style.background='linear-gradient(145deg,#1b3552,#080e18)';},{once:true})});
+async function loadWFArticles(){try{const r=await fetch('/api/articles');if(!r.ok)throw Error('Could not load articles');const data=await r.json();if(!data.success||!Array.isArray(data.articles))throw Error('Invalid article response');newsGrid.innerHTML='';if(!data.articles.length){feedMessage='No published stories yet. New WF Pundit articles will appear here.';update();return}data.articles.forEach(article=>{const card=document.createElement('a');card.className='news-card';card.href='/article.html?id='+encodeURIComponent(article.id);card.setAttribute('aria-label','Read article: '+(article.title||''));const cat=String(article.category||"Women's Football"),low=cat.toLowerCase(),cats=[];if(low.includes('wsl')||low.includes("women's super league"))cats.push('wsl');if(low.includes('uwcl')||low.includes('champions league'))cats.push('uwcl');if(low.includes('transfer'))cats.push('transfers');if(low.includes('international')||low.includes('national team'))cats.push('international');if(low.includes('analysis'))cats.push('analysis');card.dataset.category=cats.join(' ');card.dataset.search=[article.title,article.summary,cat].filter(Boolean).join(' ').toLowerCase();const thumb=document.createElement('div');thumb.className='thumb';if(article.image_url&&/^https:\/\//i.test(article.image_url))thumb.style.backgroundImage='url("'+article.image_url.replace(/["\\]/g,'')+'")';const body=document.createElement('div');body.className='news-body';const meta=document.createElement('div');meta.className='meta';meta.textContent=cat;const title=document.createElement('h3');title.textContent=article.title||'';const summary=document.createElement('p');summary.textContent=article.summary||'';const date=document.createElement('div');date.className='date';date.textContent='WF PUNDIT · READ STORY ↗';body.append(meta,title,summary,date);card.append(thumb,body);newsGrid.append(card)});feedMessage='No published stories match that search. Try another keyword or category.';update()}catch(err){console.error('WF Pundit article feed:',err);newsGrid.innerHTML='';feedMessage='The news feed is temporarily unavailable. Please check back later.';update()}}
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopNewsAuto();else startNewsAuto()});window.addEventListener('resize',updateCarouselControls);updateCarouselControls();startNewsAuto();loadWFArticles();
+function finishLoading(){document.body.classList.add('is-loaded');const loader=$('#siteLoader');if(loader){loader.classList.add('hidden');setTimeout(()=>loader.remove(),550)}}window.addEventListener('load',()=>setTimeout(finishLoading,350));setTimeout(finishLoading,3000);
 </script>
 </body>
 </html>
