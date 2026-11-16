@@ -96,8 +96,7 @@ display:block;
 overflow:hidden;
 border:1px solid rgba(130,180,230,.35);
 border-radius:20px;
-background:
-radial-gradient(ellipse at 50% 35%,#254b72 0%,#152b44 48%,#0b1422 100%);
+background:radial-gradient(ellipse at 50% 35%,#254b72 0%,#152b44 48%,#0b1422 100%);
 color:#fff;
 isolation:isolate;
 opacity:0;
@@ -105,11 +104,7 @@ visibility:hidden;
 pointer-events:none;
 transform-style:preserve-3d;
 transform:translateX(0) scale(.7) rotateY(0deg);
-transition:
-transform .72s cubic-bezier(.2,.75,.2,1),
-opacity .55s ease,
-filter .55s ease,
-visibility 0s linear .72s;
+transition:transform .72s cubic-bezier(.2,.75,.2,1),opacity .55s ease,filter .55s ease,visibility 0s linear .72s;
 box-shadow:inset 0 0 35px rgba(83,159,235,.16);
 will-change:transform,opacity;
 }
@@ -120,11 +115,7 @@ pointer-events:auto;
 z-index:3;
 transform:translateX(0) scale(1) rotateY(0deg);
 filter:brightness(1.08);
-transition:
-transform .72s cubic-bezier(.2,.75,.2,1),
-opacity .55s ease,
-filter .55s ease,
-visibility 0s;
+transition:transform .72s cubic-bezier(.2,.75,.2,1),opacity .55s ease,filter .55s ease,visibility 0s;
 }
 .player-card.is-side{
 opacity:.72;
@@ -133,26 +124,12 @@ pointer-events:auto;
 z-index:2;
 filter:brightness(.72) saturate(.85);
 }
-.player-card.is-left{
-transform:translateX(-83%) scale(.77) rotateY(34deg);
-}
-.player-card.is-right{
-transform:translateX(83%) scale(.77) rotateY(-34deg);
-}
-.player-card.is-far{
-opacity:0;
-visibility:hidden;
-pointer-events:none;
-}
-.player-card.is-left.is-far{
-transform:translateX(-135%) scale(.58) rotateY(48deg);
-}
-.player-card.is-right.is-far{
-transform:translateX(135%) scale(.58) rotateY(-48deg);
-}
-.player-card.is-active{
-animation:rotaryArrival .65s cubic-bezier(.2,.75,.25,1) both;
-}
+.player-card.is-left{transform:translateX(-83%) scale(.77) rotateY(34deg)}
+.player-card.is-right{transform:translateX(83%) scale(.77) rotateY(-34deg)}
+.player-card.is-far{opacity:0;visibility:hidden;pointer-events:none}
+.player-card.is-left.is-far{transform:translateX(-135%) scale(.58) rotateY(48deg)}
+.player-card.is-right.is-far{transform:translateX(135%) scale(.58) rotateY(-48deg)}
+.player-card.is-active{animation:rotaryArrival .65s cubic-bezier(.2,.75,.25,1) both}
 @keyframes rotaryArrival{
 0%{filter:brightness(.65);box-shadow:inset 0 0 15px #3978c8}
 65%{filter:brightness(1.2)}
@@ -171,10 +148,7 @@ transform:translateX(-75%) rotate(12deg);
 opacity:0;
 mix-blend-mode:screen;
 }
-.player-card.is-active:before{
-opacity:1;
-animation:holoGlint 2s ease-out .15s 1;
-}
+.player-card.is-active:before{opacity:1;animation:holoGlint 2s ease-out .15s 1}
 @keyframes holoGlint{
 0%{transform:translateX(-75%) rotate(12deg);opacity:0}
 18%{opacity:.9}
@@ -201,11 +175,7 @@ border:6px solid rgba(177,218,255,.88);
 outline:2px solid rgba(73,151,235,.85);
 outline-offset:6px;
 background:radial-gradient(circle,#254b72,#0b1422);
-box-shadow:
-0 0 0 10px rgba(57,120,200,.14),
-0 0 25px rgba(74,164,255,.55),
-0 0 65px rgba(57,120,200,.34),
-inset 0 0 18px rgba(255,255,255,.16);
+box-shadow:0 0 0 10px rgba(57,120,200,.14),0 0 25px rgba(74,164,255,.55),0 0 65px rgba(57,120,200,.34),inset 0 0 18px rgba(255,255,255,.16);
 filter:saturate(1.08) contrast(1.04);
 backface-visibility:hidden;
 -webkit-backface-visibility:hidden;
@@ -217,9 +187,7 @@ height:clamp(190px,22vw,245px);
 border-width:4px;
 outline-offset:4px;
 }
-.player-card.is-active img{
-animation:portraitPop .75s cubic-bezier(.2,.8,.2,1) both;
-}
+.player-card.is-active img{animation:portraitPop .75s cubic-bezier(.2,.8,.2,1) both}
 @keyframes portraitPop{
 0%{opacity:.55;transform:translate(-50%,-50%) scale(.92)}
 70%{opacity:1;transform:translate(-50%,-50%) scale(1.025)}
@@ -280,11 +248,7 @@ line-height:1;
 box-shadow:0 0 14px #3978c833;
 transition:background .2s,transform .2s,box-shadow .2s;
 }
-.player-controls button:hover{
-background:var(--blue);
-box-shadow:0 0 18px #3978c8;
-transform:scale(1.08);
-}
+.player-controls button:hover{background:var(--blue);box-shadow:0 0 18px #3978c8;transform:scale(1.08)}
 .player-status{font-size:11px;font-weight:900;min-width:58px;text-align:center;letter-spacing:.1em;color:#d9eaff}
 
 .breaking{margin:10px 0 32px;background:var(--panel);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;overflow:hidden}
@@ -412,15 +376,7 @@ body.light-mode .nav nav{background:#fff}
 .player-card{left:11%;width:78%;top:7px;bottom:7px}
 .player-card.is-left{transform:translateX(-82%) scale(.73) rotateY(30deg)}
 .player-card.is-right{transform:translateX(82%) scale(.73) rotateY(-30deg)}
-.player-card img{
-width:clamp(225px,59vw,275px);
-height:clamp(225px,59vw,275px);
-max-width:82%;
-max-height:72%;
-top:43%;
-border-width:5px;
-outline-offset:5px;
-}
+.player-card img{width:clamp(225px,59vw,275px);height:clamp(225px,59vw,275px);max-width:82%;max-height:72%;top:43%;border-width:5px;outline-offset:5px}
 .player-card.is-side img{width:clamp(175px,45vw,215px);height:clamp(175px,45vw,215px)}
 .player-label{font-size:19px;left:10px;right:10px;bottom:15px}
 .player-label small{font-size:9px}
@@ -1060,11 +1016,12 @@ stopPlayerCarousel();
 
 if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 
+/* Advance through ALL 14 player cards every 2.5 seconds */
 playerTimer=setInterval(()=>{
 if(!playerPaused&&!document.hidden&&!pointerDown&&!playerHovering&&!playerFocused){
 showPlayer(activePlayer+1);
 }
-},5200);
+},2500);
 }
 
 function pausePlayerCarousel(){
