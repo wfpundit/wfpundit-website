@@ -78,21 +78,102 @@ font-weight:900;
 flex:none
 }
 
-/* TOP BAR */
+/* TOP SLIDING LIVE TICKER */
 .topline{
+height:29px;
+display:flex;
+align-items:center;
+overflow:hidden;
 background:#070c14;
 border-bottom:1px solid #202d40;
 color:#b9c6d8;
-font-size:12px
+font-size:10px;
+position:relative
 }
 .topline .wrap{
+width:100%;
+max-width:none;
+height:100%;
+margin:0;
+padding:0;
+overflow:hidden;
 display:flex;
-justify-content:space-between;
-gap:14px;
-padding:9px 0
+align-items:center
 }
-.ticker{color:#fff;font-weight:750}
-.ticker b{color:var(--gold);letter-spacing:.13em;margin-right:8px}
+.topline-track{
+display:flex;
+align-items:center;
+width:max-content;
+min-width:max-content;
+white-space:nowrap;
+will-change:transform;
+animation:toplineSlide 25s linear infinite
+}
+.topline-group{
+display:inline-flex;
+align-items:center;
+flex:none;
+gap:10px;
+padding-right:38px;
+white-space:nowrap
+}
+.topline-live{
+display:inline-flex;
+align-items:center;
+gap:6px;
+color:#35d987;
+font-size:9px;
+font-weight:950;
+letter-spacing:.12em;
+white-space:nowrap
+}
+.topline-dot{
+width:6px;
+height:6px;
+flex:none;
+border-radius:50%;
+background:#25d879;
+box-shadow:0 0 7px #25d879,0 0 13px #25d87988;
+animation:livePulse 1.35s ease-in-out infinite
+}
+.topline-separator{
+color:#65758b;
+font-size:10px;
+font-weight:900
+}
+.topline-location{
+color:#d5dfed;
+font-size:9px;
+font-weight:850;
+letter-spacing:.055em;
+white-space:nowrap
+}
+.topline-message{
+color:#79baff;
+font-size:9px;
+font-weight:950;
+letter-spacing:.065em;
+white-space:nowrap
+}
+@keyframes toplineSlide{
+from{transform:translateX(0)}
+to{transform:translateX(-50%)}
+}
+@keyframes livePulse{
+0%,100%{
+opacity:1;
+transform:scale(1);
+box-shadow:0 0 6px #25d879,0 0 12px #25d87977
+}
+50%{
+opacity:.45;
+transform:scale(.75);
+box-shadow:0 0 2px #25d879
+}
+}
+.topline:hover .topline-track{
+animation-play-state:paused
+}
 
 /* NAVIGATION */
 header{
@@ -207,7 +288,7 @@ transition:transform .3s
 .theme-toggle[aria-pressed=true] .theme-thumb{transform:translateX(21px)}
 .theme-label{min-width:57px}
 
-/* HERO INTRO - NEW FRONT PAGE DESIGN */
+/* HERO INTRO */
 .hero{padding:35px 0 22px}
 
 .welcome-hero{
@@ -915,7 +996,14 @@ body.light-mode header{background:#fffffff7;border-color:#dce3ec}
 body.light-mode .brand .mark{color:#172438}
 body.light-mode nav{color:#34445c}
 body.light-mode .topline,body.light-mode footer{background:#e7edf4;color:#34445c}
-body.light-mode .ticker{color:#1c2939}
+body.light-mode .topline-live{color:#16834a}
+body.light-mode .topline-dot{
+background:#159b58;
+box-shadow:0 0 6px #159b58,0 0 11px #159b5877
+}
+body.light-mode .topline-location{color:#34445c}
+body.light-mode .topline-message{color:#2865aa}
+body.light-mode .topline-separator{color:#8492a5}
 body.light-mode .search,
 body.light-mode .signup input,
 body.light-mode .language-select{
@@ -978,7 +1066,11 @@ nav{gap:13px;font-size:11px}
 }
 @media(max-width:720px){
 .wrap{width:calc(100% - 24px)}
-.topline .wrap{font-size:9px}
+.topline{height:27px}
+.topline .wrap{width:100%;padding:0}
+.topline-group{gap:8px;padding-right:30px}
+.topline-live,.topline-location,.topline-message{font-size:8px}
+.topline-dot{width:5px;height:5px}
 .nav{min-height:66px;justify-content:flex-start;gap:9px}
 .menu{display:block;flex-shrink:0}
 .brand{font-size:19px;flex-shrink:0}
@@ -1084,9 +1176,14 @@ height:clamp(175px,45vw,215px)
 .theme-toggle[aria-pressed=true] .theme-thumb{transform:translateX(9px)}
 .language-select{max-width:68px;font-size:8px}
 }
+
+/* ACCESSIBILITY: RESPECT REDUCED MOTION */
 @media(prefers-reduced-motion:reduce){
 html,.news-grid{scroll-behavior:auto}
 .loader-line span{animation:none}
+.topline-track{animation:none}
+.topline-dot{animation:none}
+.topline-group[aria-hidden="true"]{display:none}
 .news-card,.theme-thumb,.player-card,.player-card img{transition:none;animation:none!important}
 .player-card:before{display:none}
 }
@@ -1103,10 +1200,34 @@ html,.news-grid{scroll-behavior:auto}
 </div>
 </div>
 
-<div class="topline">
+<!-- SLIM TOP LIVE TICKER -->
+<div class="topline" aria-label="WF Pundit live status and location">
 <div class="wrap">
-<div class="ticker"><b>WF PUNDIT</b> THE HOME OF WOMEN'S FOOTBALL</div>
-<div>NEWS · TRANSFERS · MATCHDAY · ANALYSIS</div>
+<div class="topline-track">
+
+<div class="topline-group">
+<span class="topline-live">
+<span class="topline-dot"></span>
+LIVE
+</span>
+<span class="topline-separator">•</span>
+<span class="topline-location">UNITED KINGDOM</span>
+<span class="topline-separator">•</span>
+<span class="topline-message">THE HOME OF WOMEN'S FOOTBALL</span>
+</div>
+
+<div class="topline-group" aria-hidden="true">
+<span class="topline-live">
+<span class="topline-dot"></span>
+LIVE
+</span>
+<span class="topline-separator">•</span>
+<span class="topline-location">UNITED KINGDOM</span>
+<span class="topline-separator">•</span>
+<span class="topline-message">THE HOME OF WOMEN'S FOOTBALL</span>
+</div>
+
+</div>
 </div>
 </div>
 
@@ -1167,7 +1288,6 @@ html,.news-grid{scroll-behavior:auto}
 
 <div class="wrap hero">
 
-<!-- NEW WELCOME SECTION -->
 <section class="welcome-hero">
 <div class="welcome-tag">
 <span class="welcome-dot"></span>
@@ -2024,4 +2144,4 @@ setTimeout(finishLoading,3000);
 </script>
 
 </body>
-</html>
+  </html>
