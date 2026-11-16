@@ -7,467 +7,593 @@
 <title>WF Pundit | Admin Dashboard</title>
 
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
+:root {
+  --bg: #101522;
+  --panel: #192235;
+  --text: #f4f6fb;
+  --muted: #aab4c5;
+  --border: #303d54;
+  --accent: #1769e8;
+  --danger: #d93649;
+}
+body.light {
+  --bg: #f3f5f9;
+  --panel: #ffffff;
+  --text: #172033;
+  --muted: #667085;
+  --border: #dce2ec;
+  --accent: #1769e8;
+  --danger: #d93649;
+}
+* { box-sizing: border-box; }
 body {
+  margin: 0;
+  padding: 20px;
+  background: var(--bg);
+  color: var(--text);
   font-family: Arial, sans-serif;
-  background: #080f20;
-  color: #fff;
-  min-height: 100vh;
 }
-
-.header {
-  background: linear-gradient(120deg, #101e3d, #123c82);
-  padding: 25px 20px;
-  border-bottom: 3px solid #1688ff;
+.container { max-width: 1050px; margin: auto; }
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
 }
-
-.brand {
-  font-size: 27px;
-  font-weight: 900;
-  letter-spacing: 1px;
-}
-
-.brand span { color: #36a0ff; }
-
-.header p {
-  color: #c5d7ef;
-  margin-top: 8px;
-  font-size: 13px;
-}
-
-.container {
-  max-width: 850px;
-  margin: 30px auto;
-  padding: 0 16px;
-}
-
-.welcome { margin-bottom: 25px; }
-
-.welcome h2 {
-  font-size: 25px;
-  margin-bottom: 8px;
-}
-
-.welcome p {
-  color: #9eacc3;
-  font-size: 14px;
-}
-
+h1 { font-size: 25px; margin: 0; }
+h2 { font-size: 19px; margin-top: 0; }
 .panel {
-  background: #111d34;
-  border: 1px solid #243958;
-  border-radius: 14px;
-  padding: 24px;
-  box-shadow: 0 12px 35px rgba(0,0,0,.25);
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
 }
-
-.panel h3 {
-  font-size: 20px;
-  margin-bottom: 8px;
-}
-
-.panel .description {
-  color: #9eacc3;
-  font-size: 13px;
-  margin-bottom: 23px;
-}
-
 label {
   display: block;
-  font-size: 13px;
+  margin: 15px 0 7px;
   font-weight: bold;
-  margin: 17px 0 8px;
-  color: #dce9fb;
+  font-size: 14px;
 }
-
 input, textarea, select {
   width: 100%;
-  padding: 14px;
-  background: #091326;
-  border: 1px solid #304463;
-  border-radius: 8px;
-  color: white;
-  font-size: 14px;
-  outline: none;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
 }
-
-input:focus, textarea:focus, select:focus {
-  border-color: #2995ff;
-}
-
-textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-select option { background: #111d34; }
-
+textarea { min-height: 110px; resize: vertical; }
 button {
-  width: 100%;
-  padding: 15px;
-  margin-top: 22px;
-  border: none;
-  border-radius: 8px;
-  background: linear-gradient(100deg, #0878ee, #36a0ff);
+  border: 0;
+  border-radius: 7px;
+  padding: 11px 15px;
+  background: var(--accent);
   color: white;
-  font-size: 15px;
   font-weight: bold;
   cursor: pointer;
 }
-
-button:disabled {
-  opacity: .6;
-  cursor: wait;
+button:disabled { opacity: .55; cursor: wait; }
+button.secondary { background: #586579; }
+button.danger { background: var(--danger); }
+button.small { padding: 8px 11px; font-size: 13px; }
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 15px;
 }
-
-.token-box {
-  background: #0a1830;
-  padding: 16px;
-  border: 1px solid #285184;
-  border-radius: 10px;
-  margin-bottom: 23px;
-}
-
-.token-box p {
-  color: #91bce9;
-  font-size: 12px;
-  margin-bottom: 10px;
-}
-
-#message, #uploadMessage {
+.muted { color: var(--muted); font-size: 13px; }
+#message { margin: 12px 0; font-size: 14px; }
+.article {
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 14px;
   margin-top: 12px;
-  font-size: 14px;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
 }
-
-#uploadMessage { color: #a9cfff; }
-
-.photo-preview {
+.article h3 { margin: 0 0 8px; font-size: 16px; }
+.article-meta {
+  color: var(--muted);
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+.article img {
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 7px;
+  margin: 8px 0;
+}
+#preview {
   display: none;
   max-width: 100%;
-  max-height: 230px;
-  object-fit: contain;
+  max-height: 220px;
   margin-top: 12px;
   border-radius: 8px;
-  border: 1px solid #304463;
 }
-
-.footer {
-  text-align: center;
-  color: #71829c;
-  padding: 30px 10px;
-  font-size: 12px;
-}
-
-/* DARK AND LIGHT MODE BUTTON */
-.theme-toggle {
-  width: auto;
-  margin: 15px 0 0;
-  padding: 10px 14px;
-  background: #152033;
-  color: #fff;
-  border: 1px solid #47709e;
-  border-radius: 7px;
-  cursor: pointer;
-  font-size: 13px;
-}
-
-/* LIGHT MODE */
-body.light-mode {
-  background: #f4f7fb;
-  color: #172033;
-}
-
-body.light-mode .header {
-  background: linear-gradient(120deg, #ffffff, #e6f0ff);
-}
-
-body.light-mode .header p {
-  color: #526078;
-}
-
-body.light-mode .panel {
-  background: #fff;
-  border-color: #d8e0ec;
-}
-
-body.light-mode .welcome p,
-body.light-mode .panel .description {
-  color: #526078;
-}
-
-body.light-mode label {
-  color: #344158;
-}
-
-body.light-mode input,
-body.light-mode textarea,
-body.light-mode select {
-  background: #fff;
-  color: #172033;
-  border-color: #cbd5e1;
-}
-
-body.light-mode .token-box {
-  background: #edf3fb;
-  border-color: #cbd5e1;
-}
-
-body.light-mode .token-box p {
-  color: #315d91;
-}
-
-body.light-mode .footer {
-  color: #526078;
-}
-
-body.light-mode .theme-toggle {
-  background: #fff;
-  color: #172033;
-  border-color: #cbd5e1;
-}
-
-@media(max-width: 500px) {
-  .brand { font-size: 23px; }
-  .panel { padding: 18px; }
-  .welcome h2 { font-size: 22px; }
+.hidden { display: none !important; }
+@media (max-width: 600px) {
+  body { padding: 12px; }
+  .panel { padding: 15px; }
 }
 </style>
 </head>
 
 <body>
+<div class="container">
 
-<header class="header">
-  <div class="brand">WF <span>PUNDIT</span></div>
-  <p>FOOTBALL NEWS MANAGEMENT SYSTEM</p>
-  <button class="theme-toggle" id="themeToggle" type="button">
-    ☀️ Light Mode
+<header>
+  <h1>WF Pundit Admin</h1>
+  <button type="button" class="secondary" id="themeButton">
+    Toggle Theme
   </button>
 </header>
 
-<main class="container">
-
-  <div class="welcome">
-    <h2>Welcome, Admin 👋</h2>
-    <p>Manage your football news and publish stories to your website.</p>
+<section class="panel">
+  <h2>Admin Access</h2>
+  <label for="adminToken">Admin Token</label>
+  <input id="adminToken" type="password" placeholder="Enter your admin token">
+  <div class="actions">
+    <button type="button" id="loadButton">Load Articles</button>
   </div>
+  <p class="muted">Your token is used for authenticated admin requests.</p>
+</section>
 
-  <section class="panel">
-    <h3>Create New Article</h3>
-    <p class="description">Write, edit and publish your latest football stories.</p>
+<section class="panel">
+  <h2 id="formHeading">Create New Article</h2>
 
-    <div class="token-box">
-      <p>ADMIN SECURITY</p>
-      <label for="token">Admin Token</label>
-      <input type="password" id="token" placeholder="Enter your ADMIN_TOKEN value" autocomplete="off">
+  <form id="articleForm">
+    <input type="hidden" id="articleId">
+
+    <label for="title">Article Title</label>
+    <input id="title" required>
+
+    <label for="summary">Summary</label>
+    <textarea id="summary"></textarea>
+
+    <label for="content">Article Content</label>
+    <textarea id="content" rows="9"></textarea>
+
+    <label for="category">Main Category</label>
+    <select id="category" required>
+      <option value="Latest News">Latest News</option>
+      <option value="Women's Leagues">Women's Leagues</option>
+      <option value="Transfers">Transfers</option>
+      <option value="Women's Champions League (UWCL)">Women's Champions League (UWCL)</option>
+      <option value="International Football">International Football</option>
+      <option value="Interviews & Features">Interviews & Features</option>
+      <option value="Match Reports & Analysis">Match Reports & Analysis</option>
+    </select>
+
+    <label for="subcategory">League / Competition Subcategory</label>
+    <select id="subcategory">
+      <option value="">No subcategory</option>
+    </select>
+
+    <label for="author">Author</label>
+    <input id="author" value="WF Pundit">
+
+    <label for="status">Article Status</label>
+    <select id="status">
+      <option value="draft">Draft</option>
+      <option value="published">Published</option>
+    </select>
+
+    <label for="photo">Upload Article Photo</label>
+    <input id="photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+
+    <div class="actions">
+      <button type="button" id="uploadButton">Upload Photo</button>
     </div>
 
-    <form id="articleForm">
+    <img id="preview" alt="Article image preview">
 
-      <label for="title">Article Headline</label>
-      <input id="title" type="text" placeholder="Enter article headline" required>
+    <label for="imageUrl">Featured Image URL</label>
+    <input id="imageUrl" type="url" placeholder="Uploaded image URL">
 
-      <label for="summary">Short Summary</label>
-      <textarea id="summary" placeholder="Write a short introduction..."></textarea>
+    <div class="actions">
+      <button type="submit" id="saveButton">Publish / Save Article</button>
+      <button type="button" class="secondary hidden" id="cancelButton">
+        Cancel Edit
+      </button>
+    </div>
+  </form>
 
-      <label for="content">Full Article</label>
-      <textarea id="content" placeholder="Write your football news story here..."></textarea>
+  <div id="message" role="status"></div>
+</section>
 
-      <label for="photoFile">Choose Photo From Your Phone</label>
-      <input id="photoFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
+<section class="panel">
+  <h2>Manage Articles</h2>
+  <p class="muted">Published articles and drafts will appear here.</p>
+  <div id="articleList">Tap Load Articles to display your articles.</div>
+</section>
 
-      <button type="button" id="uploadPhotoBtn">UPLOAD PHOTO</button>
-
-      <p id="uploadMessage" role="status">Choose a JPG, PNG, WEBP, or GIF image (maximum 4 MB).</p>
-
-      <img id="photoPreview" class="photo-preview" alt="Selected article photo preview">
-
-      <label for="image">Featured Image URL</label>
-      <input id="image" type="url" placeholder="Uploaded photo link will appear here, or paste an image URL">
-
-      <label for="category">Article Category</label>
-      <select id="category">
-        <option>Women's Football</option>
-        <option>Men's Football</option>
-        <option>Transfer News</option>
-        <option>Football News</option>
-        <option>Champions League</option>
-      </select>
-
-      <label for="author">Author</label>
-      <input id="author" type="text" value="WF Pundit">
-
-      <label for="status">Publishing Status</label>
-      <select id="status">
-        <option value="draft">Save as Draft</option>
-        <option value="published">Publish Article</option>
-      </select>
-
-      <button type="submit" id="submitBtn">PUBLISH ARTICLE →</button>
-      <p id="message" role="status"></p>
-
-    </form>
-  </section>
-</main>
-
-<footer class="footer">© 2026 WF Pundit. All Rights Reserved.</footer>
+</div>
 
 <script>
-/* DARK AND LIGHT MODE */
-const themeToggle = document.getElementById("themeToggle");
+const $ = id => document.getElementById(id);
 
-function applyTheme(theme) {
-  document.body.classList.toggle("light-mode", theme === "light");
-  themeToggle.textContent = theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+const category = $("category");
+const subcategory = $("subcategory");
+const form = $("articleForm");
+const message = $("message");
+
+const subcategories = {
+  "Women's Leagues": [
+    "Women's Super League (WSL)",
+    "Bundesliga Women",
+    "Liga F",
+    "Serie A Women",
+    "Première Ligue",
+    "NWSL",
+    "A-League Women",
+    "Women's Championship",
+    "Liga MX Femenil",
+    "WE League",
+    "Damallsvenskan",
+    "Toppserien"
+  ],
+  "International Football": [
+    "FIFA Women's World Cup",
+    "Women's Africa Cup of Nations (WAFCON)",
+    "UEFA Women's Euros",
+    "Olympic Women's Football",
+    "AFC Women's Asian Cup",
+    "Copa América Femenina",
+    "UEFA Women's Nations League"
+  ]
+};
+
+function updateSubcategories(selected = "") {
+  subcategory.innerHTML = '<option value="">No subcategory</option>';
+
+  (subcategories[category.value] || []).forEach(item => {
+    const option = document.createElement("option");
+    option.value = item;
+    option.textContent = item;
+    subcategory.appendChild(option);
+  });
+
+  if (selected) subcategory.value = selected;
 }
 
-const savedTheme = localStorage.getItem("wf-theme") || "dark";
-applyTheme(savedTheme);
+category.addEventListener("change", () => updateSubcategories());
 
-themeToggle.addEventListener("click", function() {
-  const newTheme = document.body.classList.contains("light-mode") ? "dark" : "light";
-  localStorage.setItem("wf-theme", newTheme);
-  applyTheme(newTheme);
+function getToken() {
+  return $("adminToken").value.trim();
+}
+
+function authHeaders() {
+  return { "Authorization": "Bearer " + getToken() };
+}
+
+function showMessage(text, isError = false) {
+  message.textContent = text;
+  message.style.color = isError ? "#ff6677" : "#35c98a";
+}
+
+function setPreview(url) {
+  const preview = $("preview");
+  if (url) {
+    preview.src = url;
+    preview.style.display = "block";
+  } else {
+    preview.removeAttribute("src");
+    preview.style.display = "none";
+  }
+}
+
+$("imageUrl").addEventListener("input", () => {
+  setPreview($("imageUrl").value.trim());
 });
 
-/* ARTICLE MANAGEMENT */
-const form = document.getElementById("articleForm");
-const message = document.getElementById("message");
-const submitBtn = document.getElementById("submitBtn");
-const tokenInput = document.getElementById("token");
-const photoFile = document.getElementById("photoFile");
-const uploadPhotoBtn = document.getElementById("uploadPhotoBtn");
-const uploadMessage = document.getElementById("uploadMessage");
-const photoPreview = document.getElementById("photoPreview");
-const imageInput = document.getElementById("image");
+$("photo").addEventListener("change", () => {
+  const file = $("photo").files[0];
+  if (file) {
+    setPreview(URL.createObjectURL(file));
+  }
+});
 
-photoFile.addEventListener("change", function() {
-  const file = photoFile.files[0];
+$("uploadButton").addEventListener("click", async () => {
+  if (!getToken()) {
+    showMessage("Enter your admin token first.", true);
+    return;
+  }
+
+  const file = $("photo").files[0];
 
   if (!file) {
-    photoPreview.style.display = "none";
-    photoPreview.removeAttribute("src");
+    showMessage("Choose a photo first.", true);
     return;
   }
 
-  photoPreview.src = URL.createObjectURL(file);
-  photoPreview.style.display = "block";
-  uploadMessage.textContent = "Photo selected. Tap UPLOAD PHOTO to save it.";
-});
-
-imageInput.addEventListener("input", function() {
-  if (imageInput.value.trim()) {
-    photoPreview.src = imageInput.value.trim();
-    photoPreview.style.display = "block";
-  }
-});
-
-uploadPhotoBtn.addEventListener("click", async function() {
-  const token = tokenInput.value.trim();
-  const file = photoFile.files[0];
-
-  if (!token) {
-    uploadMessage.textContent = "Please enter your admin token above first.";
-    return;
-  }
-
-  if (!file) {
-    uploadMessage.textContent = "Please choose a photo from your phone first.";
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append("photo", file);
-
-  uploadPhotoBtn.disabled = true;
-  uploadPhotoBtn.textContent = "UPLOADING...";
-  uploadMessage.textContent = "Uploading your photo. Please wait.";
+  const button = $("uploadButton");
+  button.disabled = true;
+  showMessage("Uploading photo...");
 
   try {
+    const data = new FormData();
+    data.append("photo", file);
+
     const response = await fetch("/api/upload-image", {
       method: "POST",
-      headers: { "Authorization": "Bearer " + token },
-      body: formData
+      headers: authHeaders(),
+      body: data
     });
 
     const result = await response.json();
 
-    if (!response.ok) {
+    if (!response.ok || !result.success) {
       throw new Error(result.error || "Photo upload failed.");
     }
 
-    imageInput.value = result.image_url;
-    photoPreview.src = result.image_url;
-    photoPreview.style.display = "block";
+    const uploadedUrl = result.image_url || result.url;
 
-    uploadMessage.textContent = "SUCCESS! Your photo has been uploaded and its link added below.";
+    if (!uploadedUrl) {
+      throw new Error("Upload response did not contain an image URL.");
+    }
+
+    $("imageUrl").value = uploadedUrl;
+    setPreview(uploadedUrl);
+    showMessage("Photo uploaded successfully.");
 
   } catch (error) {
-    uploadMessage.textContent = "ERROR: " + error.message;
-
+    showMessage(error.message, true);
   } finally {
-    uploadPhotoBtn.disabled = false;
-    uploadPhotoBtn.textContent = "UPLOAD PHOTO";
+    button.disabled = false;
   }
 });
 
-form.addEventListener("submit", async function(event) {
+function resetForm() {
+  form.reset();
+  $("articleId").value = "";
+  $("author").value = "WF Pundit";
+  $("formHeading").textContent = "Create New Article";
+  $("saveButton").textContent = "Publish / Save Article";
+  $("cancelButton").classList.add("hidden");
+  setPreview("");
+  updateSubcategories();
+}
+
+$("cancelButton").addEventListener("click", () => {
+  resetForm();
+  showMessage("Editing cancelled.");
+});
+
+form.addEventListener("submit", async event => {
   event.preventDefault();
 
-  const token = tokenInput.value.trim();
-
-  if (!token) {
-    message.textContent = "Please enter your admin token.";
+  if (!getToken()) {
+    showMessage("Enter your admin token first.", true);
     return;
   }
 
+  const id = $("articleId").value;
+
+  const selectedCategory = subcategory.value || category.value;
+
   const article = {
-    title: document.getElementById("title").value.trim(),
-    summary: document.getElementById("summary").value.trim(),
-    content: document.getElementById("content").value.trim(),
-    image_url: imageInput.value.trim(),
-    category: document.getElementById("category").value,
-    author: document.getElementById("author").value.trim() || "WF Pundit",
-    status: document.getElementById("status").value
+    title: $("title").value.trim(),
+    summary: $("summary").value,
+    content: $("content").value,
+    image_url: $("imageUrl").value.trim(),
+    category: selectedCategory,
+    author: $("author").value.trim() || "WF Pundit",
+    status: $("status").value
   };
 
-  submitBtn.disabled = true;
-  submitBtn.textContent = "SUBMITTING...";
-  message.textContent = "";
+  if (!article.title) {
+    showMessage("Article title is required.", true);
+    return;
+  }
+
+  const button = $("saveButton");
+  button.disabled = true;
+  showMessage(id ? "Updating article..." : "Creating article...");
 
   try {
     const response = await fetch("/api/admin/articles", {
-      method: "POST",
+      method: id ? "PUT" : "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer " + token
+        ...authHeaders(),
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify(article)
+      body: JSON.stringify(id ? { ...article, id: Number(id) } : article)
     });
 
     const result = await response.json();
 
-    if (!response.ok) {
-      throw new Error(result.error || "Article submission failed.");
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to save article.");
     }
 
-    message.textContent = "SUCCESS! Your article has been saved.";
-    form.reset();
-    photoPreview.style.display = "none";
-    photoPreview.removeAttribute("src");
-    uploadMessage.textContent = "Choose a JPG, PNG, WEBP, or GIF image (maximum 4 MB).";
+    showMessage(id ? "Article updated successfully." : "Article created successfully.");
+    resetForm();
+    await loadArticles();
 
   } catch (error) {
-    message.textContent = "ERROR: " + error.message;
-
+    showMessage(error.message, true);
   } finally {
-    submitBtn.disabled = false;
-    submitBtn.textContent = "PUBLISH ARTICLE →";
+    button.disabled = false;
   }
 });
-</script>
 
+async function loadArticles() {
+  if (!getToken()) {
+    showMessage("Enter your admin token first.", true);
+    return;
+  }
+
+  $("articleList").textContent = "Loading articles...";
+
+  try {
+    const response = await fetch("/api/admin/articles", {
+      method: "GET",
+      headers: authHeaders()
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to load articles.");
+    }
+
+    displayArticles(result.articles || []);
+    showMessage("Articles loaded.");
+
+  } catch (error) {
+    $("articleList").textContent = error.message;
+    showMessage(error.message, true);
+  }
+}
+
+function displayArticles(articles) {
+  const list = $("articleList");
+  list.innerHTML = "";
+
+  if (!articles.length) {
+    list.textContent = "No articles found.";
+    return;
+  }
+
+  articles.forEach(article => {
+    const card = document.createElement("div");
+    card.className = "article";
+
+    const title = document.createElement("h3");
+    title.textContent = article.title || "Untitled article";
+
+    const meta = document.createElement("div");
+    meta.className = "article-meta";
+    meta.textContent =
+      "ID: " + article.id +
+      " | " + (article.status || "draft") +
+      " | " + (article.category || "Uncategorised");
+
+    card.appendChild(title);
+    card.appendChild(meta);
+
+    if (article.image_url && /^https:\/\//i.test(article.image_url)) {
+      const img = document.createElement("img");
+      img.src = article.image_url;
+      img.alt = article.title || "Article photo";
+      img.loading = "lazy";
+      card.appendChild(img);
+    }
+
+    const editButton = document.createElement("button");
+    editButton.className = "small";
+    editButton.textContent = "Edit";
+    editButton.addEventListener("click", () => editArticle(article));
+
+    const deleteButton = document.createElement("button");
+    deleteButton.className = "small danger";
+    deleteButton.textContent = "Delete";
+    deleteButton.addEventListener("click", () => deleteArticle(article.id, article.title));
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    actions.append(editButton, deleteButton);
+    card.appendChild(actions);
+
+    list.appendChild(card);
+  });
+}
+
+function editArticle(article) {
+  $("articleId").value = article.id;
+  $("title").value = article.title || "";
+  $("summary").value = article.summary || "";
+  $("content").value = article.content || "";
+  $("author").value = article.author || "WF Pundit";
+  $("status").value = article.status || "draft";
+  $("imageUrl").value = article.image_url || "";
+
+  const knownCategories = [
+    "Latest News",
+    "Women's Leagues",
+    "Transfers",
+    "Women's Champions League (UWCL)",
+    "International Football",
+    "Interviews & Features",
+    "Match Reports & Analysis"
+  ];
+
+  if (knownCategories.includes(article.category)) {
+    category.value = article.category;
+    updateSubcategories();
+  } else {
+    const leagueCategory = subcategories["Women's Leagues"] || [];
+    const internationalCategory = subcategories["International Football"] || [];
+
+    if (leagueCategory.includes(article.category)) {
+      category.value = "Women's Leagues";
+      updateSubcategories(article.category);
+    } else if (internationalCategory.includes(article.category)) {
+      category.value = "International Football";
+      updateSubcategories(article.category);
+    } else {
+      category.value = "Latest News";
+      updateSubcategories();
+    }
+  }
+
+  setPreview(article.image_url || "");
+  $("formHeading").textContent = "Edit Article #" + article.id;
+  $("saveButton").textContent = "Update Article";
+  $("cancelButton").classList.remove("hidden");
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  showMessage("Editing article #" + article.id);
+}
+
+async function deleteArticle(id, title) {
+  if (!confirm('Are you sure you want to delete "' + title + '"? This cannot be undone.')) {
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/admin/articles", {
+      method: "DELETE",
+      headers: {
+        ...authHeaders(),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ id })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to delete article.");
+    }
+
+    showMessage("Article deleted.");
+    await loadArticles();
+
+  } catch (error) {
+    showMessage(error.message, true);
+  }
+}
+
+$("loadButton").addEventListener("click", loadArticles);
+
+$("themeButton").addEventListener("click", () => {
+  document.body.classList.toggle("light");
+  localStorage.setItem(
+    "wf-theme",
+    document.body.classList.contains("light") ? "light" : "dark"
+  );
+});
+
+if (localStorage.getItem("wf-theme") === "light") {
+  document.body.classList.add("light");
+}
+
+updateSubcategories();
+</script>
 </body>
 </html>
