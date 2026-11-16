@@ -83,15 +83,72 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .banner-heading{padding:23px 25px 19px;background:linear-gradient(110deg,#142943,#101b2b);display:flex;align-items:end;justify-content:space-between;gap:20px}
 .banner-heading h1{font-size:clamp(27px,4vw,46px);line-height:1.04;letter-spacing:-1.5px;margin:8px 0 0}
 .banner-heading p{max-width:340px;color:#b9c7d8;font-size:13px;margin:0}
-.player-strip{display:grid;grid-template-columns:repeat(7,minmax(170px,1fr));gap:2px;background:#080e18;overflow-x:auto;scroll-snap-type:x mandatory}
-.player-card{position:relative;min-width:0;height:310px;overflow:hidden;background:#1b293c;scroll-snap-align:start}
-.player-card img{width:100%;height:100%;display:block;object-fit:cover;object-position:center 25%;transition:transform .3s}
-.player-card:hover img{transform:scale(1.035)}
-.player-card:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(3,8,16,.92));pointer-events:none}
-.player-label{position:absolute;z-index:1;left:13px;right:10px;bottom:14px;color:#fff;font-size:clamp(13px,1.5vw,18px);font-weight:900;line-height:1.2;text-shadow:0 2px 8px #000}
-.player-label small{display:block;color:#c7d6e8;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-top:5px}
-.photo-credits{padding:10px 14px;color:#9aabc0;font-size:10px;border-top:1px solid #26364b}
-.photo-credits a{color:var(--cyan);text-decoration:underline}
+
+/* PLAYER PORTRAIT SLIDER */
+.player-strip{
+  display:grid;
+  grid-template-columns:repeat(7,220px);
+  gap:8px;
+  background:#080e18;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  padding:5px;
+}
+.player-strip::-webkit-scrollbar{display:none}
+.player-card{
+  display:block;
+  position:relative;
+  min-width:0;
+  height:310px;
+  overflow:hidden;
+  background:#1b293c;
+  scroll-snap-align:start;
+  color:#fff;
+  text-decoration:none;
+  cursor:pointer;
+}
+.player-card img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:center 25%;
+  transition:transform .6s ease;
+}
+.player-card:hover img{transform:scale(1.07)}
+.player-card:focus-visible{outline:3px solid var(--cyan);outline-offset:-3px}
+.player-card:after{
+  content:"";
+  position:absolute;
+  inset:35% 0 0;
+  background:linear-gradient(transparent,rgba(3,8,16,.92));
+  pointer-events:none;
+}
+.player-label{
+  position:absolute;
+  z-index:1;
+  left:13px;
+  right:10px;
+  bottom:14px;
+  color:#fff;
+  font-size:16px;
+  font-weight:900;
+  line-height:1.2;
+  text-shadow:0 2px 8px #000;
+  pointer-events:none;
+}
+.player-label small{
+  display:block;
+  color:#c7d6e8;
+  font-size:9px;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  margin-top:5px;
+  pointer-events:none;
+}
 
 .breaking{margin:10px 0 32px;background:var(--panel);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;overflow:hidden}
 .breaking strong{background:var(--blue);padding:13px 17px;font-size:10px;letter-spacing:.12em;white-space:nowrap}
@@ -190,7 +247,6 @@ body.light-mode .newsletter p{color:#66758a}
 body.light-mode .foot .brand{color:#1c2939}
 body.light-mode .banner-heading{background:linear-gradient(110deg,#e5edf7,#fff)}
 body.light-mode .banner-heading p{color:#526078}
-body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
 
 /* TABLET */
 @media(max-width:1000px){
@@ -345,59 +401,43 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
       <p>From the WSL to the world stage, celebrating the players shaping the game.</p>
     </div>
 
-    <div class="player-strip">
-      <div class="player-card">
-        <img src="https://cdn.media.amplience.net/i/ArsenalDirect/Russo_2026_sbp?%24sbp-page-heroimage-small-6024%24=&fmt=jpg"
-             alt="Alessia Russo of Arsenal" loading="eager">
-        <div class="player-label">Alessia Russo<small>Arsenal · England</small></div>
-      </div>
+    <div class="player-strip" id="playerStrip">
 
-      <div class="player-card">
-        <img src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png"
-             alt="Hannah Hampton of Chelsea" loading="lazy">
-        <div class="player-label">Hannah Hampton<small>Chelsea · England</small></div>
-      </div>
+      <a class="player-card" href="https://www.arsenal.com/women/players/alessia-russo" target="_blank" rel="noopener noreferrer" aria-label="View Alessia Russo at Arsenal">
+        <img src="https://cdn.media.amplience.net/i/ArsenalDirect/Russo_2026_sbp?%24sbp-page-heroimage-small-6024%24=&fmt=jpg" alt="Alessia Russo of Arsenal" loading="eager">
+        <span class="player-label">Alessia Russo<small>Arsenal · England</small></span>
+      </a>
 
-      <div class="player-card">
-        <img src="https://static.wixstatic.com/media/63ec97_0e76eb6e0ac24fb08a1b49fbb3981369~mv2.png/v1/fill/w_744%2Ch_700%2Cfp_0.53_0.11%2Cq_90%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/putellaspp.png"
-             alt="Alexia Putellas of London City Lionesses" loading="lazy">
-        <div class="player-label">Alexia Putellas<small>London City Lionesses · Spain</small></div>
-      </div>
+      <a class="player-card" href="https://www.chelseafc.com/en/teams/profile/hannah-hampton" target="_blank" rel="noopener noreferrer" aria-label="View Hannah Hampton at Chelsea">
+        <img src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png" alt="Hannah Hampton of Chelsea" loading="lazy">
+        <span class="player-label">Hannah Hampton<small>Chelsea · England</small></span>
+      </a>
 
-      <div class="player-card">
-        <img src="https://www.fcbarcelona.com/photo-resources/2025/09/10/e09695b4-8d3c-411e-864a-0bc580d3aa81/14_Aitana.jpg?height=600&width=600"
-             alt="Aitana Bonmatí of Barcelona" loading="lazy">
-        <div class="player-label">Aitana Bonmatí<small>Barcelona · Spain</small></div>
-      </div>
+      <a class="player-card" href="https://www.londoncitylionesses.com/squad/alexia-putellas" target="_blank" rel="noopener noreferrer" aria-label="View Alexia Putellas at London City Lionesses">
+        <img src="https://static.wixstatic.com/media/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg/v1/fill/w_640%2Ch_429%2Cal_t%2Cq_90/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg" alt="Alexia Putellas of London City Lionesses" loading="lazy">
+        <span class="player-label">Alexia Putellas<small>London City Lionesses · Spain</small></span>
+      </a>
 
-      <div class="player-card">
-        <img src="https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/vaikl8nl7hdr4y9jj4jyb9ey/players/linda-caicedo-alegria/LINDA_AV39491_550x650.png"
-             alt="Linda Caicedo of Real Madrid" loading="lazy">
-        <div class="player-label">Linda Caicedo<small>Real Madrid · Colombia</small></div>
-      </div>
+      <a class="player-card" href="https://www.fcbarcelona.com/en/football/womens-football/players" target="_blank" rel="noopener noreferrer" aria-label="View Aitana Bonmatí at Barcelona">
+        <img src="https://www.fcbarcelona.com/photo-resources/2025/09/10/e09695b4-8d3c-411e-864a-0bc580d3aa81/14_Aitana.jpg?height=600&width=600" alt="Aitana Bonmatí of Barcelona" loading="lazy">
+        <span class="player-label">Aitana Bonmatí<small>Barcelona · Spain</small></span>
+      </a>
 
-      <div class="player-card">
-        <img src="https://washingtonspirit.com/wp-content/uploads/2023/04/02192026_rodmantrinity_cc_0016_2_2x-1-1.webp"
-             alt="Trinity Rodman of Washington Spirit" loading="lazy">
-        <div class="player-label">Trinity Rodman<small>Washington Spirit · USA</small></div>
-      </div>
+      <a class="player-card" href="https://www.realmadrid.com/en-US/football/womens-team/players/linda-caicedo-alegria" target="_blank" rel="noopener noreferrer" aria-label="View Linda Caicedo at Real Madrid">
+        <img src="https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/vaikl8nl7hdr4y9jj4jyb9ey/players/linda-caicedo-alegria/caritas-26-27/LINDA_EQUIPO_CARITA_550X650.png" alt="Linda Caicedo of Real Madrid" loading="lazy">
+        <span class="player-label">Linda Caicedo<small>Real Madrid · Colombia</small></span>
+      </a>
 
-      <div class="player-card">
-        <img src="https://img.fcbayern.com/image/upload/f_auto/q_auto/ar_1%3A1%2Cc_fill%2Cg_custom%3Aface%2Cw_768/v1785329818/cms/public/images/fcbayern-com/spielerinnen/portrait/Profilbilder/Profilbild_B%C3%BChl_Klara.png"
-             alt="Klara Bühl of Bayern Munich" loading="lazy">
-        <div class="player-label">Klara Bühl<small>Bayern Munich · Germany</small></div>
-      </div>
-    </div>
+      <a class="player-card" href="https://washingtonspirit.com/team-member/trinity-rodman/" target="_blank" rel="noopener noreferrer" aria-label="View Trinity Rodman at Washington Spirit">
+        <img src="https://washingtonspirit.com/wp-content/uploads/2023/04/02192026_rodmantrinity_cc_0016_2_2x-1-1.webp" alt="Trinity Rodman of Washington Spirit" loading="lazy">
+        <span class="player-label">Trinity Rodman<small>Washington Spirit · USA</small></span>
+      </a>
 
-    <div class="photo-credits">
-      Player portraits:
-      <a href="https://www.arsenal.com/women/players/alessia-russo" target="_blank" rel="noopener">Alessia Russo</a> ·
-      <a href="https://www.chelseafc.com/en/teams/profile/hannah-hampton" target="_blank" rel="noopener">Hannah Hampton</a> ·
-      <a href="https://www.londoncitylionesses.com/squad/alexia-putellas" target="_blank" rel="noopener">Alexia Putellas</a> ·
-      <a href="https://www.fcbarcelona.com/en/football/womens-football/players" target="_blank" rel="noopener">Aitana Bonmatí</a> ·
-      <a href="https://www.realmadrid.com/en-US/football/womens-team/players/linda-caicedo-alegria" target="_blank" rel="noopener">Linda Caicedo</a> ·
-      <a href="https://washingtonspirit.com/team-member/trinity-rodman/" target="_blank" rel="noopener">Trinity Rodman</a> ·
-      <a href="https://fcbayern.com/frauen/en/teams/first-team/klara-buehl" target="_blank" rel="noopener">Klara Bühl</a>.
+      <a class="player-card" href="https://fcbayern.com/frauen/en/teams/first-team/klara-buehl" target="_blank" rel="noopener noreferrer" aria-label="View Klara Bühl at Bayern Munich">
+        <img src="https://img.fcbayern.com/image/upload/f_auto/q_auto/ar_1%3A1%2Cc_fill%2Cg_custom%3Aface%2Cw_768/v1785329818/cms/public/images/fcbayern-com/spielerinnen/portrait/Profilbilder/Profilbild_B%C3%BChl_Klara.png" alt="Klara Bühl of Bayern Munich" loading="lazy">
+        <span class="player-label">Klara Bühl<small>Bayern Munich · Germany</small></span>
+      </a>
+
     </div>
   </section>
 </div>
@@ -848,12 +888,64 @@ async function loadWFArticles(){
   }
 }
 
+/* AUTOMATIC PLAYER PORTRAIT SLIDER */
+const playerStrip=document.getElementById('playerStrip');
+let playerDirection=1;
+let playerTimer=null;
+let playerPaused=false;
+
+function stopPlayerSlider(){
+  if(playerTimer){
+    clearInterval(playerTimer);
+    playerTimer=null;
+  }
+}
+
+function startPlayerSlider(){
+  stopPlayerSlider();
+
+  if(!playerStrip)return;
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+
+  playerTimer=setInterval(()=>{
+    if(playerPaused||document.hidden)return;
+
+    const maxScroll=playerStrip.scrollWidth-playerStrip.clientWidth;
+
+    if(maxScroll<=0)return;
+
+    playerStrip.scrollLeft+=playerDirection*0.7;
+
+    if(playerStrip.scrollLeft>=maxScroll-1){
+      playerDirection=-1;
+    }
+
+    if(playerStrip.scrollLeft<=1){
+      playerDirection=1;
+    }
+  },20);
+}
+
+if(playerStrip){
+  playerStrip.addEventListener('mouseenter',()=>playerPaused=true);
+  playerStrip.addEventListener('mouseleave',()=>playerPaused=false);
+  playerStrip.addEventListener('touchstart',()=>playerPaused=true,{passive:true});
+  playerStrip.addEventListener('touchend',()=>playerPaused=false,{passive:true});
+  playerStrip.addEventListener('focusin',()=>playerPaused=true);
+  playerStrip.addEventListener('focusout',()=>playerPaused=false);
+
+  startPlayerSlider();
+  window.addEventListener('resize',startPlayerSlider);
+}
+
 /* PAUSE AUTOMATIC SLIDING WHEN THE PAGE IS HIDDEN */
 document.addEventListener('visibilitychange',()=>{
   if(document.hidden){
     stopNewsAutoScroll();
+    stopPlayerSlider();
   }else{
     startNewsAutoScroll();
+    startPlayerSlider();
   }
 });
 
