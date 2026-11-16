@@ -87,6 +87,7 @@ export async function onRequestPost({ request, env }) {
           "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
           "Accept": "application/vnd.github+json",
           "X-GitHub-Api-Version": "2022-11-28",
+          "User-Agent": "WF-Pundit-Website",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
@@ -97,8 +98,6 @@ export async function onRequestPost({ request, env }) {
       }
     );
 
-    // Read the response as text first.
-    // This safely handles JSON and plain-text responses.
     const responseText = await githubResponse.text();
 
     let result = {};
