@@ -4,6 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#101522">
 <title>WF Pundit | Admin Dashboard</title>
 
 <style>
@@ -15,7 +16,9 @@
   --border: #303d54;
   --accent: #1769e8;
   --danger: #d93649;
+  --input-bg: #101522;
 }
+
 body.light {
   --bg: #f3f5f9;
   --panel: #ffffff;
@@ -24,16 +27,22 @@ body.light {
   --border: #dce2ec;
   --accent: #1769e8;
   --danger: #d93649;
+  --input-bg: #f8faff;
 }
+
 * { box-sizing: border-box; }
+
 body {
   margin: 0;
   padding: 20px;
   background: var(--bg);
   color: var(--text);
   font-family: Arial, sans-serif;
+  transition: background .25s ease, color .25s ease;
 }
+
 .container { max-width: 1050px; margin: auto; }
+
 header {
   display: flex;
   align-items: center;
@@ -42,31 +51,43 @@ header {
   flex-wrap: wrap;
   margin-bottom: 22px;
 }
+
 h1 { font-size: 25px; margin: 0; }
 h2 { font-size: 19px; margin-top: 0; }
+
 .panel {
   background: var(--panel);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 20px;
+  transition: background .25s ease, border-color .25s ease;
 }
+
 label {
   display: block;
   margin: 15px 0 7px;
   font-weight: bold;
   font-size: 14px;
 }
+
 input, textarea, select {
   width: 100%;
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: 7px;
-  background: var(--bg);
+  background: var(--input-bg);
   color: var(--text);
   font: inherit;
 }
+
+input:focus, textarea:focus, select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
 textarea { min-height: 110px; resize: vertical; }
+
 button {
   border: 0;
   border-radius: 7px;
@@ -75,31 +96,63 @@ button {
   color: white;
   font-weight: bold;
   cursor: pointer;
+  transition: opacity .2s ease, transform .2s ease;
 }
+
+button:hover { opacity: .9; }
+button:active { transform: scale(.98); }
 button:disabled { opacity: .55; cursor: wait; }
 button.secondary { background: #586579; }
 button.danger { background: var(--danger); }
 button.small { padding: 8px 11px; font-size: 13px; }
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 125px;
+  padding: 10px 15px;
+  border: 1px solid var(--border);
+  border-radius: 30px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: 13px;
+  box-shadow: 0 3px 12px rgba(0,0,0,.12);
+}
+
+.theme-icon {
+  font-size: 17px;
+  line-height: 1;
+}
+
+.theme-label { font-size: 12px; }
+
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 9px;
   margin-top: 15px;
 }
+
 .muted { color: var(--muted); font-size: 13px; }
 #message { margin: 12px 0; font-size: 14px; }
+
 .article {
   border: 1px solid var(--border);
   border-radius: 9px;
   padding: 14px;
   margin-top: 12px;
 }
+
 .article h3 { margin: 0 0 8px; font-size: 16px; }
+
 .article-meta {
   color: var(--muted);
   font-size: 13px;
   margin-bottom: 12px;
 }
+
 .article img {
   width: 100%;
   max-height: 180px;
@@ -107,6 +160,7 @@ button.small { padding: 8px 11px; font-size: 13px; }
   border-radius: 7px;
   margin: 8px 0;
 }
+
 #preview {
   display: none;
   max-width: 100%;
@@ -114,10 +168,13 @@ button.small { padding: 8px 11px; font-size: 13px; }
   margin-top: 12px;
   border-radius: 8px;
 }
+
 .hidden { display: none !important; }
+
 @media (max-width: 600px) {
   body { padding: 12px; }
   .panel { padding: 15px; }
+  h1 { font-size: 21px; }
 }
 </style>
 </head>
@@ -127,8 +184,10 @@ button.small { padding: 8px 11px; font-size: 13px; }
 
 <header>
   <h1>WF Pundit Admin</h1>
-  <button type="button" class="secondary" id="themeButton">
-    Toggle Theme
+
+  <button type="button" class="theme-toggle" id="themeButton">
+    <span class="theme-icon" id="themeIcon">☀️</span>
+    <span class="theme-label" id="themeLabel">Light Mode</span>
   </button>
 </header>
 
@@ -221,6 +280,54 @@ const subcategory = $("subcategory");
 const form = $("articleForm");
 const message = $("message");
 
+/* DARK / LIGHT THEME */
+
+const themeButton = $("themeButton");
+const themeIcon = $("themeIcon");
+const themeLabel = $("themeLabel");
+
+function applyTheme(theme) {
+  const isLight = theme === "light";
+
+  document.body.classList.toggle("light", isLight);
+
+  themeIcon.textContent = isLight ? "🌙" : "☀️";
+  themeLabel.textContent = isLight ? "Dark Mode" : "Light Mode";
+
+  themeButton.setAttribute(
+    "aria-label",
+    isLight ? "Switch to dark mode" : "Switch to light mode"
+  );
+
+  const themeColor = document.querySelector('meta[name="theme-color"]');
+
+  if (themeColor) {
+    themeColor.content = isLight ? "#f3f5f9" : "#101522";
+  }
+}
+
+let savedTheme = "dark";
+
+try {
+  savedTheme = localStorage.getItem("wf-theme") || "dark";
+} catch (error) {}
+
+applyTheme(savedTheme);
+
+themeButton.addEventListener("click", () => {
+  const newTheme = document.body.classList.contains("light")
+    ? "dark"
+    : "light";
+
+  try {
+    localStorage.setItem("wf-theme", newTheme);
+  } catch (error) {}
+
+  applyTheme(newTheme);
+});
+
+/* ARTICLE CATEGORIES */
+
 const subcategories = {
   "Women's Leagues": [
     "Women's Super League (WSL)",
@@ -236,6 +343,7 @@ const subcategories = {
     "Damallsvenskan",
     "Toppserien"
   ],
+
   "International Football": [
     "FIFA Women's World Cup",
     "Women's Africa Cup of Nations (WAFCON)",
@@ -277,6 +385,7 @@ function showMessage(text, isError = false) {
 
 function setPreview(url) {
   const preview = $("preview");
+
   if (url) {
     preview.src = url;
     preview.style.display = "block";
@@ -292,10 +401,13 @@ $("imageUrl").addEventListener("input", () => {
 
 $("photo").addEventListener("change", () => {
   const file = $("photo").files[0];
+
   if (file) {
     setPreview(URL.createObjectURL(file));
   }
 });
+
+/* PHOTO UPLOAD */
 
 $("uploadButton").addEventListener("click", async () => {
   if (!getToken()) {
@@ -347,6 +459,8 @@ $("uploadButton").addEventListener("click", async () => {
   }
 });
 
+/* FORM RESET */
+
 function resetForm() {
   form.reset();
   $("articleId").value = "";
@@ -363,6 +477,8 @@ $("cancelButton").addEventListener("click", () => {
   showMessage("Editing cancelled.");
 });
 
+/* CREATE / UPDATE ARTICLE */
+
 form.addEventListener("submit", async event => {
   event.preventDefault();
 
@@ -372,7 +488,6 @@ form.addEventListener("submit", async event => {
   }
 
   const id = $("articleId").value;
-
   const selectedCategory = subcategory.value || category.value;
 
   const article = {
@@ -392,6 +507,7 @@ form.addEventListener("submit", async event => {
 
   const button = $("saveButton");
   button.disabled = true;
+
   showMessage(id ? "Updating article..." : "Creating article...");
 
   try {
@@ -401,7 +517,9 @@ form.addEventListener("submit", async event => {
         ...authHeaders(),
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(id ? { ...article, id: Number(id) } : article)
+      body: JSON.stringify(
+        id ? { ...article, id: Number(id) } : article
+      )
     });
 
     const result = await response.json();
@@ -410,7 +528,10 @@ form.addEventListener("submit", async event => {
       throw new Error(result.error || "Unable to save article.");
     }
 
-    showMessage(id ? "Article updated successfully." : "Article created successfully.");
+    showMessage(
+      id ? "Article updated successfully." : "Article created successfully."
+    );
+
     resetForm();
     await loadArticles();
 
@@ -420,6 +541,8 @@ form.addEventListener("submit", async event => {
     button.disabled = false;
   }
 });
+
+/* LOAD ARTICLES */
 
 async function loadArticles() {
   if (!getToken()) {
@@ -450,6 +573,8 @@ async function loadArticles() {
   }
 }
 
+/* DISPLAY ARTICLES */
+
 function displayArticles(articles) {
   const list = $("articleList");
   list.innerHTML = "";
@@ -468,6 +593,7 @@ function displayArticles(articles) {
 
     const meta = document.createElement("div");
     meta.className = "article-meta";
+
     meta.textContent =
       "ID: " + article.id +
       " | " + (article.status || "draft") +
@@ -492,7 +618,9 @@ function displayArticles(articles) {
     const deleteButton = document.createElement("button");
     deleteButton.className = "small danger";
     deleteButton.textContent = "Delete";
-    deleteButton.addEventListener("click", () => deleteArticle(article.id, article.title));
+    deleteButton.addEventListener("click", () =>
+      deleteArticle(article.id, article.title)
+    );
 
     const actions = document.createElement("div");
     actions.className = "actions";
@@ -502,6 +630,8 @@ function displayArticles(articles) {
     list.appendChild(card);
   });
 }
+
+/* EDIT ARTICLE */
 
 function editArticle(article) {
   $("articleId").value = article.id;
@@ -525,6 +655,7 @@ function editArticle(article) {
   if (knownCategories.includes(article.category)) {
     category.value = article.category;
     updateSubcategories();
+
   } else {
     const leagueCategory = subcategories["Women's Leagues"] || [];
     const internationalCategory = subcategories["International Football"] || [];
@@ -532,9 +663,11 @@ function editArticle(article) {
     if (leagueCategory.includes(article.category)) {
       category.value = "Women's Leagues";
       updateSubcategories(article.category);
+
     } else if (internationalCategory.includes(article.category)) {
       category.value = "International Football";
       updateSubcategories(article.category);
+
     } else {
       category.value = "Latest News";
       updateSubcategories();
@@ -542,16 +675,22 @@ function editArticle(article) {
   }
 
   setPreview(article.image_url || "");
+
   $("formHeading").textContent = "Edit Article #" + article.id;
   $("saveButton").textContent = "Update Article";
   $("cancelButton").classList.remove("hidden");
 
   window.scrollTo({ top: 0, behavior: "smooth" });
+
   showMessage("Editing article #" + article.id);
 }
 
+/* DELETE ARTICLE */
+
 async function deleteArticle(id, title) {
-  if (!confirm('Are you sure you want to delete "' + title + '"? This cannot be undone.')) {
+  if (!confirm(
+    'Are you sure you want to delete "' + title + '"? This cannot be undone.'
+  )) {
     return;
   }
 
@@ -579,21 +718,12 @@ async function deleteArticle(id, title) {
   }
 }
 
+/* BUTTON EVENTS */
+
 $("loadButton").addEventListener("click", loadArticles);
-
-$("themeButton").addEventListener("click", () => {
-  document.body.classList.toggle("light");
-  localStorage.setItem(
-    "wf-theme",
-    document.body.classList.contains("light") ? "light" : "dark"
-  );
-});
-
-if (localStorage.getItem("wf-theme") === "light") {
-  document.body.classList.add("light");
-}
 
 updateSubcategories();
 </script>
+
 </body>
 </html>
