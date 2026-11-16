@@ -22,6 +22,29 @@ button,input,select{font:inherit}
 button{cursor:pointer}
 .wrap{width:min(var(--max),calc(100% - 36px));margin:auto}
 
+/* LOADING SCREEN */
+.site-loader{
+  position:fixed;inset:0;z-index:9999;display:grid;place-items:center;
+  background:#080f1c;transition:opacity .65s ease,visibility .65s ease
+}
+.site-loader.hidden{opacity:0;visibility:hidden;pointer-events:none}
+.loader-content{width:min(340px,80%);text-align:center;animation:loaderReveal .8s ease both}
+.loader-brand{font-size:34px;font-weight:950;letter-spacing:-1.5px;color:#fff}
+.loader-line{height:3px;margin:22px 0 14px;overflow:hidden;background:#263a53;border-radius:10px}
+.loader-line span{display:block;width:40%;height:100%;background:linear-gradient(90deg,#3978c8,#9fc5ed);animation:loaderProgress 1.2s ease-in-out infinite}
+.loader-content p{color:#aab6c7;font-size:9px;font-weight:850;letter-spacing:2px}
+@keyframes loaderProgress{0%{transform:translateX(-110%)}100%{transform:translateX(280%)}}
+@keyframes loaderReveal{from{opacity:0;transform:translateY(15px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pageReveal{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+body.is-loaded .topline,body.is-loaded header,body.is-loaded main,body.is-loaded footer{animation:pageReveal .7s ease both}
+body.is-loaded .player-card{animation:pageReveal .7s ease both}
+body.is-loaded .player-card:nth-child(2){animation-delay:.08s}
+body.is-loaded .player-card:nth-child(3){animation-delay:.16s}
+body.is-loaded .player-card:nth-child(4){animation-delay:.24s}
+body.is-loaded .player-card:nth-child(5){animation-delay:.32s}
+body.is-loaded .player-card:nth-child(6){animation-delay:.40s}
+body.is-loaded .player-card:nth-child(7){animation-delay:.48s}
+
 .topline{background:#070c14;border-bottom:1px solid #202d40;color:#aab6c8;font-size:12px}
 .topline .wrap{display:flex;justify-content:space-between;gap:14px;padding:9px 0}
 .ticker{color:#fff}
@@ -37,37 +60,16 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .navright{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .search{width:175px;background:#121e2e;border:1px solid #304158;color:white;padding:10px 12px;border-radius:8px;outline:none}
 .search:focus{border-color:var(--cyan)}
-
-/* MENU BUTTON */
 .menu{display:none;border:1px solid #405875;background:#19283c;color:#fff;padding:9px 12px;border-radius:8px;font-size:22px;font-weight:800;line-height:1;white-space:nowrap}
 
-/* LANGUAGE TRANSLATOR */
+/* TRANSLATOR */
 .language-box{display:flex;align-items:center;gap:7px}
 .language-box label{font-size:10px;font-weight:900;color:var(--cyan);letter-spacing:.07em}
-.language-select{
-  max-width:130px;
-  background:#121e2e;
-  color:#fff;
-  border:1px solid #405875;
-  border-radius:8px;
-  padding:9px 8px;
-  font-size:11px;
-  font-weight:800;
-  outline:none;
-}
+.language-select{max-width:130px;background:#121e2e;color:#fff;border:1px solid #405875;border-radius:8px;padding:9px 8px;font-size:11px;font-weight:800;outline:none}
 .language-select:focus{border-color:var(--cyan)}
-.language-note{font-size:10px;color:var(--muted);margin-top:7px}
 
-/* PREMIUM THEME SWITCH */
-.theme-toggle{
-  position:relative;display:inline-flex;align-items:center;gap:10px;
-  min-height:44px;padding:6px 14px 6px 7px;
-  border:1px solid rgba(126,169,218,.35);border-radius:40px;
-  background:linear-gradient(135deg,rgba(37,66,103,.95),rgba(13,27,46,.98));
-  color:#fff;font-size:11px;font-weight:850;letter-spacing:.035em;
-  white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.08);
-  transition:background .3s,border-color .3s,box-shadow .3s,transform .25s;
-}
+/* THEME SWITCH */
+.theme-toggle{position:relative;display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:6px 14px 6px 7px;border:1px solid rgba(126,169,218,.35);border-radius:40px;background:linear-gradient(135deg,rgba(37,66,103,.95),rgba(13,27,46,.98));color:#fff;font-size:11px;font-weight:850;letter-spacing:.035em;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.08);transition:background .3s,border-color .3s,box-shadow .3s,transform .25s}
 .theme-toggle:hover{border-color:#75baff;box-shadow:0 0 0 3px rgba(57,120,200,.13),0 6px 22px rgba(57,120,200,.22);transform:translateY(-2px)}
 .theme-track{position:relative;display:flex;align-items:center;width:48px;height:27px;padding:3px;border-radius:30px;background:#091522;border:1px solid rgba(159,197,237,.25);box-shadow:inset 0 2px 5px rgba(0,0,0,.35);flex-shrink:0}
 .theme-thumb{position:absolute;left:3px;top:3px;display:grid;place-items:center;width:19px;height:19px;border-radius:50%;background:linear-gradient(145deg,#fff,#c8ddf4);color:#1a4779;font-size:12px;line-height:1;box-shadow:0 2px 7px rgba(0,0,0,.3);transition:transform .35s cubic-bezier(.2,.8,.2,1),background .3s,color .3s}
@@ -77,16 +79,15 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .hero{padding:32px 0 22px}
 .section-kicker{font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
 .section-kicker:before{content:"";width:24px;height:2px;background:var(--gold)}
-
 .player-banner{margin-top:16px;background:#101b2b;border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,.2)}
 .banner-heading{padding:23px 25px 19px;background:linear-gradient(110deg,#142943,#101b2b);display:flex;align-items:end;justify-content:space-between;gap:20px}
 .banner-heading h1{font-size:clamp(27px,4vw,46px);line-height:1.04;letter-spacing:-1.5px;margin:8px 0 0}
 .banner-heading p{max-width:340px;color:#b9c7d8;font-size:13px;margin:0}
-.player-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;background:#080e18}
-.player-card{position:relative;min-width:0;height:310px;overflow:hidden;background:#1b293c}
+.player-strip{display:grid;grid-template-columns:repeat(7,minmax(170px,1fr));gap:2px;background:#080e18;overflow-x:auto;scroll-snap-type:x mandatory}
+.player-card{position:relative;min-width:0;height:310px;overflow:hidden;background:#1b293c;scroll-snap-align:start}
 .player-card img{width:100%;height:100%;display:block;object-fit:cover;object-position:center 25%;transition:transform .3s}
 .player-card:hover img{transform:scale(1.035)}
-.player-card:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(3,8,16,.92))}
+.player-card:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,rgba(3,8,16,.92));pointer-events:none}
 .player-label{position:absolute;z-index:1;left:13px;right:10px;bottom:14px;color:#fff;font-size:clamp(13px,1.5vw,18px);font-weight:900;line-height:1.2;text-shadow:0 2px 8px #000}
 .player-label small{display:block;color:#c7d6e8;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin-top:5px}
 .photo-credits{padding:10px 14px;color:#9aabc0;font-size:10px;border-top:1px solid #26364b}
@@ -101,7 +102,6 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .section-head h2{font-size:26px;letter-spacing:-.8px;margin:4px 0 0}
 .section-head p{margin:4px 0 0;color:var(--muted);font-size:13px}
 .text-link{font-size:11px;color:var(--cyan);font-weight:900;text-transform:uppercase;letter-spacing:.09em}
-
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:19px}
 .filter{border:1px solid #34465e;background:#131e2e;color:#c0ccdc;padding:8px 14px;border-radius:30px;font-size:11px;font-weight:850;transition:all .2s}
 .filter.active,.filter:hover{background:var(--blue);border-color:var(--blue);color:#fff}
@@ -204,49 +204,13 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
 @media(max-width:720px){
   .wrap{width:min(100% - 24px,var(--max))}
   .topline .wrap{font-size:9px}
-
-  /* MENU LEFT, BRAND NEXT, CONTROLS RIGHT */
-  .nav{
-    min-height:66px;
-    justify-content:flex-start;
-    gap:9px;
-    flex-wrap:nowrap;
-  }
-  .menu{
-    display:block;
-    order:0;
-    flex-shrink:0;
-    padding:8px 10px;
-  }
-  .brand{
-    order:1;
-    font-size:19px;
-    flex-shrink:0;
-  }
-  .navright{
-    order:2;
-    margin-left:auto;
-    gap:5px;
-    flex-wrap:nowrap;
-    min-width:0;
-  }
-
-  nav{
-    display:none;
-    position:absolute;
-    top:66px;
-    left:0;
-    right:0;
-    background:#0d1727;
-    border-bottom:1px solid var(--line);
-    padding:17px 20px;
-    flex-direction:column;
-    align-items:flex-start;
-    gap:17px;
-  }
+  .nav{min-height:66px;justify-content:flex-start;gap:9px;flex-wrap:nowrap}
+  .menu{display:block;order:0;flex-shrink:0;padding:8px 10px}
+  .brand{order:1;font-size:19px;flex-shrink:0}
+  .navright{order:2;margin-left:auto;gap:5px;flex-wrap:nowrap;min-width:0}
+  nav{display:none;position:absolute;top:66px;left:0;right:0;background:#0d1727;border-bottom:1px solid var(--line);padding:17px 20px;flex-direction:column;align-items:flex-start;gap:17px}
   .nav.open nav{display:flex}
   body.light-mode nav{background:#fff}
-
   .search{width:95px;padding:8px 6px;font-size:10px}
   .language-box{gap:4px}
   .language-box label{display:none}
@@ -256,12 +220,11 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
   .theme-thumb{width:15px;height:15px}
   .theme-toggle[aria-pressed="true"] .theme-thumb{transform:translateX(13px)}
   .theme-label{font-size:8px;min-width:42px}
-
   .hero{padding-top:24px}
   .banner-heading{display:block;padding:19px}
   .banner-heading p{margin-top:10px}
-  .player-strip{grid-template-columns:repeat(5,155px);overflow-x:auto;scroll-snap-type:x mandatory}
-  .player-card{height:245px;scroll-snap-align:start}
+  .player-strip{grid-template-columns:repeat(7,155px)}
+  .player-card{height:245px}
   .player-label{font-size:15px}
   .breaking span{font-size:10px}
   .section-head h2{font-size:23px}
@@ -279,28 +242,37 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
   .fb-panel{padding:15px}
   .fb-frame{height:560px}
 }
-
 @media(max-width:390px){
   .nav{gap:6px}
   .brand{font-size:17px;gap:5px}
   .verified{width:15px;height:15px;font-size:10px}
   .search{width:75px;padding:8px 5px}
-  .player-strip{grid-template-columns:repeat(5,142px)}
+  .player-strip{grid-template-columns:repeat(7,142px)}
   .theme-toggle{padding:5px 5px 5px 4px;gap:4px}
   .theme-label{font-size:7px;min-width:36px}
   .theme-track{width:33px}
   .theme-toggle[aria-pressed="true"] .theme-thumb{transform:translateX(9px)}
   .language-select{max-width:72px;font-size:8px}
 }
-
 @media(prefers-reduced-motion:reduce){
   html,.news-grid{scroll-behavior:auto}
-  .news-card,.carousel-button,.player-card img,.theme-toggle,.theme-thumb{transition:none}
+  .site-loader,.loader-content,.loader-line span,.topline,header,main,footer,.player-card,
+  .news-card,.carousel-button,.player-card img,.theme-toggle,.theme-thumb{
+    animation:none!important;transition:none!important
+  }
 }
 </style>
 </head>
 
 <body>
+<div class="site-loader" id="siteLoader">
+  <div class="loader-content">
+    <div class="loader-brand">wf_pundit <span class="verified">✓</span></div>
+    <div class="loader-line"><span></span></div>
+    <p>THE WOMEN'S GAME. EVERY STORY MATTERS.</p>
+  </div>
+</div>
+
 <div class="topline">
   <div class="wrap">
     <div class="ticker"><b>WF PUNDIT</b> THE HOME OF WOMEN'S FOOTBALL</div>
@@ -310,8 +282,6 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
 
 <header>
 <div class="wrap nav" id="nav">
-
-  <!-- MENU BUTTON MOVED TO THE EXTREME LEFT -->
   <button class="menu" id="menu" type="button" aria-label="Toggle menu" aria-expanded="false">☰</button>
 
   <a class="brand" href="#home">
@@ -328,7 +298,6 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
     <a href="#about">About</a>
   </nav>
 
-  <!-- SEARCH, TRANSLATOR AND THEME SWITCH STAY ON THE RIGHT -->
   <div class="navright">
     <input class="search" id="search" type="search" placeholder="Search stories…" aria-label="Search stories">
 
@@ -357,9 +326,7 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
     </div>
 
     <button class="theme-toggle" id="themeToggle" type="button" aria-label="Switch to light mode" aria-pressed="false">
-      <span class="theme-track">
-        <span class="theme-thumb" id="themeIcon">☀</span>
-      </span>
+      <span class="theme-track"><span class="theme-thumb" id="themeIcon">☀</span></span>
       <span class="theme-label" id="themeLabel">Light Mode</span>
     </button>
   </div>
@@ -380,35 +347,57 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
 
     <div class="player-strip">
       <div class="player-card">
-        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/20260927-Alessia_Russo.jpg" alt="Alessia Russo" loading="eager">
-        <div class="player-label">Alessia Russo<small>WSL · England</small></div>
+        <img src="https://cdn.media.amplience.net/i/ArsenalDirect/Russo_2026_sbp?%24sbp-page-heroimage-small-6024%24=&fmt=jpg"
+             alt="Alessia Russo of Arsenal" loading="eager">
+        <div class="player-label">Alessia Russo<small>Arsenal · England</small></div>
       </div>
+
       <div class="player-card">
-        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/20250510-Hannah_Hampton.jpg" alt="Hannah Hampton" loading="lazy">
-        <div class="player-label">Hannah Hampton<small>WSL · England</small></div>
+        <img src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png"
+             alt="Hannah Hampton of Chelsea" loading="lazy">
+        <div class="player-label">Hannah Hampton<small>Chelsea · England</small></div>
       </div>
+
       <div class="player-card">
-        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Alexia_Putellas.jpg" alt="Alexia Putellas" loading="lazy">
-        <div class="player-label">Alexia Putellas<small>Spain · Barcelona</small></div>
+        <img src="https://static.wixstatic.com/media/63ec97_0e76eb6e0ac24fb08a1b49fbb3981369~mv2.png/v1/fill/w_744%2Ch_700%2Cfp_0.53_0.11%2Cq_90%2Cusm_0.66_1.00_0.01%2Cenc_avif%2Cquality_auto/putellaspp.png"
+             alt="Alexia Putellas of London City Lionesses" loading="lazy">
+        <div class="player-label">Alexia Putellas<small>London City Lionesses · Spain</small></div>
       </div>
+
       <div class="player-card">
-        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Trinity_Rodman.jpg" alt="Trinity Rodman" loading="lazy">
-        <div class="player-label">Trinity Rodman<small>NWSL · USA</small></div>
+        <img src="https://www.fcbarcelona.com/photo-resources/2025/09/10/e09695b4-8d3c-411e-864a-0bc580d3aa81/14_Aitana.jpg?height=600&width=600"
+             alt="Aitana Bonmatí of Barcelona" loading="lazy">
+        <div class="player-label">Aitana Bonmatí<small>Barcelona · Spain</small></div>
       </div>
+
       <div class="player-card">
-        <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Klara_B%C3%BChl_20190505.jpg" alt="Klara Bühl" loading="lazy">
-        <div class="player-label">Klara Bühl<small>Germany · Bundesliga</small></div>
+        <img src="https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/vaikl8nl7hdr4y9jj4jyb9ey/players/linda-caicedo-alegria/LINDA_AV39491_550x650.png"
+             alt="Linda Caicedo of Real Madrid" loading="lazy">
+        <div class="player-label">Linda Caicedo<small>Real Madrid · Colombia</small></div>
+      </div>
+
+      <div class="player-card">
+        <img src="https://washingtonspirit.com/wp-content/uploads/2023/04/02192026_rodmantrinity_cc_0016_2_2x-1-1.webp"
+             alt="Trinity Rodman of Washington Spirit" loading="lazy">
+        <div class="player-label">Trinity Rodman<small>Washington Spirit · USA</small></div>
+      </div>
+
+      <div class="player-card">
+        <img src="https://img.fcbayern.com/image/upload/f_auto/q_auto/ar_1%3A1%2Cc_fill%2Cg_custom%3Aface%2Cw_768/v1785329818/cms/public/images/fcbayern-com/spielerinnen/portrait/Profilbilder/Profilbild_B%C3%BChl_Klara.png"
+             alt="Klara Bühl of Bayern Munich" loading="lazy">
+        <div class="player-label">Klara Bühl<small>Bayern Munich · Germany</small></div>
       </div>
     </div>
 
     <div class="photo-credits">
-      Photos:
-      <a href="https://commons.wikimedia.org/wiki/File:20260927-Alessia_Russo.jpg" target="_blank" rel="noopener">Alessia Russo</a> ·
-      <a href="https://commons.wikimedia.org/wiki/File:20250510-Hannah_Hampton.jpg" target="_blank" rel="noopener">Hannah Hampton</a> ·
-      <a href="https://commons.wikimedia.org/wiki/File:Alexia_Putellas.jpg" target="_blank" rel="noopener">Alexia Putellas</a> ·
-      <a href="https://commons.wikimedia.org/wiki/File:Trinity_Rodman.jpg" target="_blank" rel="noopener">Trinity Rodman</a> ·
-      <a href="https://commons.wikimedia.org/wiki/File:Klara_B%C3%BChl_20190505.jpg" target="_blank" rel="noopener">Klara Bühl</a>.
-      See each source page for its photographer and reuse licence.
+      Player portraits:
+      <a href="https://www.arsenal.com/women/players/alessia-russo" target="_blank" rel="noopener">Alessia Russo</a> ·
+      <a href="https://www.chelseafc.com/en/teams/profile/hannah-hampton" target="_blank" rel="noopener">Hannah Hampton</a> ·
+      <a href="https://www.londoncitylionesses.com/squad/alexia-putellas" target="_blank" rel="noopener">Alexia Putellas</a> ·
+      <a href="https://www.fcbarcelona.com/en/football/womens-football/players" target="_blank" rel="noopener">Aitana Bonmatí</a> ·
+      <a href="https://www.realmadrid.com/en-US/football/womens-team/players/linda-caicedo-alegria" target="_blank" rel="noopener">Linda Caicedo</a> ·
+      <a href="https://washingtonspirit.com/team-member/trinity-rodman/" target="_blank" rel="noopener">Trinity Rodman</a> ·
+      <a href="https://fcbayern.com/frauen/en/teams/first-team/klara-buehl" target="_blank" rel="noopener">Klara Bühl</a>.
     </div>
   </section>
 </div>
@@ -731,11 +720,7 @@ const languageSelect=document.getElementById('languageSelect');
 
 languageSelect.addEventListener('change',()=>{
   const language=languageSelect.value;
-
-  if(language==='en'){
-    languageSelect.value='en';
-    return;
-  }
+  if(language==='en')return;
 
   const currentPage=window.location.href;
   const translateURL='https://translate.google.com/translate?sl=auto&tl='+
@@ -754,29 +739,21 @@ document.getElementById('signup').addEventListener('submit',event=>{
 /* FOOTER YEAR */
 document.getElementById('year').textContent=new Date().getFullYear();
 
-/* PREMIUM DARK AND LIGHT MODE */
+/* DARK AND LIGHT MODE */
 const themeToggle=document.getElementById('themeToggle');
 const themeIcon=document.getElementById('themeIcon');
 const themeLabel=document.getElementById('themeLabel');
 
 function applyTheme(theme){
   const isLight=theme==='light';
-
   document.body.classList.toggle('light-mode',isLight);
-
   themeIcon.textContent=isLight?'☾':'☀';
   themeLabel.textContent=isLight?'Dark Mode':'Light Mode';
-
   themeToggle.setAttribute('aria-pressed',String(isLight));
-  themeToggle.setAttribute(
-    'aria-label',
-    isLight?'Switch to dark mode':'Switch to light mode'
-  );
+  themeToggle.setAttribute('aria-label',isLight?'Switch to dark mode':'Switch to light mode');
 
   const themeColor=document.querySelector('meta[name="theme-color"]');
-  if(themeColor){
-    themeColor.content=isLight?'#f1f4f8':'#0b1220';
-  }
+  if(themeColor)themeColor.content=isLight?'#f1f4f8':'#0b1220';
 }
 
 let savedTheme='dark';
@@ -788,11 +765,7 @@ applyTheme(savedTheme);
 
 themeToggle.addEventListener('click',()=>{
   const newTheme=document.body.classList.contains('light-mode')?'dark':'light';
-
-  try{
-    localStorage.setItem('wf-theme',newTheme);
-  }catch(error){}
-
+  try{localStorage.setItem('wf-theme',newTheme)}catch(error){}
   applyTheme(newTheme);
 });
 
@@ -888,6 +861,23 @@ window.addEventListener('resize',updateCarouselControls);
 updateCarouselControls();
 startNewsAutoScroll();
 loadWFArticles();
+
+/* LOADING SCREEN */
+function finishPageLoading(){
+  document.body.classList.add('is-loaded');
+  const loader=document.getElementById('siteLoader');
+  if(loader){
+    loader.classList.add('hidden');
+    setTimeout(()=>loader.remove(),700);
+  }
+}
+
+window.addEventListener('load',()=>{
+  setTimeout(finishPageLoading,450);
+});
+
+/* SAFETY FALLBACK: NEVER LEAVE THE LOADER ON SCREEN */
+setTimeout(finishPageLoading,3500);
 </script>
 </body>
 </html>
