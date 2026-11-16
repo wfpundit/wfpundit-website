@@ -44,7 +44,6 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .section-kicker{font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase;color:var(--cyan);display:flex;align-items:center;gap:10px}
 .section-kicker:before{content:"";width:24px;height:2px;background:var(--gold)}
 
-/* FIVE-PLAYER HERO BANNER */
 .player-banner{margin-top:16px;background:#101b2b;border:1px solid rgba(255,255,255,.12);border-radius:14px;overflow:hidden;box-shadow:0 14px 36px rgba(0,0,0,.2)}
 .banner-heading{padding:23px 25px 19px;background:linear-gradient(110deg,#142943,#101b2b);display:flex;align-items:end;justify-content:space-between;gap:20px}
 .banner-heading h1{font-size:clamp(27px,4vw,46px);line-height:1.04;letter-spacing:-1.5px;margin:8px 0 0}
@@ -76,8 +75,25 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .news-carousel{position:relative}
 .news-grid{display:flex;gap:17px;overflow-x:auto;overflow-y:hidden;padding:3px 2px 15px;scroll-snap-type:x mandatory;scroll-behavior:smooth;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
 .news-grid::-webkit-scrollbar{display:none}
-.news-card{flex:0 0 calc((100% - 34px)/3);min-width:0;background:var(--panel);border:1px solid #29384c;border-radius:12px;overflow:hidden;scroll-snap-align:start;transition:transform .22s,border-color .22s,box-shadow .22s;box-shadow:0 8px 24px rgba(0,0,0,.13)}
+
+/* CLICKABLE ARTICLE CARDS */
+.news-card{
+  display:block;
+  color:inherit;
+  text-decoration:none;
+  flex:0 0 calc((100% - 34px)/3);
+  min-width:0;
+  background:var(--panel);
+  border:1px solid #29384c;
+  border-radius:12px;
+  overflow:hidden;
+  scroll-snap-align:start;
+  transition:transform .22s,border-color .22s,box-shadow .22s;
+  box-shadow:0 8px 24px rgba(0,0,0,.13);
+  cursor:pointer;
+}
 .news-card:hover{transform:translateY(-3px);border-color:#668ab7;box-shadow:0 14px 30px rgba(0,0,0,.2)}
+.news-card:focus-visible{outline:3px solid var(--cyan);outline-offset:3px}
 .thumb{height:190px;background:#1b293c center/cover}
 .news-body{padding:17px}
 .news-body .meta{font-size:10px;color:var(--cyan);font-weight:900;letter-spacing:.1em;text-transform:uppercase}
@@ -263,22 +279,18 @@ body.light-mode .photo-credits{color:#66758a;border-color:#dce3ec}
         <img src="https://commons.wikimedia.org/wiki/Special:FilePath/20260927-Alessia_Russo.jpg" alt="Alessia Russo" loading="eager">
         <div class="player-label">Alessia Russo<small>WSL · England</small></div>
       </div>
-
       <div class="player-card">
         <img src="https://commons.wikimedia.org/wiki/Special:FilePath/20250510-Hannah_Hampton.jpg" alt="Hannah Hampton" loading="lazy">
         <div class="player-label">Hannah Hampton<small>WSL · England</small></div>
       </div>
-
       <div class="player-card">
         <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Alexia_Putellas.jpg" alt="Alexia Putellas" loading="lazy">
         <div class="player-label">Alexia Putellas<small>Spain · Barcelona</small></div>
       </div>
-
       <div class="player-card">
         <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Trinity_Rodman.jpg" alt="Trinity Rodman" loading="lazy">
         <div class="player-label">Trinity Rodman<small>NWSL · USA</small></div>
       </div>
-
       <div class="player-card">
         <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Klara_B%C3%BChl_20190505.jpg" alt="Klara Bühl" loading="lazy">
         <div class="player-label">Klara Bühl<small>Germany · Bundesliga</small></div>
@@ -669,7 +681,7 @@ themeToggle.addEventListener('click',()=>{
   applyTheme(newTheme);
 });
 
-/* LOAD ONLY PUBLISHED ARTICLES FROM THE ADMIN DASHBOARD */
+/* LOAD PUBLISHED ARTICLES AND MAKE EACH CARD CLICKABLE */
 async function loadWFArticles(){
   try{
     const response=await fetch('/api/articles');
@@ -691,8 +703,15 @@ async function loadWFArticles(){
     }
 
     data.articles.forEach(article=>{
-      const card=document.createElement('article');
+      const card=document.createElement('a');
       card.className='news-card';
+
+      /* Each card opens its own article using its unique database ID */
+      card.href='/article.html?id='+encodeURIComponent(article.id);
+      card.setAttribute(
+        'aria-label',
+        'Read article: '+(article.title||'')
+      );
 
       const categoryText=String(article.category||"Women's Football");
       const normalized=categoryText.toLowerCase();
@@ -715,7 +734,8 @@ async function loadWFArticles(){
       thumb.className='thumb';
 
       if(article.image_url&&/^https:\/\//i.test(article.image_url)){
-        thumb.style.backgroundImage='url("'+article.image_url.replace(/["\\]/g,'')+'")';
+        const safeImageURL=article.image_url.replace(/["\\]/g,'');
+        thumb.style.backgroundImage='url("'+safeImageURL+'")';
       }
 
       const body=document.createElement('div');
@@ -733,7 +753,7 @@ async function loadWFArticles(){
 
       const date=document.createElement('div');
       date.className='date';
-      date.textContent='WF PUNDIT';
+      date.textContent='WF PUNDIT · READ STORY ↗';
 
       body.append(category,title,summary,date);
       card.append(thumb,body);
