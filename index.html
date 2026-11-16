@@ -172,9 +172,7 @@ transform:scale(.75);
 box-shadow:0 0 2px #25d879
 }
 }
-.topline:hover .topline-track{
-animation-play-state:paused
-}
+.topline:hover .topline-track{animation-play-state:paused}
 
 /* NAVIGATION */
 header{
@@ -338,6 +336,41 @@ border-radius:50%;
 background:#58b5ff;
 box-shadow:0 0 12px #58b5ff
 }
+
+/* WELCOME HERO ENTRANCE ANIMATION */
+@keyframes heroFadeUp{
+from{
+opacity:0;
+transform:translateY(22px)
+}
+to{
+opacity:1;
+transform:translateY(0)
+}
+}
+@keyframes heroSlideLeft{
+from{
+opacity:0;
+transform:translateX(-65px)
+}
+to{
+opacity:1;
+transform:translateX(0)
+}
+}
+@keyframes heroSlideRight{
+from{
+opacity:0;
+transform:translateX(65px)
+}
+to{
+opacity:1;
+transform:translateX(0)
+}
+}
+.welcome-hero .welcome-tag{
+animation:heroFadeUp .75s ease-out .25s both
+}
 .welcome-hero h1{
 max-width:850px;
 margin:19px 0 15px;
@@ -349,9 +382,15 @@ letter-spacing:-2.8px;
 text-transform:uppercase;
 text-shadow:0 5px 25px #0005
 }
-.welcome-hero h1 span{
+.welcome-hero h1 .hero-line-first{
 display:block;
-color:#a9d3ff
+color:#fff;
+animation:heroSlideLeft .85s cubic-bezier(.2,.75,.25,1) .48s both
+}
+.welcome-hero h1 .hero-line-second{
+display:block;
+color:#a9d3ff;
+animation:heroSlideRight .9s cubic-bezier(.2,.75,.25,1) .72s both
 }
 .welcome-hero p{
 max-width:690px;
@@ -359,14 +398,16 @@ margin:0;
 color:#d5e0ee;
 font-size:clamp(15px,1.8vw,18px);
 font-weight:650;
-line-height:1.75
+line-height:1.75;
+animation:heroFadeUp .85s ease-out 1.05s both
 }
 .welcome-actions{
 display:flex;
 align-items:center;
 gap:12px;
 flex-wrap:wrap;
-margin-top:25px
+margin-top:25px;
+animation:heroFadeUp .85s ease-out 1.3s both
 }
 .welcome-button{
 display:inline-flex;
@@ -1160,6 +1201,17 @@ html,.news-grid{scroll-behavior:auto}
 .topline-group[aria-hidden="true"]{display:none}
 .news-card,.theme-thumb,.player-card,.player-card img{transition:none;animation:none!important}
 .player-card:before{display:none}
+
+/* SHOW HERO CONTENT WITHOUT ENTRANCE MOTION */
+.welcome-hero .welcome-tag,
+.welcome-hero h1 .hero-line-first,
+.welcome-hero h1 .hero-line-second,
+.welcome-hero p,
+.welcome-hero .welcome-actions{
+animation:none!important;
+opacity:1;
+transform:none
+}
 }
 </style>
 </head>
@@ -1269,8 +1321,8 @@ THE HOME OF WOMEN'S FOOTBALL
 </div>
 
 <h1>
-WOMEN'S FOOTBALL.
-<span>EVERY STORY MATTERS.</span>
+<span class="hero-line-first">WOMEN'S FOOTBALL.</span>
+<span class="hero-line-second">EVERY STORY MATTERS.</span>
 </h1>
 
 <p>
