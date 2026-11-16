@@ -61,19 +61,20 @@ nav a:hover,nav a.active{color:var(--cyan)}
 .banner-heading h1{font-size:clamp(27px,4vw,46px);line-height:1.04;letter-spacing:-1.5px;margin:8px 0 0}
 .banner-heading p{max-width:340px;color:#b9c7d8;font-size:13px;margin:0}
 
-/* Large holographic player carousel */
+/* TRUE 3D ROTARY PLAYER CAROUSEL */
 .player-strip{
 position:relative;
-height:480px;
+height:490px;
 padding:10px;
 overflow:hidden;
 touch-action:pan-y;
 user-select:none;
 -webkit-user-select:none;
 cursor:grab;
-perspective:1200px;
+perspective:1500px;
+perspective-origin:50% 45%;
 background:
-radial-gradient(ellipse at 50% 40%,rgba(49,105,163,.48) 0%,rgba(22,49,79,.3) 40%,transparent 75%),
+radial-gradient(ellipse at 50% 42%,rgba(49,105,163,.58) 0%,rgba(22,49,79,.32) 43%,transparent 76%),
 linear-gradient(135deg,#0c1929,#101d30 48%,#080f1b);
 }
 .player-strip.is-dragging{cursor:grabbing}
@@ -82,16 +83,19 @@ content:"";
 position:absolute;
 inset:0;
 pointer-events:none;
-background:linear-gradient(90deg,rgba(7,14,24,.35),transparent 18%,transparent 82%,rgba(7,14,24,.35));
-z-index:4;
+background:linear-gradient(90deg,rgba(7,14,24,.45),transparent 17%,transparent 83%,rgba(7,14,24,.45));
+z-index:5;
 }
 .player-card{
 position:absolute;
-inset:9px;
+top:10px;
+bottom:10px;
+left:22%;
+width:56%;
 display:block;
 overflow:hidden;
-border:1px solid rgba(130,180,230,.25);
-border-radius:18px;
+border:1px solid rgba(130,180,230,.35);
+border-radius:20px;
 background:
 radial-gradient(ellipse at 50% 35%,#254b72 0%,#152b44 48%,#0b1422 100%);
 color:#fff;
@@ -100,98 +104,140 @@ opacity:0;
 visibility:hidden;
 pointer-events:none;
 transform-style:preserve-3d;
-transform:rotateY(-14deg) scale(.94);
-transition:opacity .65s ease,visibility 0s linear .65s,transform .65s ease;
-box-shadow:inset 0 0 35px rgba(83,159,235,.12);
+transform:translateX(0) scale(.7) rotateY(0deg);
+transition:
+transform .72s cubic-bezier(.2,.75,.2,1),
+opacity .55s ease,
+filter .55s ease,
+visibility 0s linear .72s;
+box-shadow:inset 0 0 35px rgba(83,159,235,.16);
+will-change:transform,opacity;
 }
 .player-card.is-active{
 opacity:1;
 visibility:visible;
 pointer-events:auto;
-z-index:2;
-transform:rotateY(0) scale(1);
-transition:opacity .65s ease,visibility 0s,transform .65s ease;
-animation:cardReveal .95s cubic-bezier(.2,.75,.25,1) both;
+z-index:3;
+transform:translateX(0) scale(1) rotateY(0deg);
+filter:brightness(1.08);
+transition:
+transform .72s cubic-bezier(.2,.75,.2,1),
+opacity .55s ease,
+filter .55s ease,
+visibility 0s;
 }
-@keyframes cardReveal{
-0%{transform:rotateY(-24deg) rotateX(7deg) scale(.88);filter:brightness(.65)}
-55%{transform:rotateY(5deg) rotateX(-2deg) scale(1.015);filter:brightness(1.2)}
-100%{transform:rotateY(0) rotateX(0) scale(1);filter:brightness(1)}
+.player-card.is-side{
+opacity:.72;
+visibility:visible;
+pointer-events:auto;
+z-index:2;
+filter:brightness(.72) saturate(.85);
+}
+.player-card.is-left{
+transform:translateX(-83%) scale(.77) rotateY(34deg);
+}
+.player-card.is-right{
+transform:translateX(83%) scale(.77) rotateY(-34deg);
+}
+.player-card.is-far{
+opacity:0;
+visibility:hidden;
+pointer-events:none;
+}
+.player-card.is-left.is-far{
+transform:translateX(-135%) scale(.58) rotateY(48deg);
+}
+.player-card.is-right.is-far{
+transform:translateX(135%) scale(.58) rotateY(-48deg);
+}
+.player-card.is-active{
+animation:rotaryArrival .65s cubic-bezier(.2,.75,.25,1) both;
+}
+@keyframes rotaryArrival{
+0%{filter:brightness(.65);box-shadow:inset 0 0 15px #3978c8}
+65%{filter:brightness(1.2)}
+100%{filter:brightness(1.08)}
 }
 
-/* Moving holographic shine */
+/* Holographic FIFA-style card shine */
 .player-card:before{
 content:"";
 position:absolute;
 z-index:3;
 inset:-40%;
 pointer-events:none;
-background:linear-gradient(112deg,transparent 38%,rgba(124,199,255,.04) 43%,rgba(255,255,255,.42) 49%,rgba(105,190,255,.13) 54%,transparent 61%);
+background:linear-gradient(112deg,transparent 38%,rgba(124,199,255,.05) 43%,rgba(255,255,255,.4) 49%,rgba(105,190,255,.15) 54%,transparent 61%);
 transform:translateX(-75%) rotate(12deg);
 opacity:0;
 mix-blend-mode:screen;
 }
 .player-card.is-active:before{
 opacity:1;
-animation:holoGlint 2.1s ease-out .2s 1;
+animation:holoGlint 2s ease-out .15s 1;
 }
 @keyframes holoGlint{
 0%{transform:translateX(-75%) rotate(12deg);opacity:0}
 18%{opacity:.9}
-75%{opacity:.7}
+75%{opacity:.65}
 100%{transform:translateX(75%) rotate(12deg);opacity:0}
 }
 
-/* Large circular player portrait */
+/* Player portraits */
 .player-card img{
 position:absolute;
 z-index:1;
-width:clamp(270px,34vw,350px);
-height:clamp(270px,34vw,350px);
-max-width:75vw;
-max-height:75vw;
+width:clamp(260px,29vw,330px);
+height:clamp(260px,29vw,330px);
+max-width:82%;
+max-height:72%;
 left:50%;
-top:45%;
+top:44%;
 transform:translate(-50%,-50%);
 display:block;
 object-fit:cover;
 object-position:center 24%;
 border-radius:50%;
-border:6px solid rgba(177,218,255,.85);
-outline:2px solid rgba(73,151,235,.8);
+border:6px solid rgba(177,218,255,.88);
+outline:2px solid rgba(73,151,235,.85);
 outline-offset:6px;
 background:radial-gradient(circle,#254b72,#0b1422);
 box-shadow:
-0 0 0 10px rgba(57,120,200,.12),
-0 0 25px rgba(74,164,255,.48),
-0 0 65px rgba(57,120,200,.3),
+0 0 0 10px rgba(57,120,200,.14),
+0 0 25px rgba(74,164,255,.55),
+0 0 65px rgba(57,120,200,.34),
 inset 0 0 18px rgba(255,255,255,.16);
 filter:saturate(1.08) contrast(1.04);
 backface-visibility:hidden;
 -webkit-backface-visibility:hidden;
 transition:filter .4s ease,box-shadow .4s ease;
 }
+.player-card.is-side img{
+width:clamp(190px,22vw,245px);
+height:clamp(190px,22vw,245px);
+border-width:4px;
+outline-offset:4px;
+}
 .player-card.is-active img{
-animation:portraitPop .9s cubic-bezier(.2,.8,.2,1) both;
+animation:portraitPop .75s cubic-bezier(.2,.8,.2,1) both;
 }
 @keyframes portraitPop{
-0%{opacity:.2;transform:translate(-50%,-50%) scale(.82) rotate(-5deg)}
-65%{opacity:1;transform:translate(-50%,-50%) scale(1.035) rotate(1deg)}
-100%{opacity:1;transform:translate(-50%,-50%) scale(1) rotate(0)}
+0%{opacity:.55;transform:translate(-50%,-50%) scale(.92)}
+70%{opacity:1;transform:translate(-50%,-50%) scale(1.025)}
+100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
 }
 .player-card:after{
 content:"";
 position:absolute;
 z-index:2;
-inset:68% 0 0;
-background:linear-gradient(transparent,rgba(3,8,16,.45) 30%,rgba(3,8,16,.94) 100%);
+inset:66% 0 0;
+background:linear-gradient(transparent,rgba(3,8,16,.5) 30%,rgba(3,8,16,.96) 100%);
 pointer-events:none;
 }
 .player-label{
 position:absolute;
 z-index:4;
-left:12px;
-right:12px;
+left:8px;
+right:8px;
 bottom:17px;
 color:#fff;
 font-size:22px;
@@ -209,11 +255,37 @@ letter-spacing:.12em;
 text-transform:uppercase;
 margin-top:6px;
 }
-.player-controls{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:10px 14px;background:#080e18;color:#c7d6e8}
-.player-controls button{width:38px;height:38px;border:1px solid #49617d;border-radius:50%;background:#15263a;color:#fff;font-size:23px;line-height:1}
-.player-controls button:hover{background:var(--blue);box-shadow:0 0 16px #3978c8}
-.player-status{font-size:10px;font-weight:850;min-width:48px;text-align:center;letter-spacing:.08em}
+.player-card.is-side .player-label{font-size:16px;bottom:13px}
+.player-card.is-side .player-label small{font-size:8px;letter-spacing:.07em}
 .player-card:focus-visible{outline:3px solid var(--cyan);outline-offset:-3px}
+
+.player-controls{
+display:flex;
+align-items:center;
+justify-content:center;
+gap:16px;
+padding:12px 14px;
+background:#080e18;
+color:#c7d6e8;
+}
+.player-controls button{
+width:42px;
+height:42px;
+border:1px solid #6485aa;
+border-radius:50%;
+background:linear-gradient(145deg,#1d3857,#101d30);
+color:#fff;
+font-size:25px;
+line-height:1;
+box-shadow:0 0 14px #3978c833;
+transition:background .2s,transform .2s,box-shadow .2s;
+}
+.player-controls button:hover{
+background:var(--blue);
+box-shadow:0 0 18px #3978c8;
+transform:scale(1.08);
+}
+.player-status{font-size:11px;font-weight:900;min-width:58px;text-align:center;letter-spacing:.1em;color:#d9eaff}
 
 .breaking{margin:10px 0 32px;background:var(--panel);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;overflow:hidden}
 .breaking strong{background:var(--blue);padding:13px 17px;font-size:10px;letter-spacing:.12em;white-space:nowrap}
@@ -311,6 +383,9 @@ body.light-mode .banner-heading p{color:#526078}
 nav{gap:13px;font-size:11px}
 .search{width:140px}
 .news-card{flex-basis:calc((100% - 17px)/2)}
+.player-card{left:17%;width:66%}
+.player-card.is-left{transform:translateX(-78%) scale(.75) rotateY(32deg)}
+.player-card.is-right{transform:translateX(78%) scale(.75) rotateY(-32deg)}
 }
 @media(max-width:720px){
 .wrap{width:calc(100% - 24px)}
@@ -334,18 +409,23 @@ body.light-mode .nav nav{background:#fff}
 .banner-heading{display:block;padding:19px}
 .banner-heading p{margin-top:10px}
 .player-strip{height:405px}
-.player-card{inset:6px}
+.player-card{left:11%;width:78%;top:7px;bottom:7px}
+.player-card.is-left{transform:translateX(-82%) scale(.73) rotateY(30deg)}
+.player-card.is-right{transform:translateX(82%) scale(.73) rotateY(-30deg)}
 .player-card img{
-width:clamp(245px,66vw,285px);
-height:clamp(245px,66vw,285px);
-max-width:78vw;
-max-height:78vw;
-top:44%;
+width:clamp(225px,59vw,275px);
+height:clamp(225px,59vw,275px);
+max-width:82%;
+max-height:72%;
+top:43%;
 border-width:5px;
 outline-offset:5px;
 }
+.player-card.is-side img{width:clamp(175px,45vw,215px);height:clamp(175px,45vw,215px)}
 .player-label{font-size:19px;left:10px;right:10px;bottom:15px}
 .player-label small{font-size:9px}
+.player-card.is-side .player-label{font-size:14px}
+.player-card.is-side .player-label small{font-size:7px}
 .breaking span{font-size:10px}
 .section-head h2{font-size:23px}
 .news-grid{gap:10px}
@@ -367,15 +447,15 @@ outline-offset:5px;
 .verified{width:15px;height:15px;font-size:10px}
 .search{width:72px;padding:8px 5px}
 .player-strip{height:375px}
-.player-card img{
-width:235px;
-height:235px;
-max-width:76vw;
-max-height:76vw;
-top:43%;
-}
+.player-card{left:9%;width:82%}
+.player-card.is-left{transform:translateX(-83%) scale(.7) rotateY(30deg)}
+.player-card.is-right{transform:translateX(83%) scale(.7) rotateY(-30deg)}
+.player-card img{width:215px;height:215px;max-width:80%;max-height:72%;top:42%}
+.player-card.is-side img{width:165px;height:165px}
 .player-label{font-size:17px;bottom:13px}
 .player-label small{font-size:8px}
+.player-card.is-side .player-label{font-size:12px}
+.player-card.is-side .player-label small{font-size:6px}
 .theme-toggle{padding:5px 5px 5px 4px;gap:4px}
 .theme-label{font-size:7px;min-width:36px}
 .theme-track{width:33px}
@@ -469,7 +549,7 @@ html,.news-grid{scroll-behavior:auto}
 
 <div class="player-strip" id="playerStrip" aria-label="Featured player portraits">
 
-<a class="player-card is-active" href="https://www.arsenal.com/women/players/alessia-russo" target="_blank" rel="noopener noreferrer" aria-label="View Alessia Russo at Arsenal">
+<a class="player-card" href="https://www.arsenal.com/women/players/alessia-russo" target="_blank" rel="noopener noreferrer" aria-label="View Alessia Russo at Arsenal">
 <img src="https://cdn.media.amplience.net/i/ArsenalDirect/Russo_2026_sbp?%24sbp-page-heroimage-small-6024%24=&fmt=jpg" alt="Alessia Russo" loading="eager" decoding="async">
 <span class="player-label">Alessia Russo<small>Arsenal · WSL · England</small></span>
 </a>
@@ -480,7 +560,7 @@ html,.news-grid{scroll-behavior:auto}
 </a>
 
 <a class="player-card" href="https://www.londoncitylionesses.com/squad/alexia-putellas" target="_blank" rel="noopener noreferrer" aria-label="View Alexia Putellas at London City Lionesses" tabindex="-1">
-<img src="https://static.wixstatic.com/media/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg" alt="Alexia Putellas" loading="eager" decoding="async" style="object-position:center 18%">
+<img src="https://static.wixstatic.com/media/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg/v1/fill/w_640%2Ch_429%2Cal_t%2Cq_90/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg" alt="Alexia Putellas" loading="eager" decoding="async" style="object-position:center 24%;transform:translate(-50%,-50%) scale(1.16)">
 <span class="player-label">Alexia Putellas<small>London City Lionesses · WSL · Spain</small></span>
 </a>
 
@@ -535,10 +615,7 @@ html,.news-grid{scroll-behavior:auto}
 </a>
 
 <div class="player-card" aria-label="Giulia Gwinn of Bayern Munich">
-<img
-src="https://img.fcbayern.com/image/upload/f_auto/q_auto/ar_1%3A1%2Cc_fill%2Cg_custom%3Aface%2Cw_768/v1785324982/cms/public/images/fcbayern-com/spielerinnen/portrait/Profilbilder/Profilbild_Gwinn_Giulia.png"
-data-fallback="https://img.fcbayern.com/image/upload/f_auto/q_auto/ar_2%3A1%2Cc_fill%2Cg_custom%2Cw_1280/v1711544942/cms/public/images/fcbayern-com/homepage/Saison-23-24/FCB%20Frauen/Sonstiges/240327-51er-gwinn-amelieniederbuchner-01.jpg"
-alt="Giulia Gwinn" loading="eager" decoding="async" style="object-position:center 22%">
+<img src="https://assets.dfb.de/uploads/000/326/113/custom_style_1_Giulia_Gwinn.jpg?1762355673=" alt="Giulia Gwinn" loading="eager" decoding="async" style="object-position:center 22%">
 <span class="player-label">Giulia Gwinn<small>Bayern Munich · Bundesliga · Germany</small></span>
 </div>
 
@@ -911,7 +988,7 @@ localStorage.setItem('wf-theme',t);
 applyTheme(t);
 });
 
-/* PLAYER PORTRAIT CAROUSEL */
+/* REAL 3D ROTARY PLAYER CAROUSEL */
 const playerStrip=$('#playerStrip');
 const playerCards=[...playerStrip.querySelectorAll('.player-card')];
 const playerPrev=$('#playerPrev');
@@ -926,9 +1003,9 @@ let pointerStartY=0;
 let pointerDown=false;
 let dragged=false;
 let resumePlayerTimer=null;
-let dragResetTimer=null;
 let playerHovering=false;
 let playerFocused=false;
+let dragPointerId=null;
 
 function showPlayer(index){
 if(!playerCards.length)return;
@@ -936,13 +1013,31 @@ if(!playerCards.length)return;
 activePlayer=(index+playerCards.length)%playerCards.length;
 
 playerCards.forEach((card,i)=>{
-const active=i===activePlayer;
+let offset=i-activePlayer;
 
-card.classList.toggle('is-active',active);
-card.setAttribute('aria-hidden',String(!active));
+/* Keep the carousel moving continuously around the circle */
+if(offset>playerCards.length/2)offset-=playerCards.length;
+if(offset<-playerCards.length/2)offset+=playerCards.length;
+
+card.classList.remove('is-active','is-side','is-left','is-right','is-far');
+
+if(offset===0){
+card.classList.add('is-active');
+card.setAttribute('aria-hidden','false');
+card.style.zIndex='3';
+}else if(Math.abs(offset)===1){
+card.classList.add('is-side');
+card.classList.add(offset<0?'is-left':'is-right');
+card.setAttribute('aria-hidden','false');
+card.style.zIndex='2';
+}else{
+card.classList.add('is-far');
+card.setAttribute('aria-hidden','true');
+card.style.zIndex='1';
+}
 
 if(card.tagName==='A'){
-if(active){
+if(offset===0){
 card.removeAttribute('tabindex');
 }else{
 card.setAttribute('tabindex','-1');
@@ -953,15 +1048,15 @@ card.setAttribute('tabindex','-1');
 playerStatus.textContent=(activePlayer+1)+' / '+playerCards.length;
 }
 
-function stopPlayerFade(){
+function stopPlayerCarousel(){
 if(playerTimer){
 clearInterval(playerTimer);
 playerTimer=null;
 }
 }
 
-function startPlayerFade(){
-stopPlayerFade();
+function startPlayerCarousel(){
+stopPlayerCarousel();
 
 if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
 
@@ -969,14 +1064,14 @@ playerTimer=setInterval(()=>{
 if(!playerPaused&&!document.hidden&&!pointerDown&&!playerHovering&&!playerFocused){
 showPlayer(activePlayer+1);
 }
-},5600);
+},5200);
 }
 
-function pausePlayerFade(){
+function pausePlayerCarousel(){
 playerPaused=true;
 }
 
-function resumePlayerFade(){
+function resumePlayerCarousel(){
 if(document.hidden||pointerDown||playerHovering||playerFocused)return;
 playerPaused=false;
 }
@@ -984,33 +1079,51 @@ playerPaused=false;
 function resumePlayerAfterInteraction(){
 clearTimeout(resumePlayerTimer);
 resumePlayerTimer=setTimeout(()=>{
-resumePlayerFade();
+resumePlayerCarousel();
 },3000);
 }
 
 playerPrev.addEventListener('click',()=>{
 showPlayer(activePlayer-1);
-pausePlayerFade();
+pausePlayerCarousel();
 resumePlayerAfterInteraction();
 });
 
 playerNext.addEventListener('click',()=>{
 showPlayer(activePlayer+1);
-pausePlayerFade();
+pausePlayerCarousel();
 resumePlayerAfterInteraction();
 });
 
-/* Smooth swipe, drag and 3D tilt support */
+/* Clicking a visible side card brings it to the centre */
+playerCards.forEach((card,index)=>{
+card.addEventListener('click',e=>{
+if(dragged){
+e.preventDefault();
+e.stopPropagation();
+return;
+}
+
+if(index!==activePlayer){
+e.preventDefault();
+showPlayer(index);
+pausePlayerCarousel();
+resumePlayerAfterInteraction();
+}
+});
+});
+
+/* Smooth swipe and drag */
 playerStrip.addEventListener('pointerdown',e=>{
 if(e.pointerType==='mouse'&&e.button!==0)return;
 
 pointerDown=true;
 dragged=false;
+dragPointerId=e.pointerId;
 pointerStartX=e.clientX;
 pointerStartY=e.clientY;
 
-clearTimeout(dragResetTimer);
-pausePlayerFade();
+pausePlayerCarousel();
 playerStrip.classList.add('is-dragging');
 
 try{
@@ -1019,26 +1132,12 @@ playerStrip.setPointerCapture(e.pointerId);
 });
 
 playerStrip.addEventListener('pointermove',e=>{
-if(e.pointerType==='mouse'&&!pointerDown)return;
+if(!pointerDown)return;
 
-const card=playerCards[activePlayer];
-if(!card)return;
-
-const rect=playerStrip.getBoundingClientRect();
-const x=(e.clientX-rect.left)/rect.width;
-const y=(e.clientY-rect.top)/rect.height;
-
-const rotateY=(x-.5)*9;
-const rotateX=(.5-y)*7;
-
-card.style.setProperty('--tilt-y',rotateX+'deg');
-card.style.setProperty('--tilt-x',rotateY+'deg');
-
-if(pointerDown){
 const dx=Math.abs(e.clientX-pointerStartX);
 const dy=Math.abs(e.clientY-pointerStartY);
+
 if(dx>9||dy>9)dragged=true;
-}
 });
 
 playerStrip.addEventListener('pointerup',e=>{
@@ -1050,20 +1149,27 @@ playerStrip.classList.remove('is-dragging');
 const dx=e.clientX-pointerStartX;
 const dy=e.clientY-pointerStartY;
 
-if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)*1.15){
+if(Math.abs(dx)>38&&Math.abs(dx)>Math.abs(dy)*1.15){
 dragged=true;
 showPlayer(activePlayer+(dx<0?1:-1));
 
-dragResetTimer=setTimeout(()=>{
+setTimeout(()=>{
 dragged=false;
-},450);
+},500);
+}else{
+setTimeout(()=>{
+dragged=false;
+},100);
 }
 
+dragPointerId=null;
 resumePlayerAfterInteraction();
 });
 
 playerStrip.addEventListener('pointercancel',()=>{
 pointerDown=false;
+dragged=false;
+dragPointerId=null;
 playerStrip.classList.remove('is-dragging');
 resumePlayerAfterInteraction();
 });
@@ -1071,49 +1177,36 @@ resumePlayerAfterInteraction();
 playerStrip.addEventListener('lostpointercapture',()=>{
 if(pointerDown){
 pointerDown=false;
+dragged=false;
+dragPointerId=null;
 playerStrip.classList.remove('is-dragging');
 resumePlayerAfterInteraction();
 }
 });
 
-playerStrip.addEventListener('click',e=>{
-if(dragged){
-e.preventDefault();
-e.stopPropagation();
-dragged=false;
-}
-},true);
-
-playerStrip.addEventListener('pointerleave',()=>{
-playerCards.forEach(card=>{
-card.style.setProperty('--tilt-x','0deg');
-card.style.setProperty('--tilt-y','0deg');
-});
-});
-
 playerStrip.addEventListener('mouseenter',()=>{
 playerHovering=true;
-pausePlayerFade();
+pausePlayerCarousel();
 });
 
 playerStrip.addEventListener('mouseleave',()=>{
 playerHovering=false;
-resumePlayerFade();
+resumePlayerCarousel();
 });
 
 playerStrip.addEventListener('focusin',()=>{
 playerFocused=true;
-pausePlayerFade();
+pausePlayerCarousel();
 });
 
 playerStrip.addEventListener('focusout',e=>{
 if(!playerStrip.contains(e.relatedTarget)){
 playerFocused=false;
-resumePlayerFade();
+resumePlayerCarousel();
 }
 });
 
-/* Fix missing player images; Gwinn has a second official Bayern image */
+/* Recover from unavailable portrait images */
 playerStrip.querySelectorAll('img').forEach(img=>{
 img.addEventListener('error',()=>{
 const fallback=img.dataset.fallback;
@@ -1124,14 +1217,14 @@ img.src=fallback;
 return;
 }
 
-img.style.display='none';
+img.style.opacity='0';
 img.parentElement.style.background='radial-gradient(ellipse at center,#254b72 0%,#152b44 48%,#0b1422 100%)';
-},{once:false});
+},{once:true});
 });
 
-/* Start with the first player */
+/* Start the rotary carousel */
 showPlayer(0);
-startPlayerFade();
+startPlayerCarousel();
 
 /* NEWS ARTICLE FEED */
 async function loadWFArticles(){
@@ -1218,10 +1311,10 @@ update();
 document.addEventListener('visibilitychange',()=>{
 if(document.hidden){
 stopNewsAuto();
-pausePlayerFade();
+pausePlayerCarousel();
 }else{
 startNewsAuto();
-resumePlayerFade();
+resumePlayerCarousel();
 }
 });
 
