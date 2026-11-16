@@ -1,3 +1,4 @@
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -29,7 +30,9 @@ export async function onRequestPost({ request, env }) {
   }
 
   if (!env.GITHUB_TOKEN) {
-    return json({ error: "Photo storage is not configured yet." }, 500);
+    return json({
+      error: "Photo storage is not configured. Check the GITHUB_TOKEN setting in Cloudflare Pages."
+    }, 500);
   }
 
   try {
@@ -50,11 +53,15 @@ export async function onRequestPost({ request, env }) {
     const extension = allowedTypes[file.type];
 
     if (!extension) {
-      return json({ error: "Please use a JPG, PNG, WEBP, or GIF image." }, 400);
+      return json({
+        error: "Please use a JPG, PNG, WEBP, or GIF image."
+      }, 400);
     }
 
     if (file.size > 4 * 1024 * 1024) {
-      return json({ error: "Please choose an image smaller than 4 MB." }, 400);
+      return json({
+        error: "Please choose an image smaller than 4 MB."
+      }, 400);
     }
 
     if (file.size === 0) {
@@ -62,7 +69,10 @@ export async function onRequestPost({ request, env }) {
     }
 
     const bytes = new Uint8Array(await file.arrayBuffer());
-    const filename = `wf-pundit-${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${extension}`;
+
+    const filename =
+      `wf-pundit-${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${extension}`;
+
     const path = `uploads/${filename}`;
 
     const githubResponse = await fetch(
@@ -87,18 +97,26 @@ export async function onRequestPost({ request, env }) {
 
     if (!githubResponse.ok) {
       return json({
-        error: "GitHub could not save the photo. Please check the GitHub token permissions and try again."
+        error: `GitHub upload error (${githubResponse.status}): ${result.message || "Unknown GitHub error"}`
       }, 502);
     }
 
     const imageUrl = result.content && result.content.download_url;
 
     if (!imageUrl) {
-      return json({ error: "The photo was saved, but its image link could not be created." }, 502);
+      return json({
+        error: "The photo was saved, but GitHub did not return an image link."
+      }, 502);
     }
 
-    return json({ success: true, image_url: imageUrl });
+    return json({
+      success: true,
+      image_url: imageUrl
+    });
+
   } catch (error) {
-    return json({ error: "Photo upload failed. Please try again." }, 500);
+    return json({
+      error: "Photo upload failed: " + (error.message || "Unknown server error")
+    }, 500);
   }
 }
