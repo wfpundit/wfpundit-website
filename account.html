@@ -333,7 +333,77 @@ async function sendRequest(url, data) {
 
   return result;
 }
+let googleMode = requestedMode === "register" ? "register" : "login";
 
+function getGoogleCsrfToken() {
+  const match = document.cookie.match(/(?:^|;\s*)g_csrf_token=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : "";
+}
+
+async function handleGoogleCredential(response) {
+  message.className = "message";
+
+  try {
+    const csrfToken = getGoogleCsrfToken();
+
+    if (!csrfToken) {
+      throw new Error("Google security check failed. Please refresh the page.");
+    }
+
+    const result = await sendRequest("/api/google-auth", {
+      credential: response.credential,
+      csrfToken,
+      mode: googleMode
+    });
+
+    displayUser(result.user);
+
+  } catch (error) {
+    showMessage(error.message);
+  }
+}
+
+function initializeGoogleButtons() {
+  if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+    return;
+  }
+
+  window.google.accounts.id.initialize({
+    client_id: "144042989918-4mr54e85nqnblq1v4uqcjqnp9p6k803g.apps.googleusercontent.com",
+    callback: handleGoogleCredential,
+    auto_select: false
+  });
+
+  window.google.accounts.id.renderButton(
+    document.getElementById("googleLoginButton"),
+    {
+      type: "standard",
+      theme: "outline",
+      size: "large",
+      text: "signin_with",
+      shape: "rectangular",
+      width: 280
+    }
+  );
+
+  window.google.accounts.id.renderButton(
+    document.getElementById("googleRegisterButton"),
+    {
+      type: "standard",
+      theme: "outline",
+      size: "large",
+      text: "signup_with",
+      shape: "rectangular",
+      width: 280
+    }
+  );
+}
+
+window.addEventListener("load", initializeGoogleButtons);
+
+if (window.google && window.google.accounts) {
+  initializeGoogleButtons();
+      }
 function displayUser(user) {
   accountForms.hidden = true;
   loggedIn.hidden = false;
