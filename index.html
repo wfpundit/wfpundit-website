@@ -2214,6 +2214,8 @@ const formattedDate=publishedDate&&!Number.isNaN(publishedDate.getTime())
 date.textContent=
 (formattedDate?formattedDate+' · ':'')+
 'WF PUNDIT · READ STORY ↗';
+    
+body.append(meta,title,summary,date);
 card.append(thumb,body);
 newsGrid.append(card);
 });
