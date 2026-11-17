@@ -336,20 +336,13 @@ async function sendRequest(url, data) {
 }
 
 
-function getGoogleCsrfToken() {
-  const match = document.cookie.match(/(?:^|;\s*)g_csrf_token=([^;]+)/);
-  return match ? decodeURIComponent(match[1]) : "";
-}
+
 
 async function handleGoogleCredential(response) {
   message.className = "message";
 
   try {
-    const csrfToken = getGoogleCsrfToken();
-
-    if (!csrfToken) {
-      throw new Error("Google security check failed. Please refresh the page.");
-    }
+    
 
     const result = await sendRequest("/api/google-auth", {
       credential: response.credential,
