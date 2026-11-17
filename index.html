@@ -2187,9 +2187,34 @@ summary.textContent=article.summary||'';
 
 const date=document.createElement('div');
 date.className='date';
-date.textContent='WF PUNDIT · READ STORY ↗';
+const date=document.createElement('div');
+date.className='date';
 
-body.append(meta,title,summary,date);
+const rawCreatedAt=String(article.created_at||'').trim();
+
+const normalizedCreatedAt=
+/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(rawCreatedAt)
+? rawCreatedAt.replace(' ','T')+'Z'
+: rawCreatedAt;
+
+const publishedDate=normalizedCreatedAt
+? new Date(normalizedCreatedAt)
+: null;
+
+const formattedDate=publishedDate&&!Number.isNaN(publishedDate.getTime())
+? new Intl.DateTimeFormat(undefined,{
+    year:'numeric',
+    month:'short',
+    day:'numeric',
+    hour:'2-digit',
+    minute:'2-digit',
+    hourCycle:'h23'
+  }).format(publishedDate)
+: '';
+
+date.textContent=
+(formattedDate?formattedDate+' · ':'')+
+'WF PUNDIT · READ STORY ↗';
 card.append(thumb,body);
 newsGrid.append(card);
 });
