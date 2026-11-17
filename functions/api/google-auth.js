@@ -119,7 +119,13 @@ export async function onRequestPost({ request, env }) {
     return json({ error: error.message || "Please try again." }, 400);
   }
 
-  const csrfCookie = readCookie(request, "g_csrf_token");
+  const origin = request.headers.get("Origin");
+
+if (!origin || origin !== new URL(request.url).origin) {
+  return json({
+    error: "Google security check failed. Please refresh and try again."
+  }, 403);
+}
 
   if (
     !csrfCookie ||
