@@ -266,7 +266,9 @@ function showMessage(text, type = "error") {
 }
 
 function setTab(tab) {
-  const registering = tab === "register";
+  const registering = tab === "register";document.getElementById("googleLoginArea").hidden = registering;
+document.getElementById("googleRegisterArea").hidden = !registering;
+googleMode = registering ? "register" : "login";
 
   loginForm.hidden = registering;
   registerForm.hidden = !registering;
