@@ -682,7 +682,45 @@ async function loadComments() {
         });
 
         card.appendChild(editButton);
-      }
+            const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "comment-edit-button";
+        deleteButton.textContent = "DELETE COMMENT";
+        deleteButton.style.color = "#e05252";
+        deleteButton.style.borderColor = "#a44";
+
+        deleteButton.addEventListener("click", async () => {
+          if (!window.confirm("Are you sure you want to delete this comment?")) {
+            return;
+          }
+
+          deleteButton.disabled = true;
+          deleteButton.textContent = "DELETING...";
+
+          try {
+            const deleteResponse = await fetch("/api/comments", {
+              method: "POST",
+              credentials: "same-origin",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                action: "delete",
+                commentId: item.id
+              })
+            });
+
+            await readJsonResponse(deleteResponse);
+            await loadComments();
+
+          } catch (error) {
+            deleteButton.disabled = false;
+            deleteButton.textContent = "DELETE COMMENT";
+            alert(error.message || "Unable to delete your comment.");
+          }
+        });
+
+        card.appendChild(deleteButton);  }
 
       commentList.appendChild(card);
     });
