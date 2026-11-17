@@ -49,18 +49,11 @@ export async function onRequestPost({ request, env }) {
     }, 201, { "Set-Cookie": session.cookie });
 
   } catch (error) {
-    if (String(error).toLowerCase().includes("unique")) {
-      return json({
-        success: false,
-        error: "An account with this email already exists. Try logging in."
-      }, 409);
-    }
-
-    console.error("Reader registration error:", error);
+    console.error("Reader registration diagnostic:", error);
 
     return json({
       success: false,
-      error: "We couldn't create your account right now. Please try again."
+      error: "Registration failed. Please try again."
     }, 500);
   }
 }
