@@ -355,7 +355,7 @@ async function handleGoogleCredential(response) {
     const result = await sendRequest("/api/google-auth", {
       credential: response.credential,
       csrfToken,
-      mode: googleMode
+      mode: registerForm.hidden ? "login" : "register"
     });
 
     displayUser(result.user);
