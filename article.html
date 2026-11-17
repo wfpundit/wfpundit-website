@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -173,10 +174,21 @@ h1{
   border-radius:10px;
   background:var(--panel-soft);
 }
-.comment-meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px;margin-bottom:7px}
+.comment-meta{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:space-between;
+  gap:6px;
+  margin-bottom:7px;
+}
 .comment-name{font-size:13px;font-weight:900}
 .comment-date{color:var(--muted);font-size:11px}
-.comment-text{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+.comment-text{
+  margin:0;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  font-size:14px;
+}
 .status-message{padding:14px;color:var(--muted);font-size:13px}
 .error-message{color:#ffb5bf}
 .modal-backdrop{
@@ -215,7 +227,11 @@ h1{
   font-weight:900;
 }
 .modal-actions a.primary{background:var(--blue);border-color:var(--blue)}
-.modal-close{margin-top:14px;background:transparent;color:var(--muted)}
+.modal-close{
+  margin-top:14px;
+  background:transparent;
+  color:var(--muted);
+}
 [hidden]{display:none!important}
 body.light-mode{
   --bg:#f1f4f8;
@@ -229,14 +245,30 @@ body.light-mode .site-header{background:rgba(255,255,255,.96)}
 body.light-mode .back-link,
 body.light-mode .theme-toggle,
 body.light-mode .action-button,
-body.light-mode .modal-actions a{background:#fff;color:#245d9d;border-color:#a9bfd9}
+body.light-mode .modal-actions a{
+  background:#fff;
+  color:#245d9d;
+  border-color:#a9bfd9;
+}
 body.light-mode .action-button.primary,
-body.light-mode .modal-actions a.primary{background:#2869b3;color:#fff;border-color:#2869b3}
-body.light-mode .comment-form textarea{background:#fff;color:#1c2939;border-color:#cbd5e1}
+body.light-mode .modal-actions a.primary{
+  background:#2869b3;
+  color:#fff;
+  border-color:#2869b3;
+}
+body.light-mode .comment-form textarea{
+  background:#fff;
+  color:#1c2939;
+  border-color:#cbd5e1;
+}
 @media(max-width:600px){
   .site-header{padding:12px 15px}
   .brand{font-size:19px}
-  .back-link,.theme-toggle{min-height:37px;padding:7px 10px;font-size:11px}
+  .back-link,.theme-toggle{
+    min-height:37px;
+    padding:7px 10px;
+    font-size:11px;
+  }
   .page-wrap{margin-top:20px}
   .summary{font-size:15px}
   .article-content{font-size:15px}
@@ -285,7 +317,9 @@ body.light-mode .comment-form textarea{background:#fff;color:#1c2939;border-colo
 
     <div class="comment-prompt" id="commentLoginPrompt" hidden>
       <p>You need to log in or create an account before you can comment.</p>
-      <button class="action-button primary" id="openCommentLogin" type="button">LOG IN / SIGN UP TO COMMENT</button>
+      <button class="action-button primary" id="openCommentLogin" type="button">
+        LOG IN / SIGN UP TO COMMENT
+      </button>
     </div>
 
     <form class="comment-form" id="commentForm" hidden>
@@ -318,18 +352,38 @@ body.light-mode .comment-form textarea{background:#fff;color:#1c2939;border-colo
 const params = new URLSearchParams(window.location.search);
 const articleId = Number(params.get("id"));
 
+const themeToggle = document.getElementById("themeToggle");
 const articleStatus = document.getElementById("articleStatus");
 const articleContent = document.getElementById("articleContent");
 const commentsSection = document.getElementById("commentsSection");
+const articleCategory = document.getElementById("articleCategory");
+const articleTitle = document.getElementById("articleTitle");
+const articleSummary = document.getElementById("articleSummary");
+const articleAuthor = document.getElementById("articleAuthor");
+const articleDate = document.getElementById("articleDate");
+const articleImage = document.getElementById("articleImage");
+const articleBody = document.getElementById("articleBody");
+const saveButton = document.getElementById("saveButton");
 const commentLoginPrompt = document.getElementById("commentLoginPrompt");
+const openCommentLogin = document.getElementById("openCommentLogin");
 const commentForm = document.getElementById("commentForm");
+const commentInput = document.getElementById("commentInput");
+const commentSubmit = document.getElementById("commentSubmit");
 const commentList = document.getElementById("commentList");
 const loginModal = document.getElementById("loginModal");
-const saveButton = document.getElementById("saveButton");
+const modalLoginLink = document.getElementById("modalLoginLink");
+const modalRegisterLink = document.getElementById("modalRegisterLink");
+const closeLoginModalButton = document.getElementById("closeLoginModal");
 
 let currentUser = null;
-let currentArticle = null;function applyTheme(theme) {
+
+function applyTheme(theme) {
   document.body.classList.toggle("light-mode", theme === "light");
+
+  if (themeToggle) {
+    themeToggle.textContent =
+      theme === "light" ? "🌙 Dark Mode" : "☀️ Light Mode";
+  }
 
   try {
     localStorage.setItem("wf-theme", theme);
@@ -337,63 +391,54 @@ let currentArticle = null;function applyTheme(theme) {
 }
 
 try {
-  const savedTheme = localStorage.getItem("wf-theme");
-  applyTheme(savedTheme === "light" ? "light" : "dark");
+  applyTheme(
+    localStorage.getItem("wf-theme") === "light" ? "light" : "dark"
+  );
 } catch (error) {
   applyTheme("dark");
 }
 
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
-    const isLight = document.body.classList.contains("light-mode");
-    applyTheme(isLight ? "dark" : "light");
+    applyTheme(
+      document.body.classList.contains("light-mode") ? "dark" : "light"
+    );
   });
 }
 
-function showLoginModal(mode = "login") {
-  if (!authModal) return;
+function getReturnUrl() {
+  return window.location.pathname +
+    window.location.search +
+    window.location.hash;
+}
 
-  authModal.hidden = false;
-  authModal.setAttribute("aria-hidden", "false");
+function openLoginModal() {
+  const returnTo = encodeURIComponent(getReturnUrl());
 
-  if (modalTitle) {
-    modalTitle.textContent =
-      mode === "register" ? "Create your account" : "Log in to comment";
-  }
+  modalLoginLink.href =
+    "/account.html?mode=login&returnTo=" + returnTo;
 
-  if (modalMessage) {
-    modalMessage.textContent = "";
-  }
+  modalRegisterLink.href =
+    "/account.html?mode=register&returnTo=" + returnTo;
 
-  if (modalEmail) {
-    modalEmail.value = "";
-  }
-
-  if (modalPassword) {
-    modalPassword.value = "";
-  }
-
-  if (mode === "register" && modalRegister) {
-    modalRegister.hidden = false;
-  } else if (modalRegister) {
-    modalRegister.hidden = true;
-  }
+  loginModal.classList.add("open");
 }
 
 function closeLoginModal() {
-  if (!authModal) return;
-
-  authModal.hidden = true;
-  authModal.setAttribute("aria-hidden", "true");
+  loginModal.classList.remove("open");
 }
 
-if (closeModal) {
-  closeModal.addEventListener("click", closeLoginModal);
+if (openCommentLogin) {
+  openCommentLogin.addEventListener("click", openLoginModal);
 }
 
-if (authModal) {
-  authModal.addEventListener("click", event => {
-    if (event.target === authModal) {
+if (closeLoginModalButton) {
+  closeLoginModalButton.addEventListener("click", closeLoginModal);
+}
+
+if (loginModal) {
+  loginModal.addEventListener("click", event => {
+    if (event.target === loginModal) {
       closeLoginModal();
     }
   });
@@ -405,10 +450,10 @@ document.addEventListener("keydown", event => {
   }
 });
 
-function formatDate(dateValue) {
-  if (!dateValue) return "";
+function formatDate(value) {
+  if (!value) return "";
 
-  const date = new Date(dateValue);
+  const date = new Date(value);
 
   if (Number.isNaN(date.getTime())) return "";
 
@@ -444,100 +489,25 @@ async function checkLogin() {
     });
 
     const result = await readJsonResponse(response);
-
     currentUser = result.loggedIn ? result.user : null;
 
-    if (currentUser) {
-      if (loginPrompt) loginPrompt.hidden = true;
-      if (commentForm) commentForm.hidden = false;
-      if (saveButton) saveButton.hidden = false;
-    } else {
-      if (loginPrompt) loginPrompt.hidden = false;
-      if (commentForm) commentForm.hidden = true;
-      if (saveButton) saveButton.hidden = true;
-    }
   } catch (error) {
     currentUser = null;
-
-    if (loginPrompt) loginPrompt.hidden = false;
-    if (commentForm) commentForm.hidden = true;
-    if (saveButton) saveButton.hidden = true;
-  }
-}
-
-async function loadArticle() {
-  if (!articleId) {
-    if (articleTitle) articleTitle.textContent = "Article not found";
-    if (articleBody) articleBody.textContent =
-      "No article was selected. Please return to the homepage.";
-    return;
   }
 
-  try {
-    const response = await fetch(
-      "/api/article?id=" + encodeURIComponent(articleId),
-      { credentials: "same-origin" }
-    );
-
-    const result = await readJsonResponse(response);
-    currentArticle = result.article;
-
-    if (!currentArticle) {
-      throw new Error("This article could not be found.");
-    }
-
-    if (articleCategory) {
-      articleCategory.textContent = currentArticle.category || "Women's Football";
-    }
-
-    if (articleTitle) {
-      articleTitle.textContent = currentArticle.title || "Untitled article";
-    }
-
-    if (articleSummary) {
-      articleSummary.textContent = currentArticle.summary || "";
-    }
-
-    if (articleAuthor) {
-      articleAuthor.textContent = currentArticle.author
-        ? "By " + currentArticle.author
-        : "";
-    }
-
-    if (articleDate) {
-      articleDate.textContent = formatDate(currentArticle.created_at);
-    }
-
-    if (articleImage) {
-      if (currentArticle.image_url) {
-        articleImage.src = currentArticle.image_url;
-        articleImage.hidden = false;
-      } else {
-        articleImage.hidden = true;
-      }
-    }
-
-    if (articleBody) {
-      articleBody.textContent = currentArticle.content || "";
-    }
-
-    await loadComments();
-  } catch (error) {
-    if (articleTitle) {
-      articleTitle.textContent = "Unable to load article";
-    }
-
-    if (articleBody) {
-      articleBody.textContent =
-        error.message || "Please refresh the page and try again.";
-    }
+  if (currentUser) {
+    commentLoginPrompt.hidden = true;
+    commentForm.hidden = false;
+    saveButton.hidden = false;
+  } else {
+    commentLoginPrompt.hidden = false;
+    commentForm.hidden = true;
+    saveButton.hidden = true;
   }
 }
 
 async function loadComments() {
-  if (!articleId || !commentsList) return;
-
-  commentsList.replaceChildren();
+  commentList.replaceChildren();
 
   try {
     const response = await fetch(
@@ -549,150 +519,136 @@ async function loadComments() {
     const comments = result.comments || [];
 
     if (comments.length === 0) {
-      commentsList.textContent = "No comments yet. Be the first to comment.";
+      const empty = document.createElement("div");
+      empty.className = "status-message";
+      empty.textContent = "No comments yet. Be the first to comment.";
+      commentList.appendChild(empty);
       return;
     }
 
     comments.forEach(item => {
-      const commentCard = document.createElement("div");
-      commentCard.className = "comment-item";
+      const card = document.createElement("article");
+      card.className = "comment-item";
+
+      const meta = document.createElement("div");
+      meta.className = "comment-meta";
 
       const name = document.createElement("strong");
+      name.className = "comment-name";
       name.textContent = item.display_name || "Reader";
 
-      const date = document.createElement("small");
+      const date = document.createElement("span");
+      date.className = "comment-date";
       date.textContent = formatDate(item.created_at);
 
       const content = document.createElement("p");
+      content.className = "comment-text";
       content.textContent = item.comment || "";
 
-      commentCard.append(name, date, content);
-      commentsList.appendChild(commentCard);
+      meta.append(name, date);
+      card.append(meta, content);
+      commentList.appendChild(card);
     });
+
   } catch (error) {
-    commentsList.textContent =
-      "Comments could not be loaded. Please refresh the page.";
+    const message = document.createElement("div");
+    message.className = "status-message error-message";
+    message.textContent =
+      error.message || "Comments could not be loaded.";
+
+    commentList.appendChild(message);
   }
-  }// Handle login and registration inside the comment popup.
-if (authModal) {
-  const modalForms = authModal.querySelectorAll("form");
-
-  modalForms.forEach((form, index) => {
-    form.addEventListener("submit", async event => {
-      event.preventDefault();
-
-      const isRegister =
-        form.id.toLowerCase().includes("register") || index > 0;
-
-      const emailField = form.querySelector('input[type="email"]');
-      const passwordField = form.querySelector('input[type="password"]');
-      const nameField = form.querySelector(
-        'input[name="displayName"], input[name="name"], input[type="text"]'
-      );
-
-      const button = form.querySelector('button[type="submit"]');
-
-      if (!emailField || !passwordField) return;
-
-      if (button) {
-        button.disabled = true;
-        button.textContent = "PLEASE WAIT...";
-      }
-
-      try {
-        const endpoint = isRegister ? "/api/register" : "/api/login";
-
-        const data = isRegister
-          ? {
-              displayName: nameField ? nameField.value.trim() : "",
-              email: emailField.value.trim(),
-              password: passwordField.value
-            }
-          : {
-              email: emailField.value.trim(),
-              password: passwordField.value
-            };
-
-        const response = await fetch(endpoint, {
-          method: "POST",
-          credentials: "same-origin",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-
-        const result = await readJsonResponse(response);
-
-        currentUser = result.user;
-        closeLoginModal();
-
-        if (loginPrompt) loginPrompt.hidden = true;
-        if (commentForm) commentForm.hidden = false;
-        if (saveButton) saveButton.hidden = false;
-
-      } catch (error) {
-        if (modalMessage) {
-          modalMessage.textContent =
-            error.message || "Unable to continue. Please try again.";
-        }
-      } finally {
-        if (button) {
-          button.disabled = false;
-          button.textContent = isRegister ? "CREATE ACCOUNT" : "LOG IN";
-        }
-      }
-    });
-  });
 }
 
-// Open the login or registration popup from the comment prompt.
-if (loginPrompt) {
-  loginPrompt.addEventListener("click", event => {
-    const clicked = event.target.closest("button, a");
+async function loadArticle() {
+  if (!Number.isInteger(articleId) || articleId < 1) {
+    articleStatus.textContent =
+      "No article was selected. Please return to the homepage.";
+    articleStatus.classList.add("error-message");
+    return;
+  }
 
-    if (!clicked) return;
-
-    event.preventDefault();
-
-    const text = (clicked.textContent || "").toLowerCase();
-
-    showLoginModal(
-      text.includes("sign") || text.includes("register")
-        ? "register"
-        : "login"
+  try {
+    const response = await fetch(
+      "/api/article?id=" + encodeURIComponent(articleId),
+      { credentials: "same-origin" }
     );
-  });
+
+    const result = await readJsonResponse(response);
+    const article = result.article;
+
+    if (!article) {
+      throw new Error("This article could not be found.");
+    }
+
+    articleCategory.textContent =
+      article.category || "Women's Football";
+
+    articleTitle.textContent =
+      article.title || "Untitled article";
+
+    articleSummary.textContent =
+      article.summary || "";
+
+    articleAuthor.textContent =
+      article.author ? "By " + article.author : "";
+
+    articleDate.textContent =
+      formatDate(article.created_at);
+
+    articleBody.textContent =
+      article.content || "";
+
+    if (article.image_url) {
+      articleImage.src = article.image_url;
+      articleImage.alt = article.title || "Article image";
+      articleImage.hidden = false;
+    } else {
+      articleImage.hidden = true;
+      articleImage.removeAttribute("src");
+    }
+
+    articleStatus.hidden = true;
+    articleContent.hidden = false;
+    commentsSection.hidden = false;
+
+    await loadComments();
+
+  } catch (error) {
+    articleStatus.textContent =
+      error.message ||
+      "Unable to load this article. Please refresh the page.";
+
+    articleStatus.classList.add("error-message");
+  }
 }
 
-// Submit a comment.
 if (commentForm) {
   commentForm.addEventListener("submit", async event => {
     event.preventDefault();
 
     if (!currentUser) {
-      showLoginModal("login");
+      openLoginModal();
       return;
     }
 
-    const field = commentForm.querySelector(
-      'textarea, input[name="comment"], input[type="text"]'
-    );
+    const comment = commentInput.value.trim();
 
-    const comment = field ? field.value.trim() : "";
-
-    if (!comment) return;
-
-    const button = commentForm.querySelector('button[type="submit"]');
-
-    if (button) {
-      button.disabled = true;
-      button.textContent = "POSTING...";
+    if (!comment) {
+      commentInput.focus();
+      return;
     }
+
+    commentSubmit.disabled = true;
+    commentSubmit.textContent = "POSTING...";
 
     try {
       const response = await fetch("/api/comments", {
         method: "POST",
         credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({
           articleId,
           comment
@@ -701,25 +657,23 @@ if (commentForm) {
 
       await readJsonResponse(response);
 
-      field.value = "";
+      commentInput.value = "";
       await loadComments();
 
     } catch (error) {
       alert(error.message || "Unable to post your comment.");
+
     } finally {
-      if (button) {
-        button.disabled = false;
-        button.textContent = "POST COMMENT";
-      }
+      commentSubmit.disabled = false;
+      commentSubmit.textContent = "POST COMMENT";
     }
   });
 }
 
-// Save the article.
 if (saveButton) {
   saveButton.addEventListener("click", async () => {
     if (!currentUser) {
-      showLoginModal("login");
+      openLoginModal();
       return;
     }
 
@@ -730,27 +684,30 @@ if (saveButton) {
       const response = await fetch("/api/saved", {
         method: "POST",
         credentials: "same-origin",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json"
+        },
         body: JSON.stringify({ articleId })
       });
 
       await readJsonResponse(response);
-
-      saveButton.textContent = "SAVED";
+      saveButton.textContent = "✓ SAVED";
 
     } catch (error) {
       alert(error.message || "Unable to save this article.");
-      saveButton.textContent = "SAVE ARTICLE";
+      saveButton.textContent = "☆ SAVE ARTICLE";
+
     } finally {
       saveButton.disabled = false;
     }
   });
 }
 
-// Load the article and check the reader's login status.
 async function initialisePage() {
-  await checkLogin();
-  await loadArticle();
+  await Promise.all([
+    checkLogin(),
+    loadArticle()
+  ]);
 }
 
 initialisePage();
