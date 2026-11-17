@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -299,10 +298,7 @@ color:#fff;
 font-size:11px;
 font-weight:850;
 white-space:nowrap
-}<div class="account-actions" aria-label="Reader account">
-<a class="account-link login" href="/account.html">LOG IN</a>
-<a class="account-link signup" href="/account.html?mode=register">SIGN UP</a>
-</div>
+}
 .theme-track{
 position:relative;
 display:flex;
@@ -647,8 +643,7 @@ border:6px solid rgba(177,218,255,.88);
 outline:2px solid rgba(73,151,235,.85);
 outline-offset:6px;
 background:radial-gradient(circle,#254b72,#0b1422);
-box-shadow:0 0 0 10px rgba(57,120,200,.14),0 0 25px rgba(74,164,255,.55),0 0 65px rgba(57,120,200,.34),inset 0 0 18px rgba(255,255,255,.16);
-filter:saturate(1.08) contrast(1.04);
+box-shadow:0 0 0 10px rgba(57,120,200,.14),0 0 25px rgba(74,164,255,.55),0 0 65px rgba(57,120,200,.34),inset 0 0 18px rgba(255,255,255,.16);filter:saturate(1.08) contrast(1.04);
 backface-visibility:hidden;
 -webkit-backface-visibility:hidden;
 transition:filter .4s ease,box-shadow .4s ease
@@ -1297,9 +1292,7 @@ transform:none
 <!-- SLIM TOP LIVE TICKER -->
 <div class="topline" aria-label="WF Pundit live status and location">
 <div class="wrap">
-<div class="topline-track">
-
-<div class="topline-group">
+<div class="topline-track"><div class="topline-group">
 <span class="topline-live">
 <span class="topline-dot"></span>
 LIVE
@@ -1345,6 +1338,11 @@ LIVE
 
 <div class="navright">
 <input class="search" id="search" type="search" placeholder="Search stories…" aria-label="Search stories">
+
+<div class="account-actions" aria-label="Reader account">
+<a class="account-link login" href="/account.html">LOG IN</a>
+<a class="account-link signup" href="/account.html?mode=register">SIGN UP</a>
+</div>
 
 <div class="language-box">
 <label for="languageSelect">LANGUAGE</label>
@@ -1947,9 +1945,7 @@ showPlayer(activePlayer+1);
 
 function pausePlayerCarousel(){
 playerPaused=true;
-}
-
-function resumePlayerCarousel(){
+}function resumePlayerCarousel(){
 if(document.hidden||pointerDown||playerHovering||playerFocused)return;
 playerPaused=false;
 }
