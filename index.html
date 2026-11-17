@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -548,6 +549,7 @@ linear-gradient(135deg,#0c1929,#101d30 48%,#080f1b)
 .player-strip.is-dragging{cursor:grabbing}
 .player-strip:after{
 content:"";
+
 position:absolute;
 inset:0;
 pointer-events:none;
@@ -1098,6 +1100,7 @@ body.light-mode .team small,
 body.light-mode .standings th,
 body.light-mode .carousel-status{color:#526078}
 body.light-mode .news-body .date{color:#66758a}
+
 body.light-mode .fixture,
 body.light-mode .standings td{border-color:#e3e8ef}
 body.light-mode .standings th{border-color:#dce3ec}
@@ -1171,6 +1174,22 @@ align-items:flex-start;
 gap:17px
 }
 .nav.open nav{display:flex}
+
+/* ACCOUNT BUTTONS INSIDE THE MOBILE MENU */
+.nav nav .account-actions{
+width:100%;
+flex-direction:column;
+align-items:stretch;
+gap:9px;
+margin-top:5px
+}
+.nav nav .account-link{
+width:100%;
+min-height:42px;
+font-size:10px;
+justify-content:center
+}
+
 body.light-mode .nav nav{background:#fff}
 .search{width:90px;padding:8px 6px;font-size:10px}
 .language-box label{display:none}
@@ -1334,6 +1353,11 @@ LIVE
 <a href="#competitions">Competitions</a>
 <a href="#matchday">Matchday</a>
 <a href="#about">About</a>
+
+<div class="account-actions" aria-label="Reader account">
+<a class="account-link login" href="/account.html">LOG IN</a>
+<a class="account-link signup" href="/account.html?mode=register">SIGN UP</a>
+</div>
 </nav>
 
 <div class="navright">
