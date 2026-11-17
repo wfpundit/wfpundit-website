@@ -1,4 +1,4 @@
-
+ 
 import {
   json,
   readJson,
@@ -135,7 +135,47 @@ export async function onRequestPost({ request, env }) {
         edited_at: editedAt
       });
     }
+    // DELETE THE SIGNED-IN USER'S OWN COMMENT
+    if (body.action === "delete") {
+      const commentId = Number(body.commentId);
 
+      if (!Number.isSafeInteger(commentId) || commentId < 1) {
+        return json({ success: false, error: "A valid comment ID is required." }, 400);
+      }
+
+      const existing = await env.DB.prepare(`
+        SELECT c.id
+        FROM article_comments c
+        JOIN articles a ON a.id = c.article_id
+        WHERE c.id = ?
+          AND c.user_id = ?
+          AND c.status = 'approved'
+          AND a.status = 'published'
+        LIMIT 1
+      `).bind(commentId, user.id).first();
+
+      if (!existing) {
+        return json({
+          success: false,
+          error: "Comment not found or you do not have permission to delete it."
+        }, 404);
+      }
+
+      await env.DB.prepare(`
+        DELETE FROM article_comment_edits
+        WHERE comment_id = ?
+      `).bind(commentId).run();
+
+      await env.DB.prepare(`
+        DELETE FROM article_comments
+        WHERE id = ? AND user_id = ?
+      `).bind(commentId, user.id).run();
+
+      return json({
+        success: true,
+        message: "Your comment has been deleted."
+      });
+    }
     // CREATE A NEW COMMENT
     const articleId = Number(body.articleId);
     const comment = typeof body.comment === "string"
