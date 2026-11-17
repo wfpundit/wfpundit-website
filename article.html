@@ -27,6 +27,10 @@ h1{font-size:clamp(27px,5vw,43px);line-height:1.15;letter-spacing:-1px;margin:12
 .meta{color:#8798ad;font-size:11px;margin-bottom:24px;border-bottom:1px solid var(--line);padding-bottom:18px}
 .content{color:#e0e6ef;font-size:15px;white-space:pre-wrap;overflow-wrap:anywhere}
 .message{text-align:center;color:var(--muted);padding:40px 15px}
+.save-area{margin:18px 0 24px}
+.save-button{padding:11px 18px;border:0;border-radius:8px;background:#3978c8;color:white;font-weight:800;cursor:pointer}
+.save-button:disabled{opacity:.6;cursor:not-allowed}
+.save-message{font-size:13px;color:var(--muted);margin:8px 0 0}
 footer{border-top:1px solid var(--line);padding:25px 0;color:var(--muted);font-size:11px;text-align:center}
 body.light-mode{--bg:#f1f4f8;--panel:#fff;--line:#dce3ec;--text:#1c2939;--muted:#66758a}
 body.light-mode header{background:#fff}
@@ -35,51 +39,150 @@ body.light-mode .summary,body.light-mode .content{color:#34445a}
 </style>
 </head>
 <body>
-<header><div class="wrap">
+<header>
+<div class="wrap">
 <a class="brand" href="/index.html">wf_pundit <span class="verified">✓</span></a>
-</div></header>
+</div>
+</header>
+
 <main class="wrap">
 <a class="back" href="/index.html#latest">← Back to latest news</a>
+
 <div id="message" class="message">Loading article...</div>
+
 <article class="article" id="article" hidden>
 <img class="article-image" id="articleImage" alt="">
+
 <div class="article-content">
 <div class="category" id="category"></div>
 <h1 id="title"></h1>
 <p class="summary" id="summary"></p>
 <div class="meta" id="meta"></div>
+
+<div class="save-area" id="saveArea">
+<button class="save-button" id="saveButton" type="button">
+♡ Save Article
+</button>
+<p class="save-message" id="saveMessage"></p>
+</div>
+
 <div class="content" id="content"></div>
 </div>
 </article>
 </main>
-<footer><div class="wrap">© <span id="year"></span> WF Pundit · Women's football. Every story matters.</div></footer>
+
+<footer>
+<div class="wrap">© <span id="year"></span> WF Pundit · Women's football. Every story matters.</div>
+</footer>
+
 <script>
 document.getElementById("year").textContent=new Date().getFullYear();
-try{if(localStorage.getItem("wf-theme")==="light")document.body.classList.add("light-mode")}catch(error){}
+
+try{
+if(localStorage.getItem("wf-theme")==="light"){
+document.body.classList.add("light-mode");
+}
+}catch(error){}
+
+let currentArticleId=null;
+
 async function loadArticle(){
 const message=document.getElementById("message");
 const articleElement=document.getElementById("article");
 const id=new URLSearchParams(window.location.search).get("id");
-if(!id||!/^\d+$/.test(id)){message.textContent="This article link is invalid.";return}
+
+if(!id||!/^\d+$/.test(id)){
+message.textContent="This article link is invalid.";
+return;
+}
+
 try{
 const response=await fetch("/api/article?id="+encodeURIComponent(id));
 const data=await response.json();
-if(!response.ok||!data.success||!data.article)throw new Error(data.error||"Article not found.");
+
+if(!response.ok||!data.success||!data.article){
+throw new Error(data.error||"Article not found.");
+}
+
 const article=data.article;
+currentArticleId=Number(article.id);
+
 document.title=(article.title||"Article")+" | WF Pundit";
 document.getElementById("title").textContent=article.title||"";
 document.getElementById("summary").textContent=article.summary||"";
 document.getElementById("category").textContent=article.category||"Women's Football";
 document.getElementById("content").textContent=article.content||"";
+
 const author=article.author||"WF Pundit";
-const date=article.created_at?new Date(article.created_at).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"}):"";
-document.getElementById("meta").textContent="By "+author+(date?" · "+date:"");
+const date=article.created_at
+?new Date(article.created_at).toLocaleDateString("en-GB",{
+day:"numeric",
+month:"long",
+year:"numeric"
+})
+:"";
+
+document.getElementById("meta").textContent=
+"By "+author+(date?" · "+date:"");
+
 const image=document.getElementById("articleImage");
-if(article.image_url&&/^https:\/\//i.test(article.image_url)){image.src=article.image_url;image.alt=article.title||"Article image";image.style.display="block"}
+
+if(article.image_url&&/^https:\/\//i.test(article.image_url)){
+image.src=article.image_url;
+image.alt=article.title||"Article image";
+image.style.display="block";
+}
+
 message.hidden=true;
 articleElement.hidden=false;
-}catch(error){console.error("Article loading error:",error);message.textContent=error.message||"Unable to load this article. Please try again."}
+
+}catch(error){
+console.error("Article loading error:",error);
+message.textContent=error.message||"Unable to load this article. Please try again.";
 }
+}
+
+document.getElementById("saveButton").addEventListener("click",async function(){
+const button=this;
+const saveMessage=document.getElementById("saveMessage");
+
+if(!currentArticleId){
+saveMessage.textContent="Article is not ready yet.";
+return;
+}
+
+button.disabled=true;
+button.textContent="Saving...";
+saveMessage.textContent="";
+
+try{
+const response=await fetch("/api/saved",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+articleId:currentArticleId
+})
+});
+
+const data=await response.json();
+
+if(!response.ok||!data.success){
+throw new Error(data.error||"Unable to save article.");
+}
+
+button.textContent="✓ Saved";
+saveMessage.textContent="Article saved to your account.";
+
+}catch(error){
+button.textContent="♡ Save Article";
+saveMessage.textContent=error.message||"Something went wrong.";
+}finally{
+button.disabled=false;
+}
+});
+
 loadArticle();
 </script>
 </body>
