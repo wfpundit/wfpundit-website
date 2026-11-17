@@ -246,6 +246,11 @@ function setTab(tab) {
 
   loginTab.classList.toggle("active", !registering);
   registerTab.classList.toggle("active", registering);
+  const requestedMode = new URLSearchParams(window.location.search).get("mode");
+
+if (requestedMode === "register") {
+  setTab("register");
+}
 
   message.className = "message";
 }
