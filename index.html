@@ -213,6 +213,47 @@ letter-spacing:.055em
 }
 nav a:hover,nav a.active{color:var(--cyan)}
 .navright{display:flex;align-items:center;gap:10px}
+
+.account-actions{
+display:flex;
+align-items:center;
+gap:6px;
+flex:none
+}
+
+.account-link{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+min-height:40px;
+padding:0 12px;
+border:1px solid #6486ad;
+border-radius:8px;
+color:#dceaff;
+background:transparent;
+font-size:10px;
+font-weight:950;
+letter-spacing:.05em;
+white-space:nowrap
+}
+
+.account-link.signup{
+color:#fff;
+background:#3978c8;
+border-color:#3978c8
+}
+
+body.light-mode .account-link.login{
+color:#245d9d;
+background:#fff;
+border-color:#9bb8d8
+}
+
+body.light-mode .account-link.signup{
+color:#fff;
+background:#2869b3;
+border-color:#2869b3
+}
 .search{
 width:175px;
 background:#121e2e;
@@ -258,7 +299,10 @@ color:#fff;
 font-size:11px;
 font-weight:850;
 white-space:nowrap
-}
+}<div class="account-actions" aria-label="Reader account">
+<a class="account-link login" href="/account.html">LOG IN</a>
+<a class="account-link signup" href="/account.html?mode=register">SIGN UP</a>
+</div>
 .theme-track{
 position:relative;
 display:flex;
