@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -174,6 +175,7 @@ body.light-mode label { color:#34445c; }
   .card { padding:20px; }
 }
 </style>
+
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 
@@ -216,13 +218,15 @@ body.light-mode label { color:#34445c; }
 
         <button class="submit" type="submit">CREATE ACCOUNT</button>
       </form>
-<div id="googleLoginArea" style="margin-top:15px;text-align:center;">
-  <div id="googleLoginButton"></div>
-</div>
 
-<div id="googleRegisterArea" hidden style="margin-top:15px;text-align:center;">
-  <div id="googleRegisterButton"></div>
-</div>
+      <div id="googleLoginArea" style="margin-top:15px;text-align:center;">
+        <div id="googleLoginButton"></div>
+      </div>
+
+      <div id="googleRegisterArea" hidden style="margin-top:15px;text-align:center;">
+        <div id="googleRegisterButton"></div>
+      </div>
+
       <div id="message" class="message" role="status" aria-live="polite"></div>
     </div>
 
@@ -259,6 +263,8 @@ const registerForm = document.getElementById("registerForm");
 const message = document.getElementById("message");
 const accountForms = document.getElementById("accountForms");
 const loggedIn = document.getElementById("loggedIn");
+const googleLoginArea = document.getElementById("googleLoginArea");
+const googleRegisterArea = document.getElementById("googleRegisterArea");
 
 function showMessage(text, type = "error") {
   message.textContent = text;
@@ -266,8 +272,10 @@ function showMessage(text, type = "error") {
 }
 
 function setTab(tab) {
-  const registering = tab === "register";document.getElementById("googleLoginArea").hidden = registering;
-document.getElementById("googleRegisterArea").hidden = !registering;
+  const registering = tab === "register";
+
+  googleLoginArea.hidden = registering;
+  googleRegisterArea.hidden = !registering;
 
   loginForm.hidden = registering;
   registerForm.hidden = !registering;
@@ -282,6 +290,7 @@ loginTab.addEventListener("click", () => setTab("login"));
 registerTab.addEventListener("click", () => setTab("register"));
 
 const requestedMode = new URLSearchParams(window.location.search).get("mode");
+
 if (requestedMode === "register") {
   setTab("register");
 }
@@ -335,18 +344,12 @@ async function sendRequest(url, data) {
   return result;
 }
 
-
-
-
 async function handleGoogleCredential(response) {
   message.className = "message";
 
   try {
-    
-
     const result = await sendRequest("/api/google-auth", {
       credential: response.credential,
-      csrfToken,
       mode: registerForm.hidden ? "login" : "register"
     });
 
@@ -397,7 +400,8 @@ window.addEventListener("load", initializeGoogleButtons);
 
 if (window.google && window.google.accounts) {
   initializeGoogleButtons();
-      }
+}
+
 function displayUser(user) {
   accountForms.hidden = true;
   loggedIn.hidden = false;
