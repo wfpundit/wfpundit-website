@@ -1,6 +1,7 @@
+
 const SESSION_COOKIE = "wf_reader_session";
 const SESSION_DAYS = 30;
-const PBKDF2_ITERATIONS = 310000;
+const PBKDF2_ITERATIONS = 100000;
 
 export function json(data, status = 200, headers = {}) {
   return new Response(JSON.stringify(data), {
@@ -70,7 +71,7 @@ export async function verifyPassword(password, stored) {
   try {
     const [algorithm, iterationsText, saltText, hashText] = stored.split("$");
     const iterations = Number(iterationsText);
-    if (algorithm !== "pbkdf2" || !Number.isInteger(iterations) || iterations < 100000 || iterations > 1000000) return false;
+    if (algorithm !== "pbkdf2" || !Number.isInteger(iterations) || iterations < 100000 || iterations > 100000) return false;
 
     const salt = fromBase64Url(saltText);
     const expected = fromBase64Url(hashText);
