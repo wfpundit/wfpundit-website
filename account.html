@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1220">
+<title>Reader Account | WF Pundit</title>
+
+<style>
+:root {
+  --bg:#0b1220;
+  --panel:#131e2e;
+  --line:#2a3a50;
+  --text:#f5f7fb;
+  --muted:#b9c6d8;
+  --blue:#3978c8;
+  --cyan:#a9d3ff;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  min-height:100vh;
+  padding:25px 16px;
+  display:grid;
+  place-items:center;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+.account-wrap { width:min(440px,100%); }
+.brand {
+  text-align:center;
+  margin-bottom:25px;
+  font-size:30px;
+  font-weight:950;
+  letter-spacing:-1px;
+}
+.brand span { color:var(--cyan); }
+.card {
+  padding:28px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:0 18px 45px #0005;
+}
+h1 { margin:0 0 7px; font-size:25px; }
+.intro { margin:0 0 23px; color:var(--muted); font-size:14px; }
+.tabs { display:flex; gap:8px; margin-bottom:22px; }
+.tabs button {
+  flex:1;
+  padding:11px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#0b1626;
+  color:var(--muted);
+  font-weight:800;
+}
+.tabs button.active {
+  background:var(--blue);
+  border-color:var(--blue);
+  color:white;
+}
+label {
+  display:block;
+  margin:15px 0 7px;
+  font-size:12px;
+  font-weight:800;
+  color:#dce8f7;
+}
+input {
+  width:100%;
+  padding:13px;
+  border:1px solid #40536c;
+  border-radius:8px;
+  outline:none;
+  background:#0b1626;
+  color:white;
+}
+input:focus { border-color:var(--cyan); }
+.submit {
+  width:100%;
+  margin-top:22px;
+  padding:14px;
+  border:0;
+  border-radius:8px;
+  background:linear-gradient(135deg,#4389d9,#2865aa);
+  color:white;
+  font-weight:900;
+  cursor:pointer;
+}
+.submit:disabled { opacity:.6; cursor:wait; }
+.message {
+  display:none;
+  margin-top:16px;
+  padding:11px;
+  border-radius:8px;
+  font-size:13px;
+  overflow-wrap:anywhere;
+}
+.message.show { display:block; }
+.message.error { background:#6b202c; color:#ffe2e6; }
+.message.success { background:#174b39; color:#d8ffed; }
+.back {
+  display:block;
+  margin-top:22px;
+  text-align:center;
+  color:var(--cyan);
+  font-size:13px;
+  text-decoration:none;
+}
+.account-status { text-align:center; color:var(--muted); }
+[hidden] { display:none !important; }
+</style>
+</head>
+
+<body>
+<main class="account-wrap">
+  <div class="brand">WF <span>PUNDIT</span></div>
+
+  <section class="card">
+    <div id="accountForms">
+      <h1>Reader Account</h1>
+      <p class="intro">Join the WF Pundit community and stay connected with women's football.</p>
+
+      <div class="tabs">
+        <button type="button" id="loginTab" class="active">Log In</button>
+        <button type="button" id="registerTab">Register</button>
+      </div>
+
+      <form id="loginForm">
+        <label for="loginEmail">Email address</label>
+        <input id="loginEmail" type="email" autocomplete="email" required maxlength="254">
+
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required maxlength="128">
+
+        <button class="submit" type="submit">LOG IN</button>
+      </form>
+
+      <form id="registerForm" hidden>
+        <label for="displayName">Your name</label>
+        <input id="displayName" type="text" autocomplete="name" required minlength="2" maxlength="50">
+
+        <label for="registerEmail">Email address</label>
+        <input id="registerEmail" type="email" autocomplete="email" required maxlength="254">
+
+        <label for="registerPassword">Create password</label>
+        <input id="registerPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128">
+
+        <label for="confirmPassword">Confirm password</label>
+        <input id="confirmPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128">
+
+        <button class="submit" type="submit">CREATE ACCOUNT</button>
+      </form>
+
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+    </div>
+
+    <div id="loggedIn" hidden>
+      <h1>Welcome!</h1>
+      <p class="intro">You are logged in to your WF Pundit reader account.</p>
+      <p class="account-status" id="readerDetails"></p>
+      <button class="submit" id="logoutButton" type="button">LOG OUT</button>
+      <div id="logoutMessage" class="message" role="status"></div>
+    </div>
+  </section>
+
+  <a class="back" href="/">← Back to WF Pundit</a>
+</main>
+
+<script>
+const loginTab = document.getElementById("loginTab");
+const registerTab = document.getElementById("registerTab");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const message = document.getElementById("message");
+const accountForms = document.getElementById("accountForms");
+const loggedIn = document.getElementById("loggedIn");
+
+function showMessage(text, type = "error") {
+  message.textContent = text;
+  message.className = "message show " + type;
+}
+
+function setTab(tab) {
+  const registering = tab === "register";
+  loginForm.hidden = registering;
+  registerForm.hidden = !registering;
+  loginTab.classList.toggle("active", !registering);
+  registerTab.classList.toggle("active", registering);
+  message.className = "message";
+}
+
+loginTab.addEventListener("click", () => setTab("login"));
+registerTab.addEventListener("click", () => setTab("register"));
+
+async function sendRequest(url, data) {
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
+
+  const result = await response.json();
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || "Something went wrong. Please try again.");
+  }
+  return result;
+}
+
+function displayUser(user) {
+  accountForms.hidden = true;
+  loggedIn.hidden = false;
+  document.getElementById("readerDetails").textContent =
+    user.displayName + " · " + user.email;
+}
+
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const button = loginForm.querySelector("button");
+  button.disabled = true;
+  button.textContent = "PLEASE WAIT...";
+  message.className = "message";
+
+  try {
+    const result = await sendRequest("/api/login", {
+      email: document.getElementById("loginEmail").value,
+      password: document.getElementById("loginPassword").value
+    });
+    displayUser(result.user);
+  } catch (error) {
+    showMessage(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "LOG IN";
+  }
+});
+
+registerForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const password = document.getElementById("registerPassword").value;
+  const confirmation = document.getElementById("confirmPassword").value;
+
+  if (password !== confirmation) {
+    showMessage("Your passwords do not match.");
+    return;
+  }
+
+  const button = registerForm.querySelector("button");
+  button.disabled = true;
+  button.textContent = "CREATING ACCOUNT...";
+  message.className = "message";
+
+  try {
+    const result = await sendRequest("/api/register", {
+      displayName: document.getElementById("displayName").value,
+      email: document.getElementById("registerEmail").value,
+      password
+    });
+    displayUser(result.user);
+  } catch (error) {
+    showMessage(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "CREATE ACCOUNT";
+  }
+});
+
+document.getElementById("logoutButton").addEventListener("click", async () => {
+  const button = document.getElementById("logoutButton");
+  const output = document.getElementById("logoutMessage");
+  button.disabled = true;
+  button.textContent = "PLEASE WAIT...";
+
+  try {
+    const response = await fetch("/api/logout", {
+      method: "POST",
+      credentials: "same-origin"
+    });
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to log out.");
+    }
+
+    loggedIn.hidden = true;
+    accountForms.hidden = false;
+    setTab("login");
+    loginForm.reset();
+    registerForm.reset();
+  } catch (error) {
+    output.textContent = error.message;
+    output.className = "message show error";
+  } finally {
+    button.disabled = false;
+    button.textContent = "LOG OUT";
+  }
+});
+
+async function checkLogin() {
+  try {
+    const response = await fetch("/api/me", {
+      credentials: "same-origin"
+    });
+    const result = await response.json();
+
+    if (response.ok && result.success && result.loggedIn) {
+      displayUser(result.user);
+    }
+  } catch (error) {
+    console.error("Could not check reader session:", error);
+  }
+}
+
+checkLogin();
+</script>
+</body>
+</html>
