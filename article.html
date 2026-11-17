@@ -1,470 +1,563 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b1220">
-<meta name="description" content="Read the latest women's football news from WF Pundit.">
-<title>WF Pundit | Article</title>
+<title>Reader Account | WF Pundit</title>
 
 <style>
-:root{
---bg:#0b1220;
---panel:#131e2e;
---line:#2a3a50;
---text:#f5f7fb;
---muted:#aab6c7;
---cyan:#9fc5ed;
+:root {
+  --bg:#0b1220;
+  --panel:#131e2e;
+  --line:#2a3a50;
+  --text:#f5f7fb;
+  --muted:#b9c6d8;
+  --blue:#3978c8;
+  --cyan:#a9d3ff;
 }
-*{box-sizing:border-box}
-body{
-margin:0;
-background:var(--bg);
-color:var(--text);
-font-family:Inter,system-ui,sans-serif;
-line-height:1.7
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  min-height:100vh;
+  padding:25px 16px;
+  display:grid;
+  place-items:center;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
-a{color:inherit;text-decoration:none}
-.wrap{width:min(850px,calc(100% - 32px));margin:auto}
-header{
-border-bottom:1px solid var(--line);
-background:#0d1727;
-padding:18px 0
+.account-wrap { width:min(600px,100%); }
+.brand {
+  text-align:center;
+  margin-bottom:25px;
+  font-size:30px;
+  font-weight:950;
+  letter-spacing:-1px;
 }
-.brand{font-size:23px;font-weight:950;letter-spacing:-1px}
-.verified{
-display:inline-grid;
-place-items:center;
-width:16px;
-height:16px;
-border-radius:50%;
-background:#1689ff;
-color:white;
-font-size:10px
+.brand span { color:var(--cyan); }
+.card {
+  padding:28px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:16px;
+  box-shadow:0 18px 45px #0005;
 }
-main{padding:35px 0 60px}
-.back{
-display:inline-block;
-color:var(--cyan);
-font-size:12px;
-font-weight:800;
-margin-bottom:25px
+h1 { margin:0 0 7px; font-size:25px; }
+.intro { margin:0 0 23px; color:var(--muted); font-size:14px; }
+.tabs { display:flex; gap:8px; margin-bottom:22px; }
+.tabs button {
+  flex:1;
+  padding:11px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#0b1626;
+  color:var(--muted);
+  font-weight:800;
 }
-.article{
-background:var(--panel);
-border:1px solid var(--line);
-border-radius:13px;
-overflow:hidden
+.tabs button.active {
+  background:var(--blue);
+  border-color:var(--blue);
+  color:white;
 }
-.article-image{
-width:100%;
-max-height:470px;
-object-fit:cover;
-display:none
+label {
+  display:block;
+  margin:15px 0 7px;
+  font-size:12px;
+  font-weight:800;
+  color:#dce8f7;
 }
-.article-content{padding:28px}
-.category{
-color:var(--cyan);
-font-size:11px;
-font-weight:900;
-text-transform:uppercase;
-letter-spacing:.1em
+input {
+  width:100%;
+  padding:13px;
+  border:1px solid #40536c;
+  border-radius:8px;
+  outline:none;
+  background:#0b1626;
+  color:white;
 }
-h1{
-font-size:clamp(27px,5vw,43px);
-line-height:1.15;
-letter-spacing:-1px;
-margin:12px 0
+input:focus { border-color:var(--cyan); }
+.submit {
+  width:100%;
+  margin-top:22px;
+  padding:14px;
+  border:0;
+  border-radius:8px;
+  background:linear-gradient(135deg,#4389d9,#2865aa);
+  color:white;
+  font-weight:900;
+  cursor:pointer;
 }
-.summary{color:#c4d0df;font-size:16px;margin:0 0 18px}
-.meta{
-color:#8798ad;
-font-size:11px;
-margin-bottom:24px;
-border-bottom:1px solid var(--line);
-padding-bottom:18px
+.submit:disabled { opacity:.6; cursor:wait; }
+.message {
+  display:none;
+  margin-top:16px;
+  padding:11px;
+  border-radius:8px;
+  font-size:13px;
+  overflow-wrap:anywhere;
 }
-.content{
-color:#e0e6ef;
-font-size:15px;
-white-space:pre-wrap;
-overflow-wrap:anywhere
+.message.show { display:block; }
+.message.error { background:#6b202c; color:#ffe2e6; }
+.message.success { background:#174b39; color:#d8ffed; }
+.back {
+  display:block;
+  margin-top:22px;
+  text-align:center;
+  color:var(--cyan);
+  font-size:13px;
+  text-decoration:none;
 }
-.message{text-align:center;color:var(--muted);padding:40px 15px}
-.save-area{margin:18px 0 24px}
-.save-button,.comment-button{
-padding:11px 18px;
-border:0;
-border-radius:8px;
-background:#3978c8;
-color:white;
-font-weight:800;
-cursor:pointer
+.account-status { text-align:center; color:var(--muted); }
+.saved-section {
+  margin-top:28px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
 }
-.save-button:disabled,.comment-button:disabled{
-opacity:.6;
-cursor:not-allowed
+.saved-section h2 { font-size:19px; margin:0 0 12px; }
+.saved-item {
+  padding:14px;
+  margin:12px 0;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#0b1626;
 }
-.save-message,.comment-message{
-font-size:13px;
-color:var(--muted);
-margin:8px 0 0
+.saved-item h3 {
+  margin:0 0 7px;
+  font-size:16px;
+  line-height:1.4;
 }
-.comments{
-margin-top:35px;
-padding-top:25px;
-border-top:1px solid var(--line)
+.saved-item p {
+  margin:0 0 10px;
+  color:var(--muted);
+  font-size:13px;
 }
-.comments h2{font-size:22px;margin:0 0 18px}
-.comment-form textarea{
-width:100%;
-min-height:110px;
-resize:vertical;
-padding:13px;
-border:1px solid var(--line);
-border-radius:8px;
-background:var(--bg);
-color:var(--text);
-font:inherit;
-outline:none
+.saved-actions {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
 }
-.comment-form textarea:focus{border-color:var(--cyan)}
-.comment-form textarea::placeholder{color:var(--muted)}
-.comment-login{
-color:var(--muted);
-font-size:13px;
-margin:0 0 12px
+.saved-actions a {
+  color:var(--cyan);
+  font-size:13px;
+  font-weight:800;
 }
-.comment-login a{color:var(--cyan);font-weight:800}
-.comment-button{margin-top:12px}
-.comment-list{margin-top:25px}
-.comment-item{
-padding:15px 0;
-border-bottom:1px solid var(--line)
+.remove-button {
+  padding:7px 11px;
+  border:1px solid #70404a;
+  border-radius:7px;
+  background:#38202a;
+  color:#ffdce2;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:800;
 }
-.comment-author{font-weight:850;font-size:14px}
-.comment-date{color:var(--muted);font-size:11px}
-.comment-text{
-font-size:14px;
-white-space:pre-wrap;
-overflow-wrap:anywhere;
-margin-top:7px
+.remove-button:disabled { opacity:.6; cursor:wait; }
+body.light-mode {
+  --bg:#f1f4f8;
+  --panel:#fff;
+  --line:#dce3ec;
+  --text:#1c2939;
+  --muted:#66758a;
 }
-footer{
-border-top:1px solid var(--line);
-padding:25px 0;
-color:var(--muted);
-font-size:11px;
-text-align:center
+body.light-mode .tabs button,
+body.light-mode input,
+body.light-mode .saved-item {
+  background:#fff;
+  color:#1c2939;
+  border-color:#cbd5e1;
 }
-body.light-mode{
---bg:#f1f4f8;
---panel:#fff;
---line:#dce3ec;
---text:#1c2939;
---muted:#66758a
-}
-body.light-mode header{background:#fff}
-body.light-mode .summary,
-body.light-mode .content{color:#34445a}
-@media(max-width:600px){
-.article-content{padding:19px}
-main{padding-top:24px}
+body.light-mode label { color:#34445c; }
+[hidden] { display:none !important; }
+@media(max-width:600px) {
+  .card { padding:20px; }
 }
 </style>
 </head>
 
 <body>
-<header>
-<div class="wrap">
-<a class="brand" href="/index.html">wf_pundit <span class="verified">✓</span></a>
-</div>
-</header>
+<main class="account-wrap">
+  <div class="brand">WF <span>PUNDIT</span></div>
 
-<main class="wrap">
-<a class="back" href="/index.html#latest">← Back to latest news</a>
+  <section class="card">
+    <div id="accountForms">
+      <h1>Reader Account</h1>
+      <p class="intro">Join the WF Pundit community and stay connected with women's football.</p>
 
-<div id="message" class="message">Loading article...</div>
+      <div class="tabs">
+        <button type="button" id="loginTab" class="active">Log In</button>
+        <button type="button" id="registerTab">Register</button>
+      </div>
 
-<article class="article" id="article" hidden>
-<img class="article-image" id="articleImage" alt="">
+      <form id="loginForm">
+        <label for="loginEmail">Email address</label>
+        <input id="loginEmail" type="email" autocomplete="email" required maxlength="254">
 
-<div class="article-content">
-<div class="category" id="category"></div>
-<h1 id="title"></h1>
-<p class="summary" id="summary"></p>
-<div class="meta" id="meta"></div>
+        <label for="loginPassword">Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required maxlength="128">
 
-<div class="save-area">
-<button class="save-button" id="saveButton" type="button">
-♡ Save Article
-</button>
-<p class="save-message" id="saveMessage"></p>
-</div>
+        <button class="submit" type="submit">LOG IN</button>
+      </form>
 
-<div class="content" id="content"></div>
+      <form id="registerForm" hidden>
+        <label for="displayName">Your name</label>
+        <input id="displayName" type="text" autocomplete="name" required minlength="2" maxlength="50">
 
-<section class="comments" id="comments">
-<h2>Comments</h2>
+        <label for="registerEmail">Email address</label>
+        <input id="registerEmail" type="email" autocomplete="email" required maxlength="254">
 
-<p class="comment-login" id="commentLogin">
-Please <a href="/account.html">log in</a> to leave a comment.
-</p>
+        <label for="registerPassword">Create password</label>
+        <input id="registerPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128">
 
-<form class="comment-form" id="commentForm">
-<textarea
-id="commentInput"
-maxlength="2000"
-placeholder="Write your comment..."
-required
-></textarea>
+        <label for="confirmPassword">Confirm password</label>
+        <input id="confirmPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128">
 
-<button class="comment-button" id="commentButton" type="submit">
-POST COMMENT
-</button>
+        <button class="submit" type="submit">CREATE ACCOUNT</button>
+      </form>
 
-<p class="comment-message" id="commentMessage"></p>
-</form>
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+    </div>
 
-<div class="comment-list" id="commentList">
-<p class="message">Loading comments...</p>
-</div>
-</section>
+    <div id="loggedIn" hidden>
+      <h1>Welcome!</h1>
+      <p class="intro">You are logged in to your WF Pundit reader account.</p>
+      <p class="account-status" id="readerDetails"></p>
 
-</div>
-</article>
+      <section class="saved-section">
+        <h2>My Saved Articles</h2>
+        <p id="savedMessage" style="color:#b9c6d8;font-size:13px;">Loading saved articles...</p>
+        <div id="savedList"></div>
+      </section>
+
+      <button class="submit" id="logoutButton" type="button">LOG OUT</button>
+      <div id="logoutMessage" class="message" role="status"></div>
+    </div>
+  </section>
+
+  <a class="back" href="/">← Back to WF Pundit</a>
 </main>
 
-<footer>
-<div class="wrap">
-© <span id="year"></span> WF Pundit · Women's football. Every story matters.
-</div>
-</footer>
-
 <script>
-document.getElementById("year").textContent=new Date().getFullYear();
+try {
+  if (localStorage.getItem("wf-theme") === "light") {
+    document.body.classList.add("light-mode");
+  }
+} catch (error) {}
 
-try{
-if(localStorage.getItem("wf-theme")==="light"){
-document.body.classList.add("light-mode");
-}
-}catch(error){}
+const loginTab = document.getElementById("loginTab");
+const registerTab = document.getElementById("registerTab");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+const message = document.getElementById("message");
+const accountForms = document.getElementById("accountForms");
+const loggedIn = document.getElementById("loggedIn");
 
-let currentArticleId=null;
-
-async function loadArticle(){
-const message=document.getElementById("message");
-const articleElement=document.getElementById("article");
-const id=new URLSearchParams(window.location.search).get("id");
-
-if(!id||! /^\d+$/.test(id)){
-message.textContent="This article link is invalid.";
-return;
-}
-
-try{
-const response=await fetch("/api/article?id="+encodeURIComponent(id));
-const data=await response.json();
-
-if(!response.ok||!data.success||!data.article){
-throw new Error(data.error||"Article not found.");
+function showMessage(text, type = "error") {
+  message.textContent = text;
+  message.className = "message show " + type;
 }
 
-const article=data.article;
-currentArticleId=Number(article.id);
+function setTab(tab) {
+  const registering = tab === "register";
 
-document.title=(article.title||"Article")+" | WF Pundit";
-document.getElementById("title").textContent=article.title||"";
-document.getElementById("summary").textContent=article.summary||"";
-document.getElementById("category").textContent=article.category||"Women's Football";
-document.getElementById("content").textContent=article.content||"";
+  loginForm.hidden = registering;
+  registerForm.hidden = !registering;
 
-const author=article.author||"WF Pundit";
-const date=article.created_at
-?new Date(article.created_at).toLocaleDateString("en-GB",{
-day:"numeric",
-month:"long",
-year:"numeric"
-})
-:"";
+  loginTab.classList.toggle("active", !registering);
+  registerTab.classList.toggle("active", registering);
 
-document.getElementById("meta").textContent=
-"By "+author+(date?" · "+date:"");
-
-const image=document.getElementById("articleImage");
-
-if(article.image_url&&/^https:\/\//i.test(article.image_url)){
-image.src=article.image_url;
-image.alt=article.title||"Article image";
-image.style.display="block";
+  message.className = "message";
 }
 
-message.hidden=true;
-articleElement.hidden=false;
+loginTab.addEventListener("click", () => setTab("login"));
+registerTab.addEventListener("click", () => setTab("register"));
 
-await loadComments();
-
-}catch(error){
-console.error("Article loading error:",error);
-message.textContent=error.message||"Unable to load this article. Please try again.";
-}
+const requestedMode = new URLSearchParams(window.location.search).get("mode");
+if (requestedMode === "register") {
+  setTab("register");
 }
 
-async function loadComments(){
-const commentList=document.getElementById("commentList");
+function getReturnToTarget() {
+  const requestedReturnTo = new URLSearchParams(window.location.search).get("returnTo");
 
-if(!currentArticleId)return;
+  if (!requestedReturnTo) {
+    return "";
+  }
 
-commentList.textContent="Loading comments...";
+  try {
+    const target = new URL(requestedReturnTo, window.location.origin);
 
-try{
-const response=await fetch(
-"/api/comments?articleId="+encodeURIComponent(currentArticleId)
-);
+    if (target.origin !== window.location.origin) {
+      return "";
+    }
 
-const data=await response.json();
+    if (target.pathname === "/account.html") {
+      return "";
+    }
 
-if(!response.ok||!data.success){
-throw new Error(data.error||"Unable to load comments.");
+    return target.pathname + target.search + target.hash;
+  } catch (error) {
+    return "";
+  }
 }
 
-commentList.replaceChildren();
+function returnToRequestedPage() {
+  const target = getReturnToTarget();
 
-if(!data.comments||data.comments.length===0){
-const empty=document.createElement("p");
-empty.className="message";
-empty.textContent="No comments yet. Be the first to comment.";
-commentList.appendChild(empty);
-return;
+  if (target) {
+    window.location.replace(target);
+  }
 }
 
-data.comments.forEach(comment=>{
-const item=document.createElement("div");
-item.className="comment-item";
+async function sendRequest(url, data) {
+  const response = await fetch(url, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data)
+  });
 
-const author=document.createElement("div");
-author.className="comment-author";
-author.textContent=comment.display_name||"Reader";
+  const result = await response.json();
 
-const date=document.createElement("div");
-date.className="comment-date";
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || "Something went wrong. Please try again.");
+  }
 
-if(comment.created_at){
-const parsedDate=new Date(comment.created_at);
-date.textContent=Number.isNaN(parsedDate.getTime())
-?""
-:parsedDate.toLocaleString();
+  return result;
 }
 
-const content=document.createElement("div");
-content.className="comment-text";
-content.textContent=comment.comment||"";
+function displayUser(user) {
+  accountForms.hidden = true;
+  loggedIn.hidden = false;
 
-item.append(author,date,content);
-commentList.appendChild(item);
+  document.getElementById("readerDetails").textContent =
+    user.displayName + " · " + user.email;
+
+  loadSavedArticles();
+  returnToRequestedPage();
+}
+
+async function loadSavedArticles() {
+  const savedMessage = document.getElementById("savedMessage");
+  const savedList = document.getElementById("savedList");
+
+  savedMessage.textContent = "Loading saved articles...";
+  savedList.replaceChildren();
+
+  try {
+    const response = await fetch("/api/saved", {
+      credentials: "same-origin"
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to load saved articles.");
+    }
+
+    const articles = result.articles || [];
+
+    if (articles.length === 0) {
+      savedMessage.textContent = "You haven't saved any articles yet.";
+      return;
+    }
+
+    savedMessage.textContent = articles.length + " saved article(s).";
+
+    articles.forEach(article => {
+      const item = document.createElement("article");
+      item.className = "saved-item";
+
+      const heading = document.createElement("h3");
+      heading.textContent = article.title || "Untitled article";
+
+      const category = document.createElement("p");
+      category.textContent = article.category || "Women's Football";
+
+      const actions = document.createElement("div");
+      actions.className = "saved-actions";
+
+      const openLink = document.createElement("a");
+      openLink.href = "/article.html?id=" + encodeURIComponent(article.id);
+      openLink.textContent = "Read article";
+
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "remove-button";
+      removeButton.textContent = "Remove";
+
+      removeButton.addEventListener("click", () => {
+        removeSavedArticle(article.id, removeButton);
+      });
+
+      actions.append(openLink, removeButton);
+      item.append(heading, category, actions);
+      savedList.appendChild(item);
+    });
+
+  } catch (error) {
+    savedMessage.textContent =
+      error.message || "Unable to load saved articles.";
+  }
+}
+
+async function removeSavedArticle(articleId, button) {
+  const confirmed = confirm(
+    "Are you sure you want to remove this article from your saved articles?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  const savedMessage = document.getElementById("savedMessage");
+
+  button.disabled = true;
+  button.textContent = "Removing...";
+
+  try {
+    const response = await fetch("/api/saved", {
+      method: "DELETE",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ articleId })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to remove article.");
+    }
+
+    await loadSavedArticles();
+
+  } catch (error) {
+    savedMessage.textContent =
+      error.message || "Unable to remove article.";
+
+    button.disabled = false;
+    button.textContent = "Remove";
+  }
+}
+
+loginForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const button = loginForm.querySelector("button");
+  button.disabled = true;
+  button.textContent = "PLEASE WAIT...";
+  message.className = "message";
+
+  try {
+    const result = await sendRequest("/api/login", {
+      email: document.getElementById("loginEmail").value,
+      password: document.getElementById("loginPassword").value
+    });
+
+    displayUser(result.user);
+
+  } catch (error) {
+    showMessage(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "LOG IN";
+  }
 });
 
-}catch(error){
-console.error("Comments loading error:",error);
-commentList.textContent=error.message||"Unable to load comments.";
-}
-}
+registerForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
 
-document.getElementById("saveButton").addEventListener("click",async function(){
-const button=this;
-const saveMessage=document.getElementById("saveMessage");
+  const password = document.getElementById("registerPassword").value;
+  const confirmation = document.getElementById("confirmPassword").value;
 
-if(!currentArticleId){
-saveMessage.textContent="Article is not ready yet.";
-return;
-}
+  if (password !== confirmation) {
+    showMessage("Your passwords do not match.");
+    return;
+  }
 
-button.disabled=true;
-button.textContent="Saving...";
-saveMessage.textContent="";
+  const button = registerForm.querySelector("button");
+  button.disabled = true;
+  button.textContent = "CREATING ACCOUNT...";
+  message.className = "message";
 
-try{
-const response=await fetch("/api/saved",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({articleId:currentArticleId})
+  try {
+    const result = await sendRequest("/api/register", {
+      displayName: document.getElementById("displayName").value,
+      email: document.getElementById("registerEmail").value,
+      password
+    });
+
+    displayUser(result.user);
+
+  } catch (error) {
+    showMessage(error.message);
+  } finally {
+    button.disabled = false;
+    button.textContent = "CREATE ACCOUNT";
+  }
 });
 
-const data=await response.json();
+document.getElementById("logoutButton").addEventListener("click", async () => {
+  const confirmed = confirm("Are you sure you want to log out?");
 
-if(!response.ok||!data.success){
-throw new Error(data.error||"Unable to save article.");
-}
+  if (!confirmed) {
+    return;
+  }
 
-button.textContent="✓ Saved";
-saveMessage.textContent="Article saved to your account.";
+  const button = document.getElementById("logoutButton");
+  const output = document.getElementById("logoutMessage");
 
-}catch(error){
-button.textContent="♡ Save Article";
-saveMessage.textContent=error.message||"Something went wrong.";
-}finally{
-button.disabled=false;
-}
+  button.disabled = true;
+  button.textContent = "PLEASE WAIT...";
+
+  try {
+    const response = await fetch("/api/logout", {
+      method: "POST",
+      credentials: "same-origin"
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to log out.");
+    }
+
+    loggedIn.hidden = true;
+    accountForms.hidden = false;
+
+    setTab("login");
+    loginForm.reset();
+    registerForm.reset();
+
+  } catch (error) {
+    output.textContent = error.message;
+    output.className = "message show error";
+  } finally {
+    button.disabled = false;
+    button.textContent = "LOG OUT";
+  }
 });
 
-document.getElementById("commentForm").addEventListener("submit",async function(event){
-event.preventDefault();
+async function checkLogin() {
+  try {
+    const response = await fetch("/api/me", {
+      credentials: "same-origin"
+    });
 
-const input=document.getElementById("commentInput");
-const button=document.getElementById("commentButton");
-const message=document.getElementById("commentMessage");
-const comment=input.value.trim();
+    const result = await response.json();
 
-if(!currentArticleId){
-message.textContent="Article is not ready yet.";
-return;
+    if (response.ok && result.success && result.loggedIn) {
+      displayUser(result.user);
+    }
+  } catch (error) {
+    console.error("Could not check reader session:", error);
+  }
 }
 
-if(!comment){
-message.textContent="Please write a comment first.";
-return;
-}
-
-if(comment.length>2000){
-message.textContent="Your comment is too long.";
-return;
-}
-
-button.disabled=true;
-button.textContent="POSTING...";
-message.textContent="";
-
-try{
-const response=await fetch("/api/comments",{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-articleId:currentArticleId,
-comment:comment
-})
-});
-
-const data=await response.json();
-
-if(!response.ok||!data.success){
-throw new Error(data.error||"Unable to publish your comment.");
-}
-
-input.value="";
-message.textContent=data.message||"Your comment has been published.";
-
-await loadComments();
-
-}catch(error){
-message.textContent=error.message||"Something went wrong. Please try again.";
-}finally{
-button.disabled=false;
-button.textContent="POST COMMENT";
-}
-});
-
-loadArticle();
+checkLogin();
 </script>
 </body>
-</html>
+          </html>
