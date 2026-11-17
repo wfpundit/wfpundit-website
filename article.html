@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -189,9 +188,38 @@ h1{
   overflow-wrap:anywhere;
   font-size:14px;
 }
+.comment-edit-button{
+  margin-top:10px;
+  padding:6px 10px;
+  border:1px solid #54769b;
+  border-radius:6px;
+  background:transparent;
+  color:var(--cyan);
+  font-size:11px;
+  font-weight:850;
+}
+.comment-edit-form{margin-top:10px}
+.comment-edit-textarea{
+  display:block;
+  width:100%;
+  min-height:90px;
+  padding:10px;
+  border:1px solid #40536c;
+  border-radius:8px;
+  background:var(--panel);
+  color:var(--text);
+  font:inherit;
+  resize:vertical;
+}
+.comment-edit-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:9px;
+}
+.comment-edit-status{margin-top:8px;color:var(--muted);font-size:12px}
 .status-message{padding:14px;color:var(--muted);font-size:13px}
-.error-message{color:#ffb5bf}
-.modal-backdrop{
+.error-message{color:#ffb5bf}.modal-backdrop{
   position:fixed;
   inset:0;
   z-index:30;
@@ -256,7 +284,8 @@ body.light-mode .modal-actions a.primary{
   color:#fff;
   border-color:#2869b3;
 }
-body.light-mode .comment-form textarea{
+body.light-mode .comment-form textarea,
+body.light-mode .comment-edit-textarea{
   background:#fff;
   color:#1c2939;
   border-color:#cbd5e1;
@@ -348,8 +377,7 @@ body.light-mode .comment-form textarea{
   </div>
 </div>
 
-<script>
-const params = new URLSearchParams(window.location.search);
+<script>const params = new URLSearchParams(window.location.search);
 const articleId = Number(params.get("id"));
 
 const themeToggle = document.getElementById("themeToggle");
@@ -450,18 +478,29 @@ document.addEventListener("keydown", event => {
   }
 });
 
-function formatDate(value) {
+// Display dates and times using each reader's local time zone.
+// SQLite timestamps without a timezone are treated as UTC.
+function formatDateTime(value) {
   if (!value) return "";
 
-  const date = new Date(value);
+  let normalized = String(value).trim();
+
+  if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(normalized)) {
+    normalized = normalized.replace(" ", "T") + "Z";
+  }
+
+  const date = new Date(normalized);
 
   if (Number.isNaN(date.getTime())) return "";
 
-  return date.toLocaleDateString(undefined, {
+  return new Intl.DateTimeFormat(undefined, {
     year: "numeric",
     month: "long",
-    day: "numeric"
-  });
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23"
+  }).format(date);
 }
 
 async function readJsonResponse(response) {
@@ -539,7 +578,12 @@ async function loadComments() {
 
       const date = document.createElement("span");
       date.className = "comment-date";
-      date.textContent = formatDate(item.created_at);
+
+      date.textContent = formatDateTime(item.created_at);
+
+      if (item.edited_at) {
+        date.textContent += " · Edited " + formatDateTime(item.edited_at);
+      }
 
       const content = document.createElement("p");
       content.className = "comment-text";
@@ -547,6 +591,99 @@ async function loadComments() {
 
       meta.append(name, date);
       card.append(meta, content);
+
+      // Only the owner of a comment sees the edit button.
+      if (item.is_own) {
+        const editButton = document.createElement("button");
+        editButton.type = "button";
+        editButton.className = "comment-edit-button";
+        editButton.textContent = "EDIT COMMENT";
+
+        editButton.addEventListener("click", () => {
+          editButton.hidden = true;
+          content.hidden = true;
+
+          const editForm = document.createElement("form");
+          editForm.className = "comment-edit-form";
+
+          const textarea = document.createElement("textarea");
+          textarea.className = "comment-edit-textarea";
+          textarea.maxLength = 2000;
+          textarea.required = true;
+          textarea.value = item.comment || "";
+
+          const actions = document.createElement("div");
+          actions.className = "comment-edit-actions";
+
+          const saveChanges = document.createElement("button");
+          saveChanges.type = "submit";
+          saveChanges.className = "action-button primary";
+          saveChanges.textContent = "SAVE CHANGES";
+
+          const cancelEdit = document.createElement("button");
+          cancelEdit.type = "button";
+          cancelEdit.className = "action-button";
+          cancelEdit.textContent = "CANCEL";
+
+          const editStatus = document.createElement("div");
+          editStatus.className = "comment-edit-status";
+
+          actions.append(saveChanges, cancelEdit);
+          editForm.append(textarea, actions, editStatus);
+          card.appendChild(editForm);
+
+          cancelEdit.addEventListener("click", () => {
+            editForm.remove();
+            content.hidden = false;
+            editButton.hidden = false;
+          });
+
+          editForm.addEventListener("submit", async event => {
+            event.preventDefault();
+
+            const updatedComment = textarea.value.trim();
+
+            if (!updatedComment) {
+              editStatus.textContent = "Please write a comment.";
+              textarea.focus();
+              return;
+            }
+
+            saveChanges.disabled = true;
+            cancelEdit.disabled = true;
+            saveChanges.textContent = "SAVING...";
+
+            try {
+              const editResponse = await fetch("/api/comments", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: {
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                  action: "edit",
+                  commentId: item.id,
+                  comment: updatedComment
+                })
+              });
+
+              await readJsonResponse(editResponse);
+              await loadComments();
+
+            } catch (error) {
+              editStatus.textContent =
+                error.message || "Unable to update your comment.";
+
+              saveChanges.disabled = false;
+              cancelEdit.disabled = false;
+              saveChanges.textContent = "SAVE CHANGES";
+            }
+          });
+        });
+
+        card.appendChild(editButton);
+      }
+
       commentList.appendChild(card);
     });
 
@@ -558,9 +695,7 @@ async function loadComments() {
 
     commentList.appendChild(message);
   }
-}
-
-async function loadArticle() {
+}async function loadArticle() {
   if (!Number.isInteger(articleId) || articleId < 1) {
     articleStatus.textContent =
       "No article was selected. Please return to the homepage.";
@@ -594,7 +729,7 @@ async function loadArticle() {
       article.author ? "By " + article.author : "";
 
     articleDate.textContent =
-      formatDate(article.created_at);
+      formatDateTime(article.created_at);
 
     articleBody.textContent =
       article.content || "";
