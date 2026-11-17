@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -27,7 +28,7 @@ body {
   color:var(--text);
   font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
-.account-wrap { width:min(440px,100%); }
+.account-wrap { width:min(600px,100%); }
 .brand {
   text-align:center;
   margin-bottom:25px;
@@ -109,7 +110,38 @@ input:focus { border-color:var(--cyan); }
   text-decoration:none;
 }
 .account-status { text-align:center; color:var(--muted); }
+.saved-section {
+  margin-top:28px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+}
+.saved-section h2 { font-size:19px; margin:0 0 12px; }
+.saved-item {
+  padding:14px;
+  margin:12px 0;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#0b1626;
+}
+.saved-item h3 { margin:0 0 7px; font-size:16px; line-height:1.4; }
+.saved-item p { margin:0 0 10px; color:var(--muted); font-size:13px; }
+.saved-actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+.saved-actions a { color:var(--cyan); font-size:13px; font-weight:800; }
+.remove-button {
+  padding:7px 11px;
+  border:1px solid #70404a;
+  border-radius:7px;
+  background:#38202a;
+  color:#ffdce2;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:800;
+}
+.remove-button:disabled { opacity:.6; cursor:wait; }
 [hidden] { display:none !important; }
+@media(max-width:600px) {
+  .card { padding:20px; }
+}
 </style>
 </head>
 
@@ -160,6 +192,13 @@ input:focus { border-color:var(--cyan); }
       <h1>Welcome!</h1>
       <p class="intro">You are logged in to your WF Pundit reader account.</p>
       <p class="account-status" id="readerDetails"></p>
+
+      <section class="saved-section">
+        <h2>My Saved Articles</h2>
+        <p id="savedMessage" style="color:#b9c6d8;font-size:13px;">Loading saved articles...</p>
+        <div id="savedList"></div>
+      </section>
+
       <button class="submit" id="logoutButton" type="button">LOG OUT</button>
       <div id="logoutMessage" class="message" role="status"></div>
     </div>
@@ -203,21 +242,119 @@ async function sendRequest(url, data) {
   });
 
   const result = await response.json();
+
   if (!response.ok || !result.success) {
     throw new Error(result.error || "Something went wrong. Please try again.");
   }
+
   return result;
 }
 
 function displayUser(user) {
   accountForms.hidden = true;
   loggedIn.hidden = false;
+
   document.getElementById("readerDetails").textContent =
     user.displayName + " · " + user.email;
+
+  loadSavedArticles();
+}
+
+async function loadSavedArticles() {
+  const savedMessage = document.getElementById("savedMessage");
+  const savedList = document.getElementById("savedList");
+
+  savedMessage.textContent = "Loading saved articles...";
+  savedList.replaceChildren();
+
+  try {
+    const response = await fetch("/api/saved", {
+      credentials: "same-origin"
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to load saved articles.");
+    }
+
+    const articles = result.articles || [];
+
+    if (articles.length === 0) {
+      savedMessage.textContent = "You haven't saved any articles yet.";
+      return;
+    }
+
+    savedMessage.textContent = articles.length + " saved article(s).";
+
+    articles.forEach(article => {
+      const item = document.createElement("article");
+      item.className = "saved-item";
+
+      const heading = document.createElement("h3");
+      heading.textContent = article.title || "Untitled article";
+
+      const category = document.createElement("p");
+      category.textContent = article.category || "Women's Football";
+
+      const actions = document.createElement("div");
+      actions.className = "saved-actions";
+
+      const openLink = document.createElement("a");
+      openLink.href = "/article.html?id=" + encodeURIComponent(article.id);
+      openLink.textContent = "Read article";
+
+      const removeButton = document.createElement("button");
+      removeButton.type = "button";
+      removeButton.className = "remove-button";
+      removeButton.textContent = "Remove";
+
+      removeButton.addEventListener("click", () => {
+        removeSavedArticle(article.id, removeButton);
+      });
+
+      actions.append(openLink, removeButton);
+      item.append(heading, category, actions);
+      savedList.appendChild(item);
+    });
+
+  } catch (error) {
+    savedMessage.textContent = error.message || "Unable to load saved articles.";
+  }
+}
+
+async function removeSavedArticle(articleId, button) {
+  const savedMessage = document.getElementById("savedMessage");
+
+  button.disabled = true;
+  button.textContent = "Removing...";
+
+  try {
+    const response = await fetch("/api/saved", {
+      method: "DELETE",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ articleId })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to remove article.");
+    }
+
+    await loadSavedArticles();
+
+  } catch (error) {
+    savedMessage.textContent = error.message || "Unable to remove article.";
+    button.disabled = false;
+    button.textContent = "Remove";
+  }
 }
 
 loginForm.addEventListener("submit", async (event) => {
   event.preventDefault();
+
   const button = loginForm.querySelector("button");
   button.disabled = true;
   button.textContent = "PLEASE WAIT...";
@@ -228,7 +365,9 @@ loginForm.addEventListener("submit", async (event) => {
       email: document.getElementById("loginEmail").value,
       password: document.getElementById("loginPassword").value
     });
+
     displayUser(result.user);
+
   } catch (error) {
     showMessage(error.message);
   } finally {
@@ -259,7 +398,9 @@ registerForm.addEventListener("submit", async (event) => {
       email: document.getElementById("registerEmail").value,
       password
     });
+
     displayUser(result.user);
+
   } catch (error) {
     showMessage(error.message);
   } finally {
@@ -271,6 +412,7 @@ registerForm.addEventListener("submit", async (event) => {
 document.getElementById("logoutButton").addEventListener("click", async () => {
   const button = document.getElementById("logoutButton");
   const output = document.getElementById("logoutMessage");
+
   button.disabled = true;
   button.textContent = "PLEASE WAIT...";
 
@@ -279,6 +421,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
       method: "POST",
       credentials: "same-origin"
     });
+
     const result = await response.json();
 
     if (!response.ok || !result.success) {
@@ -290,6 +433,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
     setTab("login");
     loginForm.reset();
     registerForm.reset();
+
   } catch (error) {
     output.textContent = error.message;
     output.className = "message show error";
@@ -304,6 +448,7 @@ async function checkLogin() {
     const response = await fetch("/api/me", {
       credentials: "same-origin"
     });
+
     const result = await response.json();
 
     if (response.ok && result.success && result.loggedIn) {
