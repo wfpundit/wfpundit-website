@@ -127,15 +127,7 @@ if (!origin || origin !== new URL(request.url).origin) {
   }, 403);
 }
 
-  if (
-    !csrfCookie ||
-    typeof body.csrfToken !== "string" ||
-    csrfCookie !== body.csrfToken
-  ) {
-    return json({
-      error: "Google security check failed. Please refresh and try again."
-    }, 403);
-  }
+  
 
   const mode = body.mode === "register" ? "register" : "login";
 
