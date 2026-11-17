@@ -123,10 +123,27 @@ input:focus { border-color:var(--cyan); }
   border-radius:10px;
   background:#0b1626;
 }
-.saved-item h3 { margin:0 0 7px; font-size:16px; line-height:1.4; }
-.saved-item p { margin:0 0 10px; color:var(--muted); font-size:13px; }
-.saved-actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-.saved-actions a { color:var(--cyan); font-size:13px; font-weight:800; }
+.saved-item h3 {
+  margin:0 0 7px;
+  font-size:16px;
+  line-height:1.4;
+}
+.saved-item p {
+  margin:0 0 10px;
+  color:var(--muted);
+  font-size:13px;
+}
+.saved-actions {
+  display:flex;
+  gap:12px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.saved-actions a {
+  color:var(--cyan);
+  font-size:13px;
+  font-weight:800;
+}
 .remove-button {
   padding:7px 11px;
   border:1px solid #70404a;
@@ -223,10 +240,13 @@ function showMessage(text, type = "error") {
 
 function setTab(tab) {
   const registering = tab === "register";
+
   loginForm.hidden = registering;
   registerForm.hidden = !registering;
+
   loginTab.classList.toggle("active", !registering);
   registerTab.classList.toggle("active", registering);
+
   message.className = "message";
 }
 
@@ -319,11 +339,20 @@ async function loadSavedArticles() {
     });
 
   } catch (error) {
-    savedMessage.textContent = error.message || "Unable to load saved articles.";
+    savedMessage.textContent =
+      error.message || "Unable to load saved articles.";
   }
 }
 
 async function removeSavedArticle(articleId, button) {
+  const confirmed = confirm(
+    "Are you sure you want to remove this article from your saved articles?"
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
   const savedMessage = document.getElementById("savedMessage");
 
   button.disabled = true;
@@ -333,7 +362,9 @@ async function removeSavedArticle(articleId, button) {
     const response = await fetch("/api/saved", {
       method: "DELETE",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify({ articleId })
     });
 
@@ -346,7 +377,9 @@ async function removeSavedArticle(articleId, button) {
     await loadSavedArticles();
 
   } catch (error) {
-    savedMessage.textContent = error.message || "Unable to remove article.";
+    savedMessage.textContent =
+      error.message || "Unable to remove article.";
+
     button.disabled = false;
     button.textContent = "Remove";
   }
@@ -430,6 +463,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 
     loggedIn.hidden = true;
     accountForms.hidden = false;
+
     setTab("login");
     loginForm.reset();
     registerForm.reset();
