@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -155,6 +154,21 @@ input:focus { border-color:var(--cyan); }
   font-weight:800;
 }
 .remove-button:disabled { opacity:.6; cursor:wait; }
+body.light-mode {
+  --bg:#f1f4f8;
+  --panel:#fff;
+  --line:#dce3ec;
+  --text:#1c2939;
+  --muted:#66758a;
+}
+body.light-mode .tabs button,
+body.light-mode input,
+body.light-mode .saved-item {
+  background:#fff;
+  color:#1c2939;
+  border-color:#cbd5e1;
+}
+body.light-mode label { color:#34445c; }
 [hidden] { display:none !important; }
 @media(max-width:600px) {
   .card { padding:20px; }
@@ -225,6 +239,12 @@ input:focus { border-color:var(--cyan); }
 </main>
 
 <script>
+try {
+  if (localStorage.getItem("wf-theme") === "light") {
+    document.body.classList.add("light-mode");
+  }
+} catch (error) {}
+
 const loginTab = document.getElementById("loginTab");
 const registerTab = document.getElementById("registerTab");
 const loginForm = document.getElementById("loginForm");
@@ -246,17 +266,49 @@ function setTab(tab) {
 
   loginTab.classList.toggle("active", !registering);
   registerTab.classList.toggle("active", registering);
-  const requestedMode = new URLSearchParams(window.location.search).get("mode");
-
-if (requestedMode === "register") {
-  setTab("register");
-}
 
   message.className = "message";
 }
 
 loginTab.addEventListener("click", () => setTab("login"));
 registerTab.addEventListener("click", () => setTab("register"));
+
+const requestedMode = new URLSearchParams(window.location.search).get("mode");
+if (requestedMode === "register") {
+  setTab("register");
+}
+
+function getReturnToTarget() {
+  const requestedReturnTo = new URLSearchParams(window.location.search).get("returnTo");
+
+  if (!requestedReturnTo) {
+    return "";
+  }
+
+  try {
+    const target = new URL(requestedReturnTo, window.location.origin);
+
+    if (target.origin !== window.location.origin) {
+      return "";
+    }
+
+    if (target.pathname === "/account.html") {
+      return "";
+    }
+
+    return target.pathname + target.search + target.hash;
+  } catch (error) {
+    return "";
+  }
+}
+
+function returnToRequestedPage() {
+  const target = getReturnToTarget();
+
+  if (target) {
+    window.location.replace(target);
+  }
+}
 
 async function sendRequest(url, data) {
   const response = await fetch(url, {
@@ -283,6 +335,7 @@ function displayUser(user) {
     user.displayName + " · " + user.email;
 
   loadSavedArticles();
+  returnToRequestedPage();
 }
 
 async function loadSavedArticles() {
