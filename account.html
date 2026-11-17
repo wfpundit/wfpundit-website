@@ -335,7 +335,7 @@ async function sendRequest(url, data) {
 
   return result;
 }
-let googleMode = requestedMode === "register" ? "register" : "login";
+
 
 function getGoogleCsrfToken() {
   const match = document.cookie.match(/(?:^|;\s*)g_csrf_token=([^;]+)/);
