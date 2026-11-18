@@ -553,7 +553,7 @@ async function removeSaved(id, button) {
     alert(e.message);
   }
 }
-
+document.getElementById("logoutButton").addEventListener("click", async () => {
   const confirmed = confirm("Are you sure you want to log out?");
   if (!confirmed) return;
   const button = document.getElementById("logoutButton");
