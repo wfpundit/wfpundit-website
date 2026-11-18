@@ -5,179 +5,50 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b1220">
 <title>Reader Account | WF Pundit</title>
-
 <style>
-:root {
-  --bg:#0b1220;
-  --panel:#131e2e;
-  --line:#2a3a50;
-  --text:#f5f7fb;
-  --muted:#b9c6d8;
-  --blue:#3978c8;
-  --cyan:#a9d3ff;
-}
-* { box-sizing:border-box; }
-body {
-  margin:0;
-  min-height:100vh;
-  padding:25px 16px;
-  display:grid;
-  place-items:center;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
-}
-.account-wrap { width:min(600px,100%); }
-.brand {
-  text-align:center;
-  margin-bottom:25px;
-  font-size:30px;
-  font-weight:950;
-  letter-spacing:-1px;
-}
-.brand span { color:var(--cyan); }
-.card {
-  padding:28px;
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:16px;
-  box-shadow:0 18px 45px #0005;
-}
-h1 { margin:0 0 7px; font-size:25px; }
-.intro { margin:0 0 23px; color:var(--muted); font-size:14px; }
-.tabs { display:flex; gap:8px; margin-bottom:22px; }
-.tabs button {
-  flex:1;
-  padding:11px;
-  border:1px solid var(--line);
-  border-radius:8px;
-  background:#0b1626;
-  color:var(--muted);
-  font-weight:800;
-}
-.tabs button.active {
-  background:var(--blue);
-  border-color:var(--blue);
-  color:white;
-}
-label {
-  display:block;
-  margin:15px 0 7px;
-  font-size:12px;
-  font-weight:800;
-  color:#dce8f7;
-}
-input {
-  width:100%;
-  padding:13px;
-  border:1px solid #40536c;
-  border-radius:8px;
-  outline:none;
-  background:#0b1626;
-  color:white;
-}
-input:focus { border-color:var(--cyan); }
-.submit {
-  width:100%;
-  margin-top:22px;
-  padding:14px;
-  border:0;
-  border-radius:8px;
-  background:linear-gradient(135deg,#4389d9,#2865aa);
-  color:white;
-  font-weight:900;
-  cursor:pointer;
-}
-.submit:disabled { opacity:.6; cursor:wait; }
-.message {
-  display:none;
-  margin-top:16px;
-  padding:11px;
-  border-radius:8px;
-  font-size:13px;
-  overflow-wrap:anywhere;
-}
-.message.show { display:block; }
-.message.error { background:#6b202c; color:#ffe2e6; }
-.message.success { background:#174b39; color:#d8ffed; }
-.back {
-  display:block;
-  margin-top:22px;
-  text-align:center;
-  color:var(--cyan);
-  font-size:13px;
-  text-decoration:none;
-}
-.account-status { text-align:center; color:var(--muted); }
-.saved-section {
-  margin-top:28px;
-  padding-top:20px;
-  border-top:1px solid var(--line);
-}
-.saved-section h2 { font-size:19px; margin:0 0 12px; }
-.saved-item {
-  padding:14px;
-  margin:12px 0;
-  border:1px solid var(--line);
-  border-radius:10px;
-  background:#0b1626;
-}
-.saved-item h3 {
-  margin:0 0 7px;
-  font-size:16px;
-  line-height:1.4;
-}
-.saved-item p {
-  margin:0 0 10px;
-  color:var(--muted);
-  font-size:13px;
-}
-.saved-actions {
-  display:flex;
-  gap:12px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-.saved-actions a {
-  color:var(--cyan);
-  font-size:13px;
-  font-weight:800;
-}
-.remove-button {
-  padding:7px 11px;
-  border:1px solid #70404a;
-  border-radius:7px;
-  background:#38202a;
-  color:#ffdce2;
-  cursor:pointer;
-  font-size:12px;
-  font-weight:800;
-}
-.remove-button:disabled { opacity:.6; cursor:wait; }
-body.light-mode {
-  --bg:#f1f4f8;
-  --panel:#fff;
-  --line:#dce3ec;
-  --text:#1c2939;
-  --muted:#66758a;
-}
-body.light-mode .tabs button,
-body.light-mode input,
-body.light-mode .saved-item {
-  background:#fff;
-  color:#1c2939;
-  border-color:#cbd5e1;
-}
-body.light-mode label { color:#34445c; }
-[hidden] { display:none !important; }
-@media(max-width:600px) {
-  .card { padding:20px; }
-}
+:root{--bg:#0b1220;--panel:#131e2e;--line:#2a3a50;--text:#f5f7fb;--muted:#b9c6d8;--blue:#3978c8;--cyan:#a9d3ff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:25px 16px;display:grid;place-items:center;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+.account-wrap{width:min(600px,100%)}
+.brand{text-align:center;margin-bottom:25px;font-size:30px;font-weight:950;letter-spacing:-1px}
+.brand span{color:var(--cyan)}
+.card{padding:28px;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 45px #0005}
+h1{margin:0 0 7px;font-size:25px}
+.intro{margin:0 0 23px;color:var(--muted);font-size:14px}
+.tabs{display:flex;gap:8px;margin-bottom:22px}
+.tabs button{flex:1;padding:11px;border:1px solid var(--line);border-radius:8px;background:#0b1626;color:var(--muted);font-weight:800}
+.tabs button.active{background:var(--blue);border-color:var(--blue);color:white}
+label{display:block;margin:15px 0 7px;font-size:12px;font-weight:800;color:#dce8f7}
+input{width:100%;padding:13px;border:1px solid #40536c;border-radius:8px;outline:none;background:#0b1626;color:white}
+input:focus{border-color:var(--cyan)}
+.submit{width:100%;margin-top:22px;padding:14px;border:0;border-radius:8px;background:linear-gradient(135deg,#4389d9,#2865aa);color:white;font-weight:900;cursor:pointer}
+.submit:disabled{opacity:.6;cursor:wait}
+.message{display:none;margin-top:16px;padding:11px;border-radius:8px;font-size:13px;overflow-wrap:anywhere}
+.message.show{display:block}
+.message.error{background:#6b202c;color:#ffe2e6}
+.message.success{background:#174b39;color:#d8ffed}
+.back{display:block;margin-top:22px;text-align:center;color:var(--cyan);font-size:13px;text-decoration:none}
+.account-status{text-align:center;color:var(--muted)}
+.saved-section{margin-top:28px;padding-top:20px;border-top:1px solid var(--line)}
+.saved-section h2{font-size:19px;margin:0 0 12px}
+.saved-item{padding:14px;margin:12px 0;border:1px solid var(--line);border-radius:10px;background:#0b1626}
+.saved-item h3{margin:0 0 7px;font-size:16px;line-height:1.4}
+.saved-item p{margin:0 0 10px;color:var(--muted);font-size:13px}
+.saved-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.saved-actions a{color:var(--cyan);font-size:13px;font-weight:800}
+.remove-button{padding:7px 11px;border:1px solid #70404a;border-radius:7px;background:#38202a;color:#ffdce2;cursor:pointer;font-size:12px;font-weight:800}
+.remove-button:disabled{opacity:.6;cursor:wait}
+.forgot-link{display:block;margin-top:13px;text-align:right;color:var(--cyan);font-size:13px;text-decoration:none;font-weight:700}
+.forgot-link:hover,.back:hover{ text-decoration:underline }
+.forgot-intro{color:var(--muted);font-size:14px;line-height:1.6}
+body.light-mode{--bg:#f1f4f8;--panel:#fff;--line:#dce3ec;--text:#1c2939;--muted:#66758a}
+body.light-mode .tabs button,body.light-mode input,body.light-mode .saved-item{background:#fff;color:#1c2939;border-color:#cbd5e1}
+body.light-mode label{color:#34445c}
+[hidden]{display:none!important}
+@media(max-width:600px){.card{padding:20px}}
 </style>
-
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-
 <body>
 <main class="account-wrap">
   <div class="brand">WF <span>PUNDIT</span></div>
@@ -187,7 +58,7 @@ body.light-mode label { color:#34445c; }
       <h1>Reader Account</h1>
       <p class="intro">Join the WF Pundit community and stay connected with women's football.</p>
 
-      <div class="tabs">
+      <div class="tabs" id="accountTabs">
         <button type="button" id="loginTab" class="active">Log In</button>
         <button type="button" id="registerTab">Register</button>
       </div>
@@ -199,7 +70,20 @@ body.light-mode label { color:#34445c; }
         <label for="loginPassword">Password</label>
         <input id="loginPassword" type="password" autocomplete="current-password" required maxlength="128">
 
+        <a href="#" class="forgot-link" id="forgotLink">Forgot password?</a>
+
         <button class="submit" type="submit">LOG IN</button>
+      </form>
+
+      <form id="forgotForm" hidden>
+        <h1>Forgot your password?</h1>
+        <p class="forgot-intro">Enter the email address connected to your WF Pundit account. If eligible, we'll send you a password-reset link.</p>
+
+        <label for="forgotEmail">Email address</label>
+        <input id="forgotEmail" type="email" autocomplete="email" required maxlength="254">
+
+        <button class="submit" type="submit">SEND RESET LINK</button>
+        <a href="#" class="back" id="backToLogin">← Back to login</a>
       </form>
 
       <form id="registerForm" hidden>
@@ -259,11 +143,13 @@ const loginTab = document.getElementById("loginTab");
 const registerTab = document.getElementById("registerTab");
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
+const forgotForm = document.getElementById("forgotForm");
 const message = document.getElementById("message");
 const accountForms = document.getElementById("accountForms");
 const loggedIn = document.getElementById("loggedIn");
 const googleLoginArea = document.getElementById("googleLoginArea");
 const googleRegisterArea = document.getElementById("googleRegisterArea");
+const accountTabs = document.getElementById("accountTabs");
 
 function showMessage(text, type = "error") {
   message.textContent = text;
@@ -275,15 +161,40 @@ function setTab(tab) {
 
   googleLoginArea.hidden = registering;
   googleRegisterArea.hidden = !registering;
-
   loginForm.hidden = registering;
   registerForm.hidden = !registering;
+  forgotForm.hidden = true;
+  accountTabs.hidden = false;
 
   loginTab.classList.toggle("active", !registering);
   registerTab.classList.toggle("active", registering);
-
   message.className = "message";
 }
+
+function showForgotForm() {
+  loginForm.hidden = true;
+  registerForm.hidden = true;
+  forgotForm.hidden = false;
+  accountTabs.hidden = true;
+  googleLoginArea.hidden = true;
+  googleRegisterArea.hidden = true;
+  message.className = "message";
+
+  const loginEmail = document.getElementById("loginEmail").value.trim();
+  if (loginEmail) {
+    document.getElementById("forgotEmail").value = loginEmail;
+  }
+}
+
+document.getElementById("forgotLink").addEventListener("click", event => {
+  event.preventDefault();
+  showForgotForm();
+});
+
+document.getElementById("backToLogin").addEventListener("click", event => {
+  event.preventDefault();
+  setTab("login");
+});
 
 loginTab.addEventListener("click", () => setTab("login"));
 registerTab.addEventListener("click", () => setTab("register"));
@@ -296,22 +207,12 @@ if (requestedMode === "register") {
 
 function getReturnToTarget() {
   const requestedReturnTo = new URLSearchParams(window.location.search).get("returnTo");
-
-  if (!requestedReturnTo) {
-    return "";
-  }
+  if (!requestedReturnTo) return "";
 
   try {
     const target = new URL(requestedReturnTo, window.location.origin);
-
-    if (target.origin !== window.location.origin) {
-      return "";
-    }
-
-    if (target.pathname === "/account.html") {
-      return "";
-    }
-
+    if (target.origin !== window.location.origin) return "";
+    if (target.pathname === "/account.html") return "";
     return target.pathname + target.search + target.hash;
   } catch (error) {
     return "";
@@ -348,9 +249,7 @@ async function handleGoogleCredential(response) {
       credential: response.credential,
       mode: registerForm.hidden ? "login" : "register"
     });
-
     displayUser(result.user);
-
   } catch (error) {
     showMessage(error.message);
   }
@@ -369,26 +268,12 @@ function initializeGoogleButtons() {
 
   window.google.accounts.id.renderButton(
     document.getElementById("googleLoginButton"),
-    {
-      type: "standard",
-      theme: "outline",
-      size: "large",
-      text: "signin_with",
-      shape: "pill",
-      width: 280
-    }
+    {type:"standard",theme:"outline",size:"large",text:"signin_with",shape:"pill",width:280}
   );
 
   window.google.accounts.id.renderButton(
     document.getElementById("googleRegisterButton"),
-    {
-      type: "standard",
-      theme: "outline",
-      size: "large",
-      text: "signup_with",
-      shape: "pill",
-      width: 280
-    }
+    {type:"standard",theme:"outline",size:"large",text:"signup_with",shape:"pill",width:280}
   );
 }
 
@@ -398,7 +283,6 @@ if (window.google && window.google.accounts) {
   initializeGoogleButtons();
 }
 
-/* RETURN TO THE REQUESTED PAGE, OR THE HOMEPAGE BY DEFAULT. */
 function displayUser(user) {
   returnToRequestedPage();
 }
@@ -411,10 +295,7 @@ async function loadSavedArticles() {
   savedList.replaceChildren();
 
   try {
-    const response = await fetch("/api/saved", {
-      credentials: "same-origin"
-    });
-
+    const response = await fetch("/api/saved", {credentials:"same-origin"});
     const result = await response.json();
 
     if (!response.ok || !result.success) {
@@ -460,35 +341,25 @@ async function loadSavedArticles() {
       item.append(heading, category, actions);
       savedList.appendChild(item);
     });
-
   } catch (error) {
-    savedMessage.textContent =
-      error.message || "Unable to load saved articles.";
+    savedMessage.textContent = error.message || "Unable to load saved articles.";
   }
 }
 
 async function removeSavedArticle(articleId, button) {
-  const confirmed = confirm(
-    "Are you sure you want to remove this article from your saved articles?"
-  );
-
-  if (!confirmed) {
-    return;
-  }
+  const confirmed = confirm("Are you sure you want to remove this article from your saved articles?");
+  if (!confirmed) return;
 
   const savedMessage = document.getElementById("savedMessage");
-
   button.disabled = true;
   button.textContent = "Removing...";
 
   try {
     const response = await fetch("/api/saved", {
-      method: "DELETE",
-      credentials: "same-origin",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ articleId })
+      method:"DELETE",
+      credentials:"same-origin",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({articleId})
     });
 
     const result = await response.json();
@@ -498,17 +369,15 @@ async function removeSavedArticle(articleId, button) {
     }
 
     await loadSavedArticles();
-
   } catch (error) {
-    savedMessage.textContent =
-      error.message || "Unable to remove article.";
-
+    savedMessage.textContent = error.message || "Unable to remove article.";
     button.disabled = false;
     button.textContent = "Remove";
   }
 }
 
-loginForm.addEventListener("submit", async (event) => {
+/* LOGIN */
+loginForm.addEventListener("submit", async event => {
   event.preventDefault();
 
   const button = loginForm.querySelector("button");
@@ -518,12 +387,10 @@ loginForm.addEventListener("submit", async (event) => {
 
   try {
     const result = await sendRequest("/api/login", {
-      email: document.getElementById("loginEmail").value,
-      password: document.getElementById("loginPassword").value
+      email:document.getElementById("loginEmail").value,
+      password:document.getElementById("loginPassword").value
     });
-
     displayUser(result.user);
-
   } catch (error) {
     showMessage(error.message);
   } finally {
@@ -532,7 +399,34 @@ loginForm.addEventListener("submit", async (event) => {
   }
 });
 
-registerForm.addEventListener("submit", async (event) => {
+/* REQUEST PASSWORD RESET */
+forgotForm.addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const button = forgotForm.querySelector("button");
+  const email = document.getElementById("forgotEmail").value.trim();
+
+  button.disabled = true;
+  button.textContent = "SENDING...";
+  message.className = "message";
+
+  try {
+    const result = await sendRequest("/api/request-password-reset", {email});
+
+    showMessage(
+      result.message || "If an eligible account exists for that email, a password-reset link will be sent.",
+      "success"
+    );
+  } catch (error) {
+    showMessage(error.message || "Unable to process your request. Please try again.");
+  } finally {
+    button.disabled = false;
+    button.textContent = "SEND RESET LINK";
+  }
+});
+
+/* REGISTER */
+registerForm.addEventListener("submit", async event => {
   event.preventDefault();
 
   const password = document.getElementById("registerPassword").value;
@@ -550,13 +444,11 @@ registerForm.addEventListener("submit", async (event) => {
 
   try {
     const result = await sendRequest("/api/register", {
-      displayName: document.getElementById("displayName").value,
-      email: document.getElementById("registerEmail").value,
+      displayName:document.getElementById("displayName").value,
+      email:document.getElementById("registerEmail").value,
       password
     });
-
     displayUser(result.user);
-
   } catch (error) {
     showMessage(error.message);
   } finally {
@@ -568,10 +460,7 @@ registerForm.addEventListener("submit", async (event) => {
 /* LOG OUT */
 document.getElementById("logoutButton").addEventListener("click", async () => {
   const confirmed = confirm("Are you sure you want to log out?");
-
-  if (!confirmed) {
-    return;
-  }
+  if (!confirmed) return;
 
   const button = document.getElementById("logoutButton");
   const output = document.getElementById("logoutMessage");
@@ -581,8 +470,8 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 
   try {
     const response = await fetch("/api/logout", {
-      method: "POST",
-      credentials: "same-origin"
+      method:"POST",
+      credentials:"same-origin"
     });
 
     const result = await response.json();
@@ -593,11 +482,10 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 
     loggedIn.hidden = true;
     accountForms.hidden = false;
-
     setTab("login");
     loginForm.reset();
     registerForm.reset();
-
+    forgotForm.reset();
   } catch (error) {
     output.textContent = error.message;
     output.className = "message show error";
@@ -610,10 +498,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
 /* CHECK EXISTING LOGIN */
 async function checkLogin() {
   try {
-    const response = await fetch("/api/me", {
-      credentials: "same-origin"
-    });
-
+    const response = await fetch("/api/me", {credentials:"same-origin"});
     const result = await response.json();
 
     if (response.ok && result.success && result.loggedIn) {
