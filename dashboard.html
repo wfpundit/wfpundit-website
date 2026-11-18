@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0b1220">
-<title>Reader Dashboard | WF Pundit</title>
+<title id="pageTitle">My Dashboard | WF Pundit</title>
 <style>
 :root {
   color-scheme: dark;
@@ -312,7 +312,7 @@ footer {
 <section class="welcome">
   <div>
     <div class="eyebrow">Reader dashboard</div>
-    <h1>Welcome back, <span id="readerName">Reader</span></h1>
+    <h1><span id="readerName">My</span>'s Dashboard</h1>
     <p>Your home for the latest women's football stories.</p>
   </div>
 </section>
@@ -581,9 +581,10 @@ async function start() {
 
     const user = data.user || {};
 
-    document.getElementById("readerName").textContent =
-      (user.displayName || "Reader").split(" ")[0];
-
+    const firstName = (user.displayName || "Reader").split(" ")[0];
+document.getElementById("readerName").textContent = firstName;
+document.getElementById("pageTitle").textContent =
+  firstName + "'s Dashboard | WF Pundit";
     document.getElementById("profileName").textContent =
       user.displayName || "Not provided";
 
