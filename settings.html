@@ -360,6 +360,7 @@ footer {
         <label class="choice"><input type="checkbox" value="Liga F"> Liga F</label>
         <label class="choice"><input type="checkbox" value="Première Ligue"> Première Ligue</label>
         <label class="choice"><input type="checkbox" value="Serie A Femminile"> Serie A Femminile</label>
+        <label class="choice"><input type="checkbox" value="Bundesliga Women"> Bundesliga Women (Google Pixel Frauen-Bundesliga)</label>
         <label class="choice"><input type="checkbox" value="International Football"> International Football</label>
         <label class="choice"><input type="checkbox" value="European Championships"> European Championships</label>
       </div>
@@ -368,7 +369,7 @@ footer {
     <div class="preference-section">
       <h3>Favourite clubs</h3>
       <p class="note">
-        Select clubs from the 2026/27 season. Clubs are grouped by their domestic leagues.
+        Select clubs from their domestic leagues. The German Bundesliga list reflects the 2026/27 season.
       </p>
       <div id="clubs"></div>
     </div>
@@ -401,7 +402,7 @@ footer {
 <script>
 const $ = id => document.getElementById(id);
 
-/* ALL CLUBS — 2026/27 */
+/* ALL CLUBS */
 
 const clubLeagues = [
   {
@@ -455,6 +456,25 @@ const clubLeagues = [
       "Como 1907","Como Women","Fiorentina","Inter","Juventus",
       "Lazio Women","AC Milan","Napoli Women","Parma","Roma",
       "Sassuolo","Ternana Women"
+    ]
+  },
+  {
+    name:"Google Pixel Frauen-Bundesliga — Germany",
+    clubs:[
+      "1. FC Union Berlin",
+      "SV Werder Bremen",
+      "Eintracht Frankfurt",
+      "SC Freiburg",
+      "Hamburger SV",
+      "TSG Hoffenheim",
+      "1. FC Köln",
+      "RB Leipzig",
+      "Bayer 04 Leverkusen",
+      "1. FSV Mainz 05",
+      "FC Bayern München",
+      "1. FC Nürnberg",
+      "VfB Stuttgart",
+      "VfL Wolfsburg"
     ]
   }
 ];
