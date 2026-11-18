@@ -10,7 +10,7 @@ function parseList(value) {
   }
 }
 
-function cleanList(value) {
+function cleanList(value, limit = 20) {
   if (!Array.isArray(value)) return null;
 
   const cleaned = value
@@ -18,7 +18,10 @@ function cleanList(value) {
     .map(item => item.trim())
     .filter(Boolean);
 
-  if (cleaned.length > 20 || cleaned.some(item => item.length > 60)) {
+  if (
+    cleaned.length > limit ||
+    cleaned.some(item => item.length > 60)
+  ) {
     return null;
   }
 
@@ -30,7 +33,10 @@ export async function onRequestGet({ request, env }) {
     const user = await currentUser(request, env);
 
     if (!user) {
-      return json({ success: false, error: "Please log in again." }, 401);
+      return json({
+        success: false,
+        error: "Please log in again."
+      }, 401);
     }
 
     const row = await env.DB.prepare(`
@@ -47,20 +53,35 @@ export async function onRequestGet({ request, env }) {
 
     return json({
       success: true,
+
       notifications: {
-        breakingNewsInApp: row ? Boolean(row.breaking_news_in_app) : true,
-        breakingNewsEmail: row ? Boolean(row.breaking_news_email) : true,
-        commentRepliesInApp: row ? Boolean(row.comment_replies_in_app) : true,
-        commentRepliesEmail: row ? Boolean(row.comment_replies_email) : true
+        breakingNewsInApp: row
+          ? Boolean(row.breaking_news_in_app)
+          : true,
+
+        breakingNewsEmail: row
+          ? Boolean(row.breaking_news_email)
+          : true,
+
+        commentRepliesInApp: row
+          ? Boolean(row.comment_replies_in_app)
+          : true,
+
+        commentRepliesEmail: row
+          ? Boolean(row.comment_replies_email)
+          : true
       },
+
       reading: {
         competitions: parseList(reading?.favourite_competitions),
         clubs: parseList(reading?.favourite_clubs),
         topics: parseList(reading?.favourite_topics)
       }
     });
+
   } catch (error) {
     console.error("Settings preferences load error:", error);
+
     return json({
       success: false,
       error: "Unable to load your preferences."
@@ -70,7 +91,10 @@ export async function onRequestGet({ request, env }) {
 
 export async function onRequestPost({ request, env }) {
   if (!validOrigin(request)) {
-    return json({ success: false, error: "Request could not be verified." }, 403);
+    return json({
+      success: false,
+      error: "Request could not be verified."
+    }, 403);
   }
 
   let data;
@@ -78,7 +102,10 @@ export async function onRequestPost({ request, env }) {
   try {
     data = await readJson(request);
   } catch {
-    return json({ success: false, error: "Please submit the form again." }, 400);
+    return json({
+      success: false,
+      error: "Please submit the form again."
+    }, 400);
   }
 
   const notificationKeys = [
@@ -90,19 +117,24 @@ export async function onRequestPost({ request, env }) {
 
   if (
     !data.notifications ||
-    notificationKeys.some(key => typeof data.notifications[key] !== "boolean")
+    notificationKeys.some(
+      key => typeof data.notifications[key] !== "boolean"
+    )
   ) {
-    return json({ success: false, error: "Please check your notification choices." }, 400);
+    return json({
+      success: false,
+      error: "Please check your notification choices."
+    }, 400);
   }
 
-  const competitions = cleanList(data.reading?.competitions);
-  const clubs = cleanList(data.reading?.clubs);
-  const topics = cleanList(data.reading?.topics);
+  const competitions = cleanList(data.reading?.competitions, 20);
+  const clubs = cleanList(data.reading?.clubs, 100);
+  const topics = cleanList(data.reading?.topics, 20);
 
   if (!competitions || !clubs || !topics) {
     return json({
       success: false,
-      error: "Each preference list can contain up to 20 entries, with 60 characters per entry."
+      error: "You can select up to 20 competitions, 100 clubs and 20 topics. Each selection must be no longer than 60 characters."
     }, 400);
   }
 
@@ -110,7 +142,10 @@ export async function onRequestPost({ request, env }) {
     const user = await currentUser(request, env);
 
     if (!user) {
-      return json({ success: false, error: "Please log in again." }, 401);
+      return json({
+        success: false,
+        error: "Please log in again."
+      }, 401);
     }
 
     const n = data.notifications;
@@ -125,6 +160,7 @@ export async function onRequestPost({ request, env }) {
         updated_at
       )
       VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+
       ON CONFLICT(user_id) DO UPDATE SET
         breaking_news_in_app = excluded.breaking_news_in_app,
         breaking_news_email = excluded.breaking_news_email,
@@ -148,6 +184,7 @@ export async function onRequestPost({ request, env }) {
         updated_at
       )
       VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+
       ON CONFLICT(user_id) DO UPDATE SET
         favourite_competitions = excluded.favourite_competitions,
         favourite_clubs = excluded.favourite_clubs,
@@ -164,8 +201,10 @@ export async function onRequestPost({ request, env }) {
       success: true,
       message: "Your preferences have been saved."
     });
+
   } catch (error) {
     console.error("Settings preferences save error:", error);
+
     return json({
       success: false,
       error: "Unable to save your preferences. Please try again."
