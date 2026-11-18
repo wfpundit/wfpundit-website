@@ -315,6 +315,13 @@ h1 {
   margin-top:12px;
 }
 
+.comment-date {
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin:0 0 10px;
+}
+
 .status {
   padding:12px;
   border:1px dashed var(--line);
@@ -648,6 +655,26 @@ async function removeSaved(id, button) {
   }
 }
 
+function formatCommentDate(value) {
+  if (!value) return "Date unavailable";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return "Date unavailable";
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day:"2-digit",
+    month:"short",
+    year:"numeric",
+    hour:"numeric",
+    minute:"2-digit",
+    hour12:true,
+    timeZone:"Africa/Lagos"
+  }).format(date);
+}
+
 async function loadMyComments() {
   const host = document.getElementById("myComments");
 
@@ -674,6 +701,14 @@ async function loadMyComments() {
       const article = document.createElement("h3");
       article.textContent = comment.article_title || "Article";
 
+      const date = document.createElement("time");
+      date.className = "comment-date";
+      date.textContent = formatCommentDate(comment.created_at);
+
+      if (comment.created_at) {
+        date.dateTime = comment.created_at;
+      }
+
       const text = document.createElement("p");
       text.textContent = comment.comment || "";
 
@@ -683,7 +718,7 @@ async function loadMyComments() {
 
       link.textContent = "VIEW ARTICLE →";
 
-      item.append(article, text, link);
+      item.append(article, date, text, link);
       host.appendChild(item);
     });
 
