@@ -319,13 +319,7 @@ function getReturnToTarget() {
   }
 }
 
-function returnToRequestedPage() {
-  const target = getReturnToTarget();
 
-  if (target) {
-    window.location.replace(target);
-  }
-}
 
 async function sendRequest(url, data) {
   const response = await fetch(url, {
