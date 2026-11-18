@@ -319,7 +319,10 @@ function getReturnToTarget() {
   }
 }
 
-
+function returnToRequestedPage() {
+  const target = getReturnToTarget() || "/dashboard.html";
+  window.location.replace(target);
+                                                                            }
 
 async function sendRequest(url, data) {
   const response = await fetch(url, {
