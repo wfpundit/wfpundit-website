@@ -1,3 +1,4 @@
+
 import { createSession, hashPassword, json, readJson, validOrigin } from "./_auth.js";
 
 export async function onRequestPost({ request, env }) {
@@ -29,6 +30,17 @@ export async function onRequestPost({ request, env }) {
   }
 
   try {
+    const existingAccount = await env.DB.prepare(
+      "SELECT id FROM reader_accounts WHERE lower(email) = ? LIMIT 1"
+    ).bind(email).first();
+
+    if (existingAccount) {
+      return json({
+        success: false,
+        error: "This email address is already registered. Please log in to your account."
+      }, 409);
+    }
+
     const passwordHash = await hashPassword(password);
 
     const result = await env.DB.prepare(`
@@ -51,9 +63,24 @@ export async function onRequestPost({ request, env }) {
   } catch (error) {
     console.error("Reader registration diagnostic:", error);
 
+    try {
+      const existingAccount = await env.DB.prepare(
+        "SELECT id FROM reader_accounts WHERE lower(email) = ? LIMIT 1"
+      ).bind(email).first();
+
+      if (existingAccount) {
+        return json({
+          success: false,
+          error: "This email address is already registered. Please log in to your account."
+        }, 409);
+      }
+    } catch (lookupError) {
+      console.error("Reader registration duplicate check failed:", lookupError);
+    }
+
     return json({
       success: false,
-      error: "Registration failed. Please try again."
+      error: "We couldn't complete your registration. Please try again."
     }, 500);
   }
 }
