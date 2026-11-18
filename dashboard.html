@@ -194,13 +194,16 @@ main {
   background: #192b40;
 }
 
+/* FACE-FRIENDLY PHOTO DISPLAY */
+
 .player-photo img {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: center 22%;
+  object-fit: contain;
+  object-position: center center;
   transform: scale(1);
+  background: #192b40;
 }
 
 .player-slide.active .player-photo img {
@@ -232,7 +235,7 @@ main {
 
 @keyframes slowZoomIn {
   from { transform: scale(1); }
-  to { transform: scale(1.055); }
+  to { transform: scale(1.015); }
 }
 
 .carousel-dots {
@@ -520,8 +523,6 @@ footer {
   }
 
   .player-club { font-size: 10px; }
-
-  .player-photo img { object-position: center 18%; }
 
   .profile-card {
     align-items: flex-start;
