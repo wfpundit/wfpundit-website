@@ -9,7 +9,7 @@
 
 <style>
 :root {
-  color-scheme: dark;
+  color-scheme:dark;
   --bg:#08111e;
   --panel:#101d2d;
   --panel2:#14243a;
@@ -19,16 +19,13 @@
   --blue:#4388d4;
   --cyan:#a9d3ff;
 }
-
 * { box-sizing:border-box; }
-
 body {
   margin:0;
   background:var(--bg);
   color:var(--text);
   font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
-
 body.light-mode {
   color-scheme:light;
   --bg:#f2f5f9;
@@ -40,7 +37,6 @@ body.light-mode {
   --blue:#286fbd;
   --cyan:#286fbd;
 }
-
 .topbar {
   min-height:70px;
   padding:0 max(18px,calc((100% - 1050px)/2));
@@ -50,7 +46,6 @@ body.light-mode {
   background:var(--panel);
   border-bottom:1px solid var(--line);
 }
-
 .brand {
   font-size:21px;
   font-weight:950;
@@ -58,15 +53,8 @@ body.light-mode {
   text-decoration:none;
   color:var(--text);
 }
-
 .brand span { color:var(--cyan); }
-
-.nav {
-  display:flex;
-  gap:8px;
-  align-items:center;
-}
-
+.nav { display:flex; gap:8px; align-items:center; }
 .nav a,.nav button {
   padding:9px 12px;
   border:1px solid var(--line);
@@ -78,32 +66,27 @@ body.light-mode {
   text-decoration:none;
   cursor:pointer;
 }
-
 main {
   max-width:900px;
   margin:0 auto;
   padding:35px 20px 65px;
 }
-
 .eyebrow {
   color:var(--cyan);
   font-size:11px;
   font-weight:900;
   letter-spacing:2px;
 }
-
 h1 {
   margin:8px 0;
   font-size:clamp(27px,5vw,38px);
   letter-spacing:-1px;
 }
-
 .intro {
   color:var(--muted);
   font-size:14px;
   margin:0 0 27px;
 }
-
 .panel {
   padding:22px;
   margin-bottom:17px;
@@ -111,27 +94,19 @@ h1 {
   border:1px solid var(--line);
   border-radius:14px;
 }
-
-.panel h2 {
-  font-size:18px;
-  margin:0 0 6px;
-}
-
+.panel h2 { font-size:18px; margin:0 0 6px; }
 .description {
   font-size:13px;
   color:var(--muted);
   margin:0 0 19px;
 }
-
 label {
   display:block;
   font-size:12px;
   font-weight:800;
   margin:0 0 8px;
 }
-
-input[type="text"],
-input[type="email"] {
+input[type="text"],input[type="email"] {
   width:100%;
   padding:13px;
   border:1px solid var(--line);
@@ -142,16 +117,9 @@ input[type="email"] {
   font-size:14px;
   outline:none;
 }
-
 input:focus { border-color:var(--blue); }
-
-input[readonly] {
-  opacity:.75;
-  cursor:not-allowed;
-}
-
+input[readonly] { opacity:.75; cursor:not-allowed; }
 .field { margin-bottom:17px; }
-
 button.primary {
   padding:12px 17px;
   border:0;
@@ -161,21 +129,14 @@ button.primary {
   font-weight:850;
   cursor:pointer;
 }
-
-button:disabled {
-  opacity:.6;
-  cursor:wait;
-}
-
+button:disabled { opacity:.6; cursor:wait; }
 .message {
   margin-top:13px;
   font-size:13px;
   line-height:1.5;
 }
-
 .message.success { color:#54c99a; }
 .message.error { color:#f08c99; }
-
 .setting-row {
   display:flex;
   justify-content:space-between;
@@ -184,19 +145,13 @@ button:disabled {
   padding:14px 0;
   border-top:1px solid var(--line);
 }
-
-.setting-row strong {
-  display:block;
-  font-size:14px;
-}
-
+.setting-row strong { display:block; font-size:14px; }
 .setting-row small {
   display:block;
   color:var(--muted);
   margin-top:4px;
   font-size:12px;
 }
-
 .setting-row button {
   border:1px solid var(--line);
   background:var(--panel2);
@@ -207,14 +162,12 @@ button:disabled {
   cursor:pointer;
   white-space:nowrap;
 }
-
 .switch-group {
   display:flex;
   gap:18px;
   flex-wrap:wrap;
   align-items:center;
 }
-
 .switch-label {
   display:flex;
   align-items:center;
@@ -225,29 +178,19 @@ button:disabled {
   font-weight:700;
   cursor:pointer;
 }
-
 .switch-label input {
   width:17px;
   height:17px;
   accent-color:var(--blue);
   cursor:pointer;
 }
-
-.preference-section {
-  margin-top:22px;
-}
-
-.preference-section h3 {
-  font-size:14px;
-  margin:0 0 12px;
-}
-
+.preference-section { margin-top:22px; }
+.preference-section h3 { font-size:14px; margin:0 0 12px; }
 .choice-grid {
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
   gap:9px;
 }
-
 .choice {
   display:flex;
   align-items:center;
@@ -261,38 +204,34 @@ button:disabled {
   cursor:pointer;
   margin:0;
 }
-
 .choice input {
   width:16px;
   height:16px;
   accent-color:var(--blue);
   flex-shrink:0;
 }
-
-.save-preferences {
-  margin-top:23px;
+.league-group { margin:17px 0 22px; }
+.league-heading {
+  color:var(--cyan);
+  font-size:13px;
+  margin:0 0 10px;
 }
-
+.save-preferences { margin-top:23px; }
 .note {
   color:var(--muted);
   font-size:12px;
   line-height:1.6;
 }
-
 footer {
   text-align:center;
   color:var(--muted);
   font-size:11px;
   padding:25px;
 }
-
 @media(max-width:520px) {
   .topbar { padding:0 13px; }
   .brand { font-size:18px; }
-  .nav a,.nav button {
-    padding:8px;
-    font-size:10px;
-  }
+  .nav a,.nav button { padding:8px; font-size:10px; }
   main { padding:25px 14px 45px; }
   .panel { padding:17px; }
   .setting-row {
@@ -308,7 +247,6 @@ footer {
 
 <header class="topbar">
   <a class="brand" href="/">WF <span>PUNDIT</span></a>
-
   <nav class="nav">
     <a href="/dashboard.html">BACK TO DASHBOARD</a>
     <button id="themeButton" type="button">LIGHT MODE</button>
@@ -316,31 +254,19 @@ footer {
 </header>
 
 <main>
-
   <div class="eyebrow">YOUR ACCOUNT</div>
   <h1>Account Settings</h1>
   <p class="intro">Manage your WF Pundit profile and preferences.</p>
 
-  <!-- PROFILE -->
-
   <section class="panel">
     <h2>Profile Information</h2>
-    <p class="description">
-      Update the name displayed on your WF Pundit account.
-    </p>
+    <p class="description">Update the name displayed on your WF Pundit account.</p>
 
     <form id="profileForm">
       <div class="field">
         <label for="displayName">Display name</label>
-        <input
-          id="displayName"
-          name="displayName"
-          type="text"
-          minlength="2"
-          maxlength="50"
-          autocomplete="name"
-          required
-        >
+        <input id="displayName" name="displayName" type="text"
+          minlength="2" maxlength="50" autocomplete="name" required>
       </div>
 
       <div class="field">
@@ -348,15 +274,10 @@ footer {
         <input id="email" type="email" readonly>
       </div>
 
-      <button class="primary" id="saveButton" type="submit">
-        SAVE CHANGES
-      </button>
-
+      <button class="primary" id="saveButton" type="submit">SAVE CHANGES</button>
       <div class="message" id="profileMessage" role="status"></div>
     </form>
   </section>
-
-  <!-- SECURITY -->
 
   <section class="panel">
     <h2>Security</h2>
@@ -365,47 +286,31 @@ footer {
     <div class="setting-row">
       <div>
         <strong>Password</strong>
-        <small>
-          Request a secure password reset link sent to your account email.
-        </small>
+        <small>Request a secure password reset link sent to your account email.</small>
       </div>
     </div>
 
     <button class="primary" id="resetPasswordButton" type="button">
       SEND PASSWORD RESET LINK
     </button>
-
-    <div
-      class="message"
-      id="resetPasswordMessage"
-      role="status"
-      aria-live="polite"
-    ></div>
+    <div class="message" id="resetPasswordMessage" role="status" aria-live="polite"></div>
   </section>
-
-  <!-- NOTIFICATIONS -->
 
   <section class="panel">
     <h2>Notifications</h2>
-    <p class="description">
-      Choose how you want to receive updates from WF Pundit.
-    </p>
+    <p class="description">Choose how you want to receive updates from WF Pundit.</p>
 
     <div class="setting-row">
       <div>
         <strong>Breaking football news</strong>
         <small>Get notified about important football stories.</small>
       </div>
-
       <div class="switch-group">
         <label class="switch-label">
-          <input type="checkbox" id="breakingNewsInApp" checked>
-          In-app
+          <input type="checkbox" id="breakingNewsInApp" checked> In-app
         </label>
-
         <label class="switch-label">
-          <input type="checkbox" id="breakingNewsEmail" checked>
-          Email
+          <input type="checkbox" id="breakingNewsEmail" checked> Email
         </label>
       </div>
     </div>
@@ -415,42 +320,28 @@ footer {
         <strong>Comment replies</strong>
         <small>Know when someone replies to your comments.</small>
       </div>
-
       <div class="switch-group">
         <label class="switch-label">
-          <input type="checkbox" id="commentRepliesInApp" checked>
-          In-app
+          <input type="checkbox" id="commentRepliesInApp" checked> In-app
         </label>
-
         <label class="switch-label">
-          <input type="checkbox" id="commentRepliesEmail" checked>
-          Email
+          <input type="checkbox" id="commentRepliesEmail" checked> Email
         </label>
       </div>
     </div>
   </section>
 
-  <!-- APPEARANCE -->
-
   <section class="panel">
     <h2>Appearance</h2>
-    <p class="description">
-      Choose the theme you prefer for your dashboard.
-    </p>
-
+    <p class="description">Choose the theme you prefer for your dashboard.</p>
     <div class="setting-row">
       <div>
         <strong>Colour theme</strong>
         <small>Switch between dark and light mode.</small>
       </div>
-
-      <button id="appearanceButton" type="button">
-        SWITCH THEME
-      </button>
+      <button id="appearanceButton" type="button">SWITCH THEME</button>
     </div>
   </section>
-
-  <!-- READING PREFERENCES -->
 
   <section class="panel">
     <h2>Reading Preferences</h2>
@@ -461,7 +352,6 @@ footer {
 
     <div class="preference-section">
       <h3>Favourite competitions</h3>
-
       <div class="choice-grid" id="competitions">
         <label class="choice"><input type="checkbox" value="Women's Super League"> Women's Super League</label>
         <label class="choice"><input type="checkbox" value="Women's Champions League"> Women's Champions League</label>
@@ -469,6 +359,7 @@ footer {
         <label class="choice"><input type="checkbox" value="Women's Championship"> Women's Championship</label>
         <label class="choice"><input type="checkbox" value="Liga F"> Liga F</label>
         <label class="choice"><input type="checkbox" value="Première Ligue"> Première Ligue</label>
+        <label class="choice"><input type="checkbox" value="Serie A Femminile"> Serie A Femminile</label>
         <label class="choice"><input type="checkbox" value="International Football"> International Football</label>
         <label class="choice"><input type="checkbox" value="European Championships"> European Championships</label>
       </div>
@@ -476,26 +367,14 @@ footer {
 
     <div class="preference-section">
       <h3>Favourite clubs</h3>
-
-      <div class="choice-grid" id="clubs">
-        <label class="choice"><input type="checkbox" value="Chelsea"> Chelsea</label>
-        <label class="choice"><input type="checkbox" value="Arsenal"> Arsenal</label>
-        <label class="choice"><input type="checkbox" value="Manchester City"> Manchester City</label>
-        <label class="choice"><input type="checkbox" value="Manchester United"> Manchester United</label>
-        <label class="choice"><input type="checkbox" value="Liverpool"> Liverpool</label>
-        <label class="choice"><input type="checkbox" value="Tottenham Hotspur"> Tottenham Hotspur</label>
-        <label class="choice"><input type="checkbox" value="London City Lionesses"> London City Lionesses</label>
-        <label class="choice"><input type="checkbox" value="Barcelona"> Barcelona</label>
-        <label class="choice"><input type="checkbox" value="Real Madrid"> Real Madrid</label>
-        <label class="choice"><input type="checkbox" value="Lyon"> Lyon</label>
-        <label class="choice"><input type="checkbox" value="Gotham FC"> Gotham FC</label>
-        <label class="choice"><input type="checkbox" value="Bayern Munich"> Bayern Munich</label>
-      </div>
+      <p class="note">
+        Select clubs from the 2026/27 season. Clubs are grouped by their domestic leagues.
+      </p>
+      <div id="clubs"></div>
     </div>
 
     <div class="preference-section">
       <h3>Favourite topics</h3>
-
       <div class="choice-grid" id="topics">
         <label class="choice"><input type="checkbox" value="Breaking News"> Breaking News</label>
         <label class="choice"><input type="checkbox" value="Transfers"> Transfers</label>
@@ -510,28 +389,111 @@ footer {
       </div>
     </div>
 
-    <button
-      class="primary save-preferences"
-      id="savePreferencesButton"
-      type="button"
-    >
+    <button class="primary save-preferences" id="savePreferencesButton" type="button">
       SAVE PREFERENCES
     </button>
-
-    <div
-      class="message"
-      id="preferencesMessage"
-      role="status"
-      aria-live="polite"
-    ></div>
+    <div class="message" id="preferencesMessage" role="status" aria-live="polite"></div>
   </section>
-
 </main>
 
 <footer>WF Pundit · Women's football, every day.</footer>
 
 <script>
 const $ = id => document.getElementById(id);
+
+/* ALL CLUBS — 2026/27 */
+
+const clubLeagues = [
+  {
+    name:"Barclays Women's Super League — England",
+    clubs:[
+      "Arsenal","Aston Villa","Birmingham City","Brighton & Hove Albion",
+      "Charlton Athletic","Chelsea","Crystal Palace","Everton","Liverpool",
+      "London City Lionesses","Manchester City","Manchester United",
+      "Tottenham Hotspur","West Ham United"
+    ]
+  },
+  {
+    name:"Women's Championship — England",
+    clubs:[
+      "Bristol City","Burnley","Durham","Ipswich Town","Leicester City",
+      "Newcastle United","Nottingham Forest","Sheffield United","Southampton",
+      "Sunderland","Watford","Wolverhampton Wanderers"
+    ]
+  },
+  {
+    name:"NWSL — United States",
+    clubs:[
+      "Angel City FC","Bay FC","Boston Legacy FC","Chicago Stars FC",
+      "Denver Summit FC","Gotham FC","Houston Dash","Kansas City Current",
+      "North Carolina Courage","Orlando Pride","Portland Thorns FC",
+      "Racing Louisville FC","San Diego Wave FC","Seattle Reign",
+      "Utah Royals","Washington Spirit"
+    ]
+  },
+  {
+    name:"Liga F — Spain",
+    clubs:[
+      "Athletic Club","Atlético de Madrid","Costa Adeje Tenerife",
+      "Deportivo Abanca","Deportivo Alavés","FC Badalona Women",
+      "FC Barcelona","Granada CF","Logroño United","Madrid CFF",
+      "RCD Espanyol","Real Madrid","Real Sociedad","SD Eibar",
+      "Sevilla FC","Valencia CF"
+    ]
+  },
+  {
+    name:"Première Ligue — France",
+    clubs:[
+      "OL Lyonnes","Paris Saint-Germain","Paris FC","FC Nantes",
+      "FC Fleury 91","RC Strasbourg","RC Lens","Olympique de Marseille",
+      "Montpellier HSC","Le Havre AC","Toulouse FC","US Saint-Malo"
+    ]
+  },
+  {
+    name:"Serie A Femminile — Italy",
+    clubs:[
+      "Como 1907","Como Women","Fiorentina","Inter","Juventus",
+      "Lazio Women","AC Milan","Napoli Women","Parma","Roma",
+      "Sassuolo","Ternana Women"
+    ]
+  }
+];
+
+function renderClubs() {
+  const container = $("clubs");
+  container.innerHTML = "";
+
+  clubLeagues.forEach(league => {
+    const group = document.createElement("div");
+    group.className = "league-group";
+
+    const heading = document.createElement("h4");
+    heading.className = "league-heading";
+    heading.textContent = league.name;
+    group.appendChild(heading);
+
+    const grid = document.createElement("div");
+    grid.className = "choice-grid";
+
+    league.clubs.forEach(club => {
+      const label = document.createElement("label");
+      label.className = "choice";
+
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.value = club;
+
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(" " + club));
+      grid.appendChild(label);
+    });
+
+    group.appendChild(grid);
+    container.appendChild(group);
+  });
+}
+
+renderClubs();
 
 /* THEME */
 
@@ -543,15 +505,13 @@ function applyTheme() {
   } catch (error) {}
 
   document.body.classList.toggle("light-mode", mode === "light");
-
   $("themeButton").textContent =
     mode === "light" ? "DARK MODE" : "LIGHT MODE";
 }
 
 function toggleTheme() {
   const next = document.body.classList.contains("light-mode")
-    ? "dark"
-    : "light";
+    ? "dark" : "light";
 
   try {
     localStorage.setItem("wf-theme", next);
@@ -562,14 +522,13 @@ function toggleTheme() {
 
 $("themeButton").addEventListener("click", toggleTheme);
 $("appearanceButton").addEventListener("click", toggleTheme);
-
 applyTheme();
 
 /* API */
 
 async function api(url, options = {}) {
   const response = await fetch(url, {
-    credentials: "same-origin",
+    credentials:"same-origin",
     ...options
   });
 
@@ -640,9 +599,9 @@ $("profileForm").addEventListener("submit", async event => {
 
   try {
     const data = await api("/api/update-profile", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ displayName: name })
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({displayName:name})
     });
 
     showMessage(
@@ -664,7 +623,6 @@ $("profileForm").addEventListener("submit", async event => {
 
 async function requestPasswordReset() {
   const button = $("resetPasswordButton");
-  const message = $("resetPasswordMessage");
   const email = $("email").value.trim();
 
   if (!email) {
@@ -678,28 +636,22 @@ async function requestPasswordReset() {
 
   button.disabled = true;
   button.textContent = "SENDING…";
-  message.textContent = "";
 
   try {
     const data = await api("/api/request-password-reset", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email })
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({email})
     });
 
     showMessage(
       "resetPasswordMessage",
-      data.message ||
-      "If an eligible account exists, a password reset link will be sent.",
+      data.message || "If an eligible account exists, a password reset link will be sent.",
       "success"
     );
 
   } catch (error) {
-    showMessage(
-      "resetPasswordMessage",
-      error.message,
-      "error"
-    );
+    showMessage("resetPasswordMessage", error.message, "error");
 
   } finally {
     button.disabled = false;
@@ -707,12 +659,9 @@ async function requestPasswordReset() {
   }
 }
 
-$("resetPasswordButton").addEventListener(
-  "click",
-  requestPasswordReset
-);
+$("resetPasswordButton").addEventListener("click", requestPasswordReset);
 
-/* READING PREFERENCE HELPERS */
+/* PREFERENCE HELPERS */
 
 function getSelected(groupId) {
   return Array.from(
@@ -723,7 +672,10 @@ function getSelected(groupId) {
 }
 
 function setSelected(groupId, values) {
-  const selected = Array.isArray(values) ? values : [];
+  const selected = Array.isArray(values) ? [...values] : [];
+
+  /* Keep an older saved Lyon selection matched to the current club name. */
+  if (selected.includes("Lyon")) selected.push("OL Lyonnes");
 
   document.querySelectorAll(
     "#" + groupId + " input[type='checkbox']"
@@ -755,11 +707,7 @@ async function loadPreferences() {
     setSelected("topics", data.reading.topics);
 
   } catch (error) {
-    showMessage(
-      "preferencesMessage",
-      error.message,
-      "error"
-    );
+    showMessage("preferencesMessage", error.message, "error");
   }
 }
 
@@ -769,17 +717,16 @@ async function savePreferences() {
   const button = $("savePreferencesButton");
 
   const preferences = {
-    notifications: {
-      breakingNewsInApp: $("breakingNewsInApp").checked,
-      breakingNewsEmail: $("breakingNewsEmail").checked,
-      commentRepliesInApp: $("commentRepliesInApp").checked,
-      commentRepliesEmail: $("commentRepliesEmail").checked
+    notifications:{
+      breakingNewsInApp:$("breakingNewsInApp").checked,
+      breakingNewsEmail:$("breakingNewsEmail").checked,
+      commentRepliesInApp:$("commentRepliesInApp").checked,
+      commentRepliesEmail:$("commentRepliesEmail").checked
     },
-
-    reading: {
-      competitions: getSelected("competitions"),
-      clubs: getSelected("clubs"),
-      topics: getSelected("topics")
+    reading:{
+      competitions:getSelected("competitions"),
+      clubs:getSelected("clubs"),
+      topics:getSelected("topics")
     }
   };
 
@@ -788,9 +735,9 @@ async function savePreferences() {
 
   try {
     const data = await api("/api/settings-preferences", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(preferences)
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify(preferences)
     });
 
     showMessage(
@@ -800,11 +747,7 @@ async function savePreferences() {
     );
 
   } catch (error) {
-    showMessage(
-      "preferencesMessage",
-      error.message,
-      "error"
-    );
+    showMessage("preferencesMessage", error.message, "error");
 
   } finally {
     button.disabled = false;
@@ -812,10 +755,7 @@ async function savePreferences() {
   }
 }
 
-$("savePreferencesButton").addEventListener(
-  "click",
-  savePreferences
-);
+$("savePreferencesButton").addEventListener("click", savePreferences);
 
 /* START */
 
