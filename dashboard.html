@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,466 +9,595 @@
 
 <style>
 :root {
-  color-scheme:dark;
-  --bg:#08111e;
-  --panel:#101d2d;
-  --panel2:#14243a;
-  --line:#263a53;
-  --text:#f4f7fb;
-  --muted:#9eafc4;
-  --blue:#4388d4;
-  --cyan:#a9d3ff;
+  color-scheme: dark;
+  --bg: #08111e;
+  --panel: #101d2d;
+  --panel2: #14243a;
+  --line: #263a53;
+  --text: #f4f7fb;
+  --muted: #9eafc4;
+  --blue: #4388d4;
+  --cyan: #a9d3ff;
 }
 
-* { box-sizing:border-box; }
+* {
+  box-sizing: border-box;
+}
 
 body {
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
-  min-height:100vh;
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 body.light-mode {
-  color-scheme:light;
-  --bg:#f2f5f9;
-  --panel:#fff;
-  --panel2:#edf3fa;
-  --line:#dce4ee;
-  --text:#172538;
-  --muted:#65758a;
-  --blue:#286fbd;
-  --cyan:#286fbd;
+  color-scheme: light;
+  --bg: #f2f5f9;
+  --panel: #ffffff;
+  --panel2: #edf3fa;
+  --line: #dce4ee;
+  --text: #172538;
+  --muted: #65758a;
+  --blue: #286fbd;
+  --cyan: #286fbd;
 }
 
-a { color:inherit; }
+a {
+  color: inherit;
+}
+
+/* HEADER */
 
 .topbar {
-  min-height:72px;
-  border-bottom:1px solid var(--line);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 max(22px,calc((100% - 1180px)/2));
-  background:var(--panel);
+  min-height: 72px;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 max(22px, calc((100% - 1180px) / 2));
+  background: var(--panel);
 }
 
 .brand {
-  font-weight:950;
-  font-size:22px;
-  letter-spacing:-1px;
-  text-decoration:none;
+  font-size: 22px;
+  font-weight: 950;
+  letter-spacing: -1px;
+  text-decoration: none;
 }
 
-.brand span { color:var(--cyan); }
+.brand span {
+  color: var(--cyan);
+}
 
 .nav {
-  display:flex;
-  align-items:center;
-  gap:10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.nav a,.nav button {
-  border:1px solid var(--line);
-  border-radius:9px;
-  padding:9px 13px;
-  text-decoration:none;
-  background:transparent;
-  color:var(--text);
-  font-weight:750;
-  font-size:12px;
-  cursor:pointer;
+.nav a,
+.nav button {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  padding: 9px 13px;
+  background: transparent;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 750;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .nav .home {
-  background:var(--blue);
-  border-color:var(--blue);
-  color:#fff;
+  background: var(--blue);
+  border-color: var(--blue);
+  color: #fff;
 }
 
 main {
-  max-width:1180px;
-  margin:0 auto;
-  padding:30px 22px 60px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 30px 22px 60px;
 }
 
+/* WELCOME */
+
 .welcome {
-  display:flex;
-  justify-content:space-between;
-  align-items:end;
-  gap:20px;
-  margin-bottom:22px;
+  margin-bottom: 22px;
 }
 
 .eyebrow {
-  color:var(--cyan);
-  font-size:11px;
-  font-weight:900;
-  letter-spacing:2px;
-  text-transform:uppercase;
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  text-transform: uppercase;
 }
 
-h1 {
-  font-size:clamp(26px,4vw,38px);
-  letter-spacing:-1.4px;
-  margin:8px 0 5px;
+.welcome h1 {
+  margin: 8px 0 5px;
+  font-size: clamp(26px, 4vw, 38px);
+  letter-spacing: -1.4px;
 }
 
 .welcome p {
-  margin:0;
-  color:var(--muted);
-  font-size:14px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
 }
 
-/* PLAYER PAIR CAROUSEL */
+/* PLAYER CAROUSEL */
 
-.hero {
-  position:relative;
-  isolation:isolate;
-  overflow:hidden;
-  min-height:390px;
-  border:1px solid #314760;
-  border-radius:18px;
-  background:#08111e;
-  margin-bottom:28px;
-  box-shadow:0 18px 45px #02081355;
+.player-showcase {
+  margin-bottom: 30px;
 }
 
-.carousel-window {
-  position:relative;
-  overflow:hidden;
-  width:100%;
-  height:390px;
+.player-showcase-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
-.player-track {
-  display:flex;
-  width:100%;
-  height:100%;
-  transition:transform 1s cubic-bezier(.22,.61,.36,1);
+.player-showcase-heading h2 {
+  margin: 0;
+  font-size: 19px;
+  letter-spacing: -0.4px;
+}
+
+.player-showcase-heading span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.carousel-stage {
+  position: relative;
+  width: 100%;
+  height: 390px;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid #314760;
+  border-radius: 17px;
+  background: #08111e;
+  box-shadow: 0 18px 45px #02081355;
 }
 
 .player-pair {
-  flex:0 0 100%;
-  display:grid;
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:0;
-  height:100%;
-  min-width:0;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 12px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 450ms ease,
+    visibility 0s linear 450ms;
+}
+
+.player-pair.active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    opacity 450ms ease,
+    visibility 0s;
 }
 
 .player-card {
-  position:relative;
-  min-width:0;
-  height:100%;
-  overflow:hidden;
-  background:#15263b;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid #314760;
+  border-radius: 12px;
+  background: #15263b;
 }
 
-.player-card img {
-  display:block;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  object-position:center 22%;
-  opacity:.9;
-  transform:scale(1);
-  transition:transform 1.2s ease,opacity .8s ease;
+.player-photo {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #192b40;
 }
 
-.player-pair.active .player-card img {
-  transform:scale(1.035);
-  opacity:1;
+.player-photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 22%;
+  transform: scale(1);
 }
 
-.player-card:after {
-  content:"";
-  position:absolute;
-  inset:45% 0 0;
-  background:linear-gradient(transparent,#07101df0);
-  pointer-events:none;
+.player-pair.active .player-photo img {
+  animation: slowZoomIn 2000ms ease-out both;
 }
 
 .player-name {
-  position:absolute;
-  z-index:1;
-  left:8px;
-  right:8px;
-  bottom:18px;
-  color:#fff;
-  font-size:clamp(12px,1.5vw,16px);
-  line-height:1.2;
-  font-weight:900;
-  text-align:center;
-  text-shadow:0 2px 8px #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 10px 6px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: clamp(12px, 1.5vw, 16px);
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 0.3px;
 }
 
-.hero-copy {
-  position:absolute;
-  z-index:3;
-  left:22px;
-  top:18px;
-  max-width:380px;
-  padding:11px 14px;
-  border:1px solid #ffffff35;
-  border-radius:10px;
-  background:#08111ecc;
-  backdrop-filter:blur(8px);
-  pointer-events:none;
-}
+@keyframes slowZoomIn {
+  from {
+    transform: scale(1);
+  }
 
-.hero-copy .eyebrow { color:#c5e2ff; }
-
-.hero-copy h2 {
-  font-size:clamp(17px,2.4vw,25px);
-  line-height:1.05;
-  margin:6px 0;
-}
-
-.hero-copy p {
-  color:#d5e2f0;
-  margin:0;
-  font-size:11px;
+  to {
+    transform: scale(1.055);
+  }
 }
 
 .carousel-dots {
-  position:absolute;
-  z-index:4;
-  right:20px;
-  bottom:16px;
-  display:flex;
-  gap:8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding-top: 13px;
 }
 
 .carousel-dot {
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#ffffff66;
-  border:0;
-  padding:0;
-  cursor:pointer;
-  transition:all .3s ease;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: #71839a;
+  cursor: pointer;
+  transition: width 450ms ease, background 450ms ease;
 }
 
 .carousel-dot.active {
-  width:24px;
-  border-radius:8px;
-  background:#fff;
+  width: 25px;
+  background: var(--blue);
 }
 
-/* DASHBOARD SECTIONS */
+/* SECTION HEADINGS */
 
 .section-head {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin:28px 0 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 28px 0 14px;
 }
 
 .section-head h2 {
-  font-size:19px;
-  margin:0;
-  letter-spacing:-.4px;
+  margin: 0;
+  font-size: 19px;
+  letter-spacing: -0.4px;
 }
 
 .section-head span {
-  font-size:12px;
-  color:var(--muted);
+  color: var(--muted);
+  font-size: 12px;
 }
 
-.grid {
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:15px;
+/* PROFILE */
+
+.profile-section {
+  margin-bottom: 30px;
 }
 
-.article,.saved,.profile {
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:13px;
-  overflow:hidden;
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 21px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
 }
 
-.article {
-  padding:17px;
-  min-height:160px;
-  display:flex;
-  flex-direction:column;
+.profile-avatar {
+  display: flex;
+  flex: 0 0 65px;
+  width: 65px;
+  height: 65px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  color: var(--cyan);
+  font-size: 21px;
+  font-weight: 900;
 }
 
-.tag {
-  font-size:10px;
-  color:var(--cyan);
-  font-weight:900;
-  text-transform:uppercase;
-  letter-spacing:1px;
+.profile-details {
+  flex: 1;
+  min-width: 0;
 }
 
-.article h3,.saved h3 {
-  font-size:16px;
-  line-height:1.35;
-  margin:9px 0;
+.profile-details h3 {
+  margin: 0 0 8px;
+  font-size: 18px;
 }
 
-.article p,.saved p {
-  font-size:12px;
-  line-height:1.55;
-  color:var(--muted);
-  margin:0 0 13px;
+.profile-details p {
+  margin: 5px 0;
+  color: var(--muted);
+  font-size: 13px;
+  overflow-wrap: anywhere;
 }
 
-.article a,.saved a {
-  color:var(--cyan);
-  font-size:12px;
-  font-weight:850;
-  text-decoration:none;
-  margin-top:auto;
+.profile-details strong {
+  color: var(--text);
 }
-
-.lower {
-  display:grid;
-  grid-template-columns:1.5fr 1fr;
-  gap:16px;
-}
-
-.saved-panel,.profile { padding:18px; }
-
-.saved-list {
-  display:grid;
-  gap:10px;
-}
-
-.saved { padding:13px; }
-
-.saved h3 { margin:0 0 7px; }
-
-.saved-actions {
-  display:flex;
-  gap:14px;
-  align-items:center;
-}
-
-.remove {
-  background:transparent;
-  border:0;
-  color:#e58a98;
-  font-size:12px;
-  font-weight:800;
-  cursor:pointer;
-}
-
-.profile p {
-  font-size:13px;
-  color:var(--muted);
-  overflow-wrap:anywhere;
-}
-
-.profile strong { color:var(--text); }
 
 .profile-actions {
-  display:flex;
-  gap:8px;
-  flex-wrap:wrap;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 13px;
 }
 
 .profile-actions a {
-  padding:9px 12px;
-  border:1px solid var(--line);
-  border-radius:8px;
-  text-decoration:none;
-  font-size:12px;
-  font-weight:800;
+  display: inline-block;
+  padding: 9px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
 }
 
-.comments-section { margin-top:24px; }
+.profile-actions a.primary {
+  border-color: var(--blue);
+  background: var(--blue);
+  color: #fff;
+}
+
+/* LATEST ARTICLES */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 15px;
+}
+
+.article,
+.saved {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: var(--panel);
+}
+
+.article {
+  display: flex;
+  min-height: 165px;
+  flex-direction: column;
+  padding: 17px;
+}
+
+.tag {
+  color: var(--cyan);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.article h3,
+.saved h3 {
+  margin: 9px 0;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.article p,
+.saved p {
+  margin: 0 0 13px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.article a,
+.saved a {
+  margin-top: auto;
+  color: var(--cyan);
+  font-size: 12px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+/* SAVED ARTICLES */
+
+.saved-list {
+  display: grid;
+  gap: 10px;
+}
+
+.saved {
+  padding: 15px;
+}
+
+.saved h3 {
+  margin: 0 0 7px;
+}
+
+.saved-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 9px;
+}
+
+.remove {
+  border: 0;
+  background: transparent;
+  color: #e58a98;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* COMMENTS */
 
 .comments-list {
-  display:grid;
-  gap:10px;
-  margin-top:12px;
+  display: grid;
+  gap: 10px;
 }
 
 .comment-date {
-  display:block;
-  color:var(--muted);
-  font-size:11px;
-  margin:0 0 10px;
+  display: block;
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 11px;
 }
 
+.comment-text {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+/* GENERAL */
+
 .status {
-  padding:12px;
-  border:1px dashed var(--line);
-  border-radius:9px;
-  color:var(--muted);
-  font-size:13px;
+  padding: 13px;
+  border: 1px dashed var(--line);
+  border-radius: 9px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 footer {
-  text-align:center;
-  color:var(--muted);
-  font-size:11px;
-  padding:28px 10px;
+  padding: 28px 10px;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
 }
 
-[hidden] { display:none!important; }
+[hidden] {
+  display: none !important;
+}
 
 /* TABLET */
 
-@media(max-width:760px) {
-  .grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
-  .lower { grid-template-columns:1fr; }
-  .welcome { align-items:start;flex-direction:column; }
-
-  .hero { min-height:310px; }
-  .carousel-window { height:310px; }
-  .player-name { font-size:12px;bottom:14px; }
-
-  .hero-copy {
-    left:12px;
-    top:12px;
-    padding:9px 11px;
+@media (max-width: 760px) {
+  .topbar {
+    padding: 0 15px;
   }
 
-  .hero-copy h2 { font-size:18px; }
-  .carousel-dots { right:14px;bottom:12px; }
+  .nav {
+    gap: 6px;
+  }
 
-  .topbar { padding:0 15px; }
-  .nav { gap:6px; }
-  .nav a,.nav button {
-    padding:8px 9px;
-    font-size:11px;
+  .nav a,
+  .nav button {
+    padding: 8px 9px;
+    font-size: 11px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .carousel-stage {
+    height: 330px;
+  }
+
+  .player-pair {
+    padding: 9px;
+    gap: 9px;
+  }
+
+  .player-name {
+    min-height: 48px;
+    font-size: 12px;
   }
 }
 
 /* MOBILE */
 
-@media(max-width:480px) {
-  main { padding:22px 14px 45px; }
-  .grid { grid-template-columns:1fr; }
-
-  .hero { min-height:270px; }
-  .carousel-window { height:270px; }
-
-  .player-card img { object-position:center 18%; }
-  .player-name {
-    font-size:10px;
-    left:3px;
-    right:3px;
-    bottom:12px;
+@media (max-width: 480px) {
+  main {
+    padding: 22px 14px 45px;
   }
 
-  .hero-copy { max-width:240px; }
-  .hero-copy h2 { font-size:15px; }
-  .brand { font-size:19px; }
+  .brand {
+    font-size: 19px;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .carousel-stage {
+    height: 280px;
+    border-radius: 13px;
+  }
+
+  .player-pair {
+    padding: 7px;
+    gap: 7px;
+  }
+
+  .player-name {
+    min-height: 45px;
+    padding: 7px 3px;
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+
+  .player-photo img {
+    object-position: center 18%;
+  }
+
+  .profile-card {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 15px;
+  }
+
+  .profile-avatar {
+    flex-basis: 48px;
+    width: 48px;
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .profile-details h3 {
+    font-size: 16px;
+  }
+
+  .profile-details p {
+    font-size: 12px;
+  }
 }
 
-@media(prefers-reduced-motion:reduce) {
-  *,*::before,*::after {
-    transition-duration:.01ms!important;
-    animation-duration:.01ms!important;
+/* REDUCED MOTION ACCESSIBILITY */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 </style>
@@ -477,6 +607,7 @@ footer {
 
 <header class="topbar">
   <a class="brand" href="/">WF <span>PUNDIT</span></a>
+
   <nav class="nav">
     <a class="home" href="/">HOME</a>
     <button id="themeButton" type="button">LIGHT MODE</button>
@@ -486,122 +617,175 @@ footer {
 
 <main>
 
-<section class="welcome">
-  <div>
+  <!-- WELCOME -->
+
+  <section class="welcome">
     <div class="eyebrow">YOUR PERSONAL SPACE</div>
-    <h1><span id="readerName">My</span>'s Dashboard</h1>
+    <h1>Welcome, <span id="readerName">Reader</span></h1>
     <p>Your home for the latest women's football stories.</p>
-  </div>
-</section>
+  </section>
 
-<section class="hero" aria-label="Featured women's football players">
-  <div class="carousel-window">
-    <div class="player-track" id="playerTrack">
+  <!-- PLAYER CAROUSEL -->
 
-      <div class="player-pair active">
-        <div class="player-card">
-          <img src="https://wsrv.nl/?url=https%3A%2F%2Fcdn.media.amplience.net%2Fi%2FArsenalDirect%2FRusso_2026_sbp%3F%2524sbp-page-heroimage-small-6024%2524%3D%26fmt%3Djpg&amp;output=png" alt="Alessia Russo" loading="eager">
-          <span class="player-name">ALESSIA RUSSO</span>
-        </div>
-        <div class="player-card">
-          <img src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png" alt="Hannah Hampton" loading="eager">
-          <span class="player-name">HANNAH HAMPTON</span>
-        </div>
+  <section class="player-showcase" aria-label="Featured players">
+
+    <div class="player-showcase-heading">
+      <h2>Featured players</h2>
+      <span>WF Pundit</span>
+    </div>
+
+    <div class="carousel-stage" id="playerCarousel">
+
+      <!-- PAIR ONE -->
+
+      <div class="player-pair active" aria-hidden="false">
+
+        <figure class="player-card">
+          <div class="player-photo">
+            <img
+              src="https://wsrv.nl/?url=https%3A%2F%2Fcdn.media.amplience.net%2Fi%2FArsenalDirect%2FRusso_2026_sbp%3F%2524sbp-page-heroimage-small-6024%2524%3D%26fmt%3Djpg&amp;output=png"
+              alt="Alessia Russo"
+              loading="eager"
+            >
+          </div>
+          <figcaption class="player-name">ALESSIA RUSSO</figcaption>
+        </figure>
+
+        <figure class="player-card">
+          <div class="player-photo">
+            <img
+              src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png"
+              alt="Hannah Hampton"
+              loading="eager"
+            >
+          </div>
+          <figcaption class="player-name">HANNAH HAMPTON</figcaption>
+        </figure>
+
       </div>
 
-      <div class="player-pair">
-        <div class="player-card">
-          <img src="https://wsrv.nl/?url=https%3A%2F%2Fstatic.wixstatic.com%2Fmedia%2Fc48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg%2Fv1%2Ffill%2Fw_640%252Ch_429%252Cal_t%252Cq_90%2Fc48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg&amp;output=png" alt="Alexia Putellas" loading="lazy">
-          <span class="player-name">ALEXIA PUTELLAS</span>
-        </div>
-        <div class="player-card">
-          <img src="https://wsrv.nl/?url=https%3A%2F%2Fwww.fcbarcelona.com%2Fphoto-resources%2F2025%2F09%2F10%2Fe09695b4-8d3c-411e-864a-0bc580d3aa81%2F14_Aitana.jpg%3Fheight%3D600%26width%3D600&amp;output=png" alt="Aitana Bonmatí" loading="lazy">
-          <span class="player-name">AITANA BONMATÍ</span>
-        </div>
+      <!-- PAIR TWO -->
+
+      <div class="player-pair" aria-hidden="true">
+
+        <figure class="player-card">
+          <div class="player-photo">
+            <img
+              src="https://wsrv.nl/?url=https%3A%2F%2Fwww.fcbarcelona.com%2Fphoto-resources%2F2025%2F09%2F10%2F42f9081a-dcc1-42c6-bcd8-2e4eea8bdc35%2F11-Alexia.jpg%3Fheight%3D600%26width%3D600&amp;output=png"
+              alt="Alexia Putellas"
+              loading="lazy"
+            >
+          </div>
+          <figcaption class="player-name">ALEXIA PUTELLAS</figcaption>
+        </figure>
+
+        <figure class="player-card">
+          <div class="player-photo">
+            <img
+              src="https://www.soccerzz.com/img/jogadores/new/83/99/428399_sakina_karchaoui_20250331201437.png"
+              alt="Sakina Karchaoui"
+              loading="lazy"
+            >
+          </div>
+          <figcaption class="player-name">SAKINA KARCHAOUI</figcaption>
+        </figure>
+
       </div>
 
-      <div class="player-pair">
-        <div class="player-card">
-          <img src="https://publish.realmadrid.com/content/dam/portals/realmadrid-com/es-es/sports/football/vaikl8nl7hdr4y9jj4jyb9ey/players/linda-caicedo-alegria/caritas-26-27/LINDA_EQUIPO_CARITA_550X650.png" alt="Linda Caicedo" loading="lazy">
-          <span class="player-name">LINDA CAICEDO</span>
-        </div>
-        <div class="player-card">
-          <img src="https://wsrv.nl/?url=https%3A%2F%2Fcommons.wikimedia.org%2Fwiki%2FSpecial%3AFilePath%2FSophia_Smith_2024-02_(cropped).jpg&amp;output=png" alt="Sophia Smith" loading="lazy">
-          <span class="player-name">SOPHIA SMITH</span>
+    </div>
+
+    <div
+      class="carousel-dots"
+      id="carouselDots"
+      aria-label="Choose featured player pair"
+    ></div>
+
+  </section>
+
+  <!-- PROFILE -->
+
+  <section class="profile-section">
+
+    <div class="section-head">
+      <h2>My Profile</h2>
+      <span>Your account details</span>
+    </div>
+
+    <div class="profile-card">
+
+      <div class="profile-avatar" id="profileAvatar">R</div>
+
+      <div class="profile-details">
+        <h3 id="profileName">Loading your profile…</h3>
+
+        <p>
+          <strong>Email:</strong>
+          <span id="profileEmail">Loading…</span>
+        </p>
+
+        <div class="profile-actions">
+          <a class="primary" href="/account.html">ACCOUNT SETTINGS</a>
+          <a href="/">BACK TO HOMEPAGE</a>
         </div>
       </div>
 
     </div>
-  </div>
 
-  <div class="hero-copy">
-    <div class="eyebrow">The game. The stories. The people.</div>
-    <h2>Women's football, closer than ever.</h2>
-    <p>Follow the stories shaping the game.</p>
-  </div>
+  </section>
 
-  <div class="carousel-dots" id="carouselDots" aria-label="Player carousel position"></div>
-</section>
+  <!-- LATEST STORIES -->
 
-<div class="section-head">
-  <h2>Latest stories</h2>
-  <span id="articleCount">Loading articles…</span>
-</div>
+  <section class="latest-section">
 
-<section id="latestArticles" class="grid">
-  <div class="status">Loading the latest stories…</div>
-</section>
+    <div class="section-head">
+      <h2>Latest stories</h2>
+      <span id="articleCount">Loading articles…</span>
+    </div>
 
-<div class="section-head">
-  <h2>Your account</h2>
-  <span>Personal space</span>
-</div>
+    <div id="latestArticles" class="grid">
+      <div class="status">Loading the latest stories…</div>
+    </div>
 
-<section class="lower">
+  </section>
 
-  <div class="saved-panel">
-    <div class="section-head" style="margin:0 0 13px">
+  <!-- SAVED ARTICLES -->
+
+  <section class="saved-section">
+
+    <div class="section-head">
       <h2>Saved articles</h2>
       <span id="savedCount"></span>
     </div>
+
     <div id="savedList" class="saved-list">
       <div class="status">Loading your saved articles…</div>
     </div>
-  </div>
 
-  <aside class="profile">
-    <div class="eyebrow">Your profile</div>
-    <h2 style="font-size:19px;margin:8px 0">Account details</h2>
+  </section>
 
-    <p>
-      <strong>Name</strong><br>
-      <span id="profileName">Loading…</span>
-    </p>
+  <!-- MY COMMENTS -->
 
-    <p>
-      <strong>Email</strong><br>
-      <span id="profileEmail">Loading…</span>
-    </p>
+  <section class="comments-section">
 
-    <div class="profile-actions">
-      <a href="/account.html">Account settings</a>
-      <a href="/">Back to homepage</a>
+    <div class="section-head">
+      <h2>My Comments</h2>
+      <span>Your comments on WF Pundit</span>
     </div>
 
-    <div class="comments-section">
-      <h2 style="font-size:19px;margin:0 0 10px">My Comments</h2>
-      <div id="myComments" class="comments-list">
-        <div class="status">Loading your comments…</div>
-      </div>
+    <div id="myComments" class="comments-list">
+      <div class="status">Loading your comments…</div>
     </div>
-  </aside>
 
-</section>
+  </section>
+
 </main>
 
-<footer>WF Pundit · Women's football, every day.</footer>
+<footer>
+  WF Pundit · Women's football, every day.
+</footer>
 
 <script>
+
 /* THEME */
 
 const themeButton = document.getElementById("themeButton");
@@ -610,7 +794,9 @@ try {
   if (localStorage.getItem("wf-theme") === "light") {
     document.body.classList.add("light-mode");
   }
-} catch (e) {}
+} catch (error) {
+  // Continue with the default theme if storage is unavailable.
+}
 
 function updateThemeLabel() {
   themeButton.textContent =
@@ -624,37 +810,51 @@ updateThemeLabel();
 themeButton.addEventListener("click", () => {
   document.body.classList.toggle("light-mode");
 
-  const mode = document.body.classList.contains("light-mode")
-    ? "light"
-    : "dark";
+  const mode =
+    document.body.classList.contains("light-mode")
+      ? "light"
+      : "dark";
 
   try {
-    localStorage.setItem("wf-theme",mode);
-  } catch (e) {}
+    localStorage.setItem("wf-theme", mode);
+  } catch (error) {
+    // Theme still changes for the current page.
+  }
 
   updateThemeLabel();
 });
 
-/* PLAYER PAIR CAROUSEL */
 
-const playerTrack = document.getElementById("playerTrack");
-const playerPairs = Array.from(document.querySelectorAll(".player-pair"));
+/* PLAYER CAROUSEL
+   Two pairs.
+   Automatic change every 2 seconds.
+   Crossfade duration: 450 milliseconds.
+*/
+
+const playerSlides = Array.from(
+  document.querySelectorAll(".player-pair")
+);
+
 const carouselDots = document.getElementById("carouselDots");
 
-let currentPair = 0;
+let currentSlide = 0;
 let carouselTimer = null;
 
 function buildCarouselDots() {
   carouselDots.replaceChildren();
 
-  playerPairs.forEach((pair,index) => {
+  playerSlides.forEach((slide, index) => {
     const dot = document.createElement("button");
+
     dot.type = "button";
     dot.className = "carousel-dot";
-    dot.setAttribute("aria-label","Show player pair " + (index + 1));
+    dot.setAttribute(
+      "aria-label",
+      "Show player pair " + (index + 1)
+    );
 
-    dot.addEventListener("click",() => {
-      currentPair = index;
+    dot.addEventListener("click", () => {
+      currentSlide = index;
       updateCarousel();
       restartCarousel();
     });
@@ -664,50 +864,105 @@ function buildCarouselDots() {
 }
 
 function updateCarousel() {
-  playerTrack.style.transform =
-    "translateX(-" + (currentPair * 100) + "%)";
+  playerSlides.forEach((slide, index) => {
+    const active = index === currentSlide;
 
-  playerPairs.forEach((pair,index) => {
-    pair.classList.toggle("active",index === currentPair);
+    slide.classList.toggle("active", active);
+    slide.setAttribute("aria-hidden", String(!active));
   });
 
-  Array.from(carouselDots.children).forEach((dot,index) => {
-    dot.classList.toggle("active",index === currentPair);
+  Array.from(carouselDots.children).forEach((dot, index) => {
+    dot.classList.toggle("active", index === currentSlide);
   });
 }
 
-function nextPair() {
-  currentPair = (currentPair + 1) % playerPairs.length;
+function nextSlide() {
+  currentSlide = (currentSlide + 1) % playerSlides.length;
   updateCarousel();
 }
 
 function restartCarousel() {
-  if (carouselTimer) clearInterval(carouselTimer);
-  carouselTimer = setInterval(nextPair,5000);
+  if (carouselTimer) {
+    clearInterval(carouselTimer);
+  }
+
+  carouselTimer = setInterval(nextSlide, 2000);
 }
 
 buildCarouselDots();
 updateCarousel();
-restartCarousel();
 
-/* API HELPERS */
+const reduceMotion = window.matchMedia(
+  "(prefers-reduced-motion: reduce)"
+).matches;
 
-async function getJson(url,options = {}) {
-  const response = await fetch(url,{
-    credentials:"same-origin",
+if (!reduceMotion) {
+  restartCarousel();
+}
+
+
+/* API HELPER */
+
+async function getJson(url, options = {}) {
+  const response = await fetch(url, {
+    credentials: "same-origin",
     ...options
   });
 
-  const result = await response.json();
+  let result;
+
+  try {
+    result = await response.json();
+  } catch (error) {
+    throw new Error("The server returned an invalid response.");
+  }
 
   if (!response.ok || !result.success) {
-    throw new Error(result.error || "Unable to load this section.");
+    throw new Error(
+      result.error || "Unable to load this section."
+    );
   }
 
   return result;
 }
 
-/* LATEST ARTICLES */
+
+/* PROFILE */
+
+function getInitials(name) {
+  const parts = String(name || "Reader")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (parts.length === 0) {
+    return "R";
+  }
+
+  return parts
+    .slice(0, 2)
+    .map(part => part.charAt(0).toUpperCase())
+    .join("");
+}
+
+function showProfile(user) {
+  const displayName = user.displayName || "Reader";
+  const firstName = displayName.trim().split(/\s+/)[0];
+
+  document.getElementById("readerName").textContent = firstName;
+  document.getElementById("profileName").textContent = displayName;
+  document.getElementById("profileEmail").textContent =
+    user.email || "Not provided";
+
+  document.getElementById("profileAvatar").textContent =
+    getInitials(displayName);
+
+  document.getElementById("pageTitle").textContent =
+    firstName + "'s Dashboard | WF Pundit";
+}
+
+
+/* LATEST STORIES */
 
 function articleCard(article) {
   const card = document.createElement("article");
@@ -724,10 +979,12 @@ function articleCard(article) {
   summary.textContent = article.summary || "";
 
   const link = document.createElement("a");
-  link.href = "/article.html?id=" + encodeURIComponent(article.id);
+  link.href =
+    "/article.html?id=" + encodeURIComponent(article.id);
   link.textContent = "READ STORY →";
 
-  card.append(tag,title,summary,link);
+  card.append(tag, title, summary, link);
+
   return card;
 }
 
@@ -736,7 +993,7 @@ async function loadLatest() {
 
   try {
     const data = await getJson("/api/articles");
-    const articles = (data.articles || []).slice(0,6);
+    const articles = (data.articles || []).slice(0, 6);
 
     host.replaceChildren();
 
@@ -744,10 +1001,12 @@ async function loadLatest() {
       const empty = document.createElement("div");
       empty.className = "status";
       empty.textContent = "No published stories yet.";
+
       host.appendChild(empty);
 
       document.getElementById("articleCount").textContent =
         "0 recent stories";
+
       return;
     }
 
@@ -766,8 +1025,11 @@ async function loadLatest() {
     message.textContent = error.message;
 
     host.appendChild(message);
+    document.getElementById("articleCount").textContent =
+      "Unable to load";
   }
 }
+
 
 /* SAVED ARTICLES */
 
@@ -801,13 +1063,15 @@ async function loadSaved() {
       title.textContent = article.title || "Untitled article";
 
       const category = document.createElement("p");
-      category.textContent = article.category || "Women's Football";
+      category.textContent =
+        article.category || "Women's Football";
 
       const actions = document.createElement("div");
       actions.className = "saved-actions";
 
       const link = document.createElement("a");
-      link.href = "/article.html?id=" + encodeURIComponent(article.id);
+      link.href =
+        "/article.html?id=" + encodeURIComponent(article.id);
       link.textContent = "Read article";
 
       const remove = document.createElement("button");
@@ -815,12 +1079,13 @@ async function loadSaved() {
       remove.type = "button";
       remove.textContent = "Remove";
 
-      remove.addEventListener("click",() => {
-        removeSaved(article.id,remove);
+      remove.addEventListener("click", () => {
+        removeSaved(article.id, remove);
       });
 
-      actions.append(link,remove);
-      item.append(title,category,actions);
+      actions.append(link, remove);
+      item.append(title, category, actions);
+
       host.appendChild(item);
     });
 
@@ -835,14 +1100,18 @@ async function loadSaved() {
   }
 }
 
-async function removeSaved(id,button) {
+async function removeSaved(id, button) {
   button.disabled = true;
 
   try {
-    await getJson("/api/saved",{
-      method:"DELETE",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({articleId:id})
+    await getJson("/api/saved", {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        articleId: id
+      })
     });
 
     await loadSaved();
@@ -853,10 +1122,13 @@ async function removeSaved(id,button) {
   }
 }
 
+
 /* MY COMMENTS */
 
 function formatCommentDate(value) {
-  if (!value) return "Date unavailable";
+  if (!value) {
+    return "Date unavailable";
+  }
 
   const date = new Date(value);
 
@@ -864,14 +1136,14 @@ function formatCommentDate(value) {
     return "Date unavailable";
   }
 
-  return new Intl.DateTimeFormat("en-GB",{
-    day:"2-digit",
-    month:"short",
-    year:"numeric",
-    hour:"numeric",
-    minute:"2-digit",
-    hour12:true,
-    timeZone:"Africa/Lagos"
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+    timeZone: "Africa/Lagos"
   }).format(date);
 }
 
@@ -888,7 +1160,7 @@ async function loadMyComments() {
       const empty = document.createElement("div");
       empty.className = "status";
       empty.textContent =
-        "You haven't posted any approved comments yet.";
+        "You haven't posted any comments yet.";
 
       host.appendChild(empty);
       return;
@@ -899,7 +1171,8 @@ async function loadMyComments() {
       item.className = "saved";
 
       const article = document.createElement("h3");
-      article.textContent = comment.article_title || "Article";
+      article.textContent =
+        comment.article_title || "Article";
 
       const date = document.createElement("time");
       date.className = "comment-date";
@@ -910,14 +1183,16 @@ async function loadMyComments() {
       }
 
       const text = document.createElement("p");
+      text.className = "comment-text";
       text.textContent = comment.comment || "";
 
       const link = document.createElement("a");
       link.href =
-        "/article.html?id=" + encodeURIComponent(comment.article_id);
+        "/article.html?id=" +
+        encodeURIComponent(comment.article_id);
       link.textContent = "VIEW ARTICLE →";
 
-      item.append(article,date,text,link);
+      item.append(article, date, text, link);
       host.appendChild(item);
     });
 
@@ -932,29 +1207,41 @@ async function loadMyComments() {
   }
 }
 
+
 /* LOG OUT */
 
-document.getElementById("logoutButton").addEventListener("click",async () => {
-  const confirmed = confirm("Are you sure you want to log out?");
+document
+  .getElementById("logoutButton")
+  .addEventListener("click", async () => {
 
-  if (!confirmed) return;
+    const confirmed = confirm(
+      "Are you sure you want to log out?"
+    );
 
-  const button = document.getElementById("logoutButton");
-  button.disabled = true;
+    if (!confirmed) {
+      return;
+    }
 
-  try {
-    await getJson("/api/logout",{method:"POST"});
-    window.location.replace("/");
+    const button = document.getElementById("logoutButton");
+    button.disabled = true;
 
-  } catch (error) {
-    alert(error.message);
-    button.disabled = false;
-  }
+    try {
+      await getJson("/api/logout", {
+        method: "POST"
+      });
+
+      window.location.replace("/");
+
+    } catch (error) {
+      alert(error.message);
+      button.disabled = false;
+    }
 });
 
-/* DASHBOARD START */
 
-async function start() {
+/* START DASHBOARD */
+
+async function startDashboard() {
   try {
     const data = await getJson("/api/me");
 
@@ -963,22 +1250,13 @@ async function start() {
         "/account.html?returnTo=" +
         encodeURIComponent("/dashboard.html")
       );
+
       return;
     }
 
     const user = data.user || {};
-    const firstName = (user.displayName || "Reader").split(" ")[0];
 
-    document.getElementById("readerName").textContent = firstName;
-
-    document.getElementById("pageTitle").textContent =
-      firstName + "'s Dashboard | WF Pundit";
-
-    document.getElementById("profileName").textContent =
-      user.displayName || "Not provided";
-
-    document.getElementById("profileEmail").textContent =
-      user.email || "Not provided";
+    showProfile(user);
 
     await Promise.all([
       loadLatest(),
@@ -988,6 +1266,7 @@ async function start() {
 
   } catch (error) {
     const host = document.getElementById("latestArticles");
+
     host.replaceChildren();
 
     const message = document.createElement("div");
@@ -998,7 +1277,8 @@ async function start() {
   }
 }
 
-start();
+startDashboard();
+
 </script>
 
 </body>
