@@ -20,9 +20,7 @@
   --cyan: #a9d3ff;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -44,9 +42,7 @@ body.light-mode {
   --cyan: #286fbd;
 }
 
-a {
-  color: inherit;
-}
+a { color: inherit; }
 
 /* HEADER */
 
@@ -67,9 +63,7 @@ a {
   text-decoration: none;
 }
 
-.brand span {
-  color: var(--cyan);
-}
+.brand span { color: var(--cyan); }
 
 .nav {
   display: flex;
@@ -104,9 +98,7 @@ main {
 
 /* WELCOME */
 
-.welcome {
-  margin-bottom: 22px;
-}
+.welcome { margin-bottom: 22px; }
 
 .eyebrow {
   color: var(--cyan);
@@ -130,9 +122,7 @@ main {
 
 /* PLAYER CAROUSEL */
 
-.player-showcase {
-  margin-bottom: 30px;
-}
+.player-showcase { margin-bottom: 30px; }
 
 .player-showcase-heading {
   display: flex;
@@ -164,33 +154,30 @@ main {
   box-shadow: 0 18px 45px #02081355;
 }
 
-.player-pair {
+.player-slide {
   position: absolute;
   inset: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
   padding: 12px;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition:
-    opacity 450ms ease,
-    visibility 0s linear 450ms;
+  transition: opacity 450ms ease, visibility 0s linear 450ms;
 }
 
-.player-pair.active {
+.player-slide.active {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
-  transition:
-    opacity 450ms ease,
-    visibility 0s;
+  transition: opacity 450ms ease, visibility 0s;
 }
 
 .player-card {
   display: flex;
   flex-direction: column;
+  width: min(100%, 520px);
   min-width: 0;
   min-height: 0;
   margin: 0;
@@ -216,32 +203,36 @@ main {
   transform: scale(1);
 }
 
-.player-pair.active .player-photo img {
-  animation: slowZoomIn 2000ms ease-out both;
+.player-slide.active .player-photo img {
+  animation: slowZoomIn 3500ms ease-out both;
 }
 
 .player-name {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 54px;
-  padding: 10px 6px;
+  min-height: 58px;
+  padding: 8px;
   background: var(--panel);
   color: var(--text);
-  font-size: clamp(12px, 1.5vw, 16px);
+  font-size: clamp(13px, 1.5vw, 17px);
   font-weight: 900;
   text-align: center;
   letter-spacing: 0.3px;
 }
 
-@keyframes slowZoomIn {
-  from {
-    transform: scale(1);
-  }
+.player-club {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0;
+}
 
-  to {
-    transform: scale(1.055);
-  }
+@keyframes slowZoomIn {
+  from { transform: scale(1); }
+  to { transform: scale(1.055); }
 }
 
 .carousel-dots {
@@ -291,9 +282,7 @@ main {
 
 /* PROFILE */
 
-.profile-section {
-  margin-bottom: 30px;
-}
+.profile-section { margin-bottom: 30px; }
 
 .profile-card {
   display: flex;
@@ -337,9 +326,7 @@ main {
   overflow-wrap: anywhere;
 }
 
-.profile-details strong {
-  color: var(--text);
-}
+.profile-details strong { color: var(--text); }
 
 .profile-actions {
   display: flex;
@@ -427,13 +414,9 @@ main {
   gap: 10px;
 }
 
-.saved {
-  padding: 15px;
-}
+.saved { padding: 15px; }
 
-.saved h3 {
-  margin: 0 0 7px;
-}
+.saved h3 { margin: 0 0 7px; }
 
 .saved-actions {
   display: flex;
@@ -490,20 +473,14 @@ footer {
   text-align: center;
 }
 
-[hidden] {
-  display: none !important;
-}
+[hidden] { display: none !important; }
 
 /* TABLET */
 
 @media (max-width: 760px) {
-  .topbar {
-    padding: 0 15px;
-  }
+  .topbar { padding: 0 15px; }
 
-  .nav {
-    gap: 6px;
-  }
+  .nav { gap: 6px; }
 
   .nav a,
   .nav button {
@@ -511,60 +488,40 @@ footer {
     font-size: 11px;
   }
 
-  .grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
-  .carousel-stage {
-    height: 330px;
-  }
+  .carousel-stage { height: 330px; }
 
-  .player-pair {
-    padding: 9px;
-    gap: 9px;
-  }
+  .player-slide { padding: 9px; }
 
-  .player-name {
-    min-height: 48px;
-    font-size: 12px;
-  }
+  .player-name { min-height: 52px; }
 }
 
 /* MOBILE */
 
 @media (max-width: 480px) {
-  main {
-    padding: 22px 14px 45px;
-  }
+  main { padding: 22px 14px 45px; }
 
-  .brand {
-    font-size: 19px;
-  }
+  .brand { font-size: 19px; }
 
-  .grid {
-    grid-template-columns: 1fr;
-  }
+  .grid { grid-template-columns: 1fr; }
 
   .carousel-stage {
     height: 280px;
     border-radius: 13px;
   }
 
-  .player-pair {
-    padding: 7px;
-    gap: 7px;
-  }
+  .player-slide { padding: 7px; }
 
   .player-name {
-    min-height: 45px;
+    min-height: 48px;
     padding: 7px 3px;
-    font-size: 10px;
-    letter-spacing: 0;
+    font-size: 12px;
   }
 
-  .player-photo img {
-    object-position: center 18%;
-  }
+  .player-club { font-size: 10px; }
+
+  .player-photo img { object-position: center 18%; }
 
   .profile-card {
     align-items: flex-start;
@@ -579,16 +536,12 @@ footer {
     font-size: 16px;
   }
 
-  .profile-details h3 {
-    font-size: 16px;
-  }
+  .profile-details h3 { font-size: 16px; }
 
-  .profile-details p {
-    font-size: 12px;
-  }
+  .profile-details p { font-size: 12px; }
 }
 
-/* REDUCED MOTION ACCESSIBILITY */
+/* REDUCED MOTION */
 
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -636,10 +589,7 @@ footer {
 
     <div class="carousel-stage" id="playerCarousel">
 
-      <!-- PAIR ONE -->
-
-      <div class="player-pair active" aria-hidden="false">
-
+      <div class="player-slide active" aria-hidden="false">
         <figure class="player-card">
           <div class="player-photo">
             <img
@@ -648,48 +598,59 @@ footer {
               loading="eager"
             >
           </div>
-          <figcaption class="player-name">ALESSIA RUSSO</figcaption>
+          <figcaption class="player-name">
+            ALESSIA RUSSO
+            <span class="player-club">ARSENAL</span>
+          </figcaption>
         </figure>
+      </div>
 
+      <div class="player-slide" aria-hidden="true">
         <figure class="player-card">
           <div class="player-photo">
             <img
               src="https://img.chelseafc.com/image/upload/f_auto%2Ch_390%2Cdpr_2.0%2Cq_90/editorial/people/ladies/2025-26/With%20IFS/3333x3333_Headshot_Image_Sponsored_IFS_ai_Women_Hampton_SF_Home_25_26_RGB.png"
               alt="Hannah Hampton"
-              loading="eager"
+              loading="lazy"
             >
           </div>
-          <figcaption class="player-name">HANNAH HAMPTON</figcaption>
+          <figcaption class="player-name">
+            HANNAH HAMPTON
+            <span class="player-club">CHELSEA</span>
+          </figcaption>
         </figure>
-
       </div>
 
-      <!-- PAIR TWO -->
-
-      <div class="player-pair" aria-hidden="true">
-
+      <div class="player-slide" aria-hidden="true">
         <figure class="player-card">
           <div class="player-photo">
             <img
-              src="https://wsrv.nl/?url=https%3A%2F%2Fwww.fcbarcelona.com%2Fphoto-resources%2F2025%2F09%2F10%2F42f9081a-dcc1-42c6-bcd8-2e4eea8bdc35%2F11-Alexia.jpg%3Fheight%3D600%26width%3D600&amp;output=png"
+              src="https://static.wixstatic.com/media/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg/v1/fill/w_640,h_429,al_t,q_90/c48041_10351fc9998f40aa9c03634efc788a88~mv2.jpg"
               alt="Alexia Putellas"
               loading="lazy"
             >
           </div>
-          <figcaption class="player-name">ALEXIA PUTELLAS</figcaption>
+          <figcaption class="player-name">
+            ALEXIA PUTELLAS
+            <span class="player-club">LONDON CITY LIONESSES</span>
+          </figcaption>
         </figure>
+      </div>
 
+      <div class="player-slide" aria-hidden="true">
         <figure class="player-card">
           <div class="player-photo">
             <img
-              src="https://www.soccerzz.com/img/jogadores/new/83/99/428399_sakina_karchaoui_20250331201437.png"
-              alt="Sakina Karchaoui"
+              src="https://washingtonspirit.com/wp-content/uploads/2023/04/02192026_rodmantrinity_cc_0016_2_2x-1-1.webp"
+              alt="Trinity Rodman"
               loading="lazy"
             >
           </div>
-          <figcaption class="player-name">SAKINA KARCHAOUI</figcaption>
+          <figcaption class="player-name">
+            TRINITY RODMAN
+            <span class="player-club">WASHINGTON SPIRIT</span>
+          </figcaption>
         </figure>
-
       </div>
 
     </div>
@@ -697,7 +658,7 @@ footer {
     <div
       class="carousel-dots"
       id="carouselDots"
-      aria-label="Choose featured player pair"
+      aria-label="Choose featured player"
     ></div>
 
   </section>
@@ -795,7 +756,7 @@ try {
     document.body.classList.add("light-mode");
   }
 } catch (error) {
-  // Continue with the default theme if storage is unavailable.
+  // Continue with default theme if storage is unavailable.
 }
 
 function updateThemeLabel() {
@@ -826,13 +787,13 @@ themeButton.addEventListener("click", () => {
 
 
 /* PLAYER CAROUSEL
-   Two pairs.
-   Automatic change every 2 seconds.
+   One player per slide.
+   Automatic change every 3.5 seconds.
    Crossfade duration: 450 milliseconds.
 */
 
 const playerSlides = Array.from(
-  document.querySelectorAll(".player-pair")
+  document.querySelectorAll(".player-slide")
 );
 
 const carouselDots = document.getElementById("carouselDots");
@@ -848,9 +809,10 @@ function buildCarouselDots() {
 
     dot.type = "button";
     dot.className = "carousel-dot";
+
     dot.setAttribute(
       "aria-label",
-      "Show player pair " + (index + 1)
+      "Show featured player " + (index + 1)
     );
 
     dot.addEventListener("click", () => {
@@ -886,7 +848,7 @@ function restartCarousel() {
     clearInterval(carouselTimer);
   }
 
-  carouselTimer = setInterval(nextSlide, 2000);
+  carouselTimer = setInterval(nextSlide, 3500);
 }
 
 buildCarouselDots();
@@ -896,7 +858,7 @@ const reduceMotion = window.matchMedia(
   "(prefers-reduced-motion: reduce)"
 ).matches;
 
-if (!reduceMotion) {
+if (!reduceMotion && playerSlides.length > 1) {
   restartCarousel();
 }
 
@@ -951,6 +913,7 @@ function showProfile(user) {
 
   document.getElementById("readerName").textContent = firstName;
   document.getElementById("profileName").textContent = displayName;
+
   document.getElementById("profileEmail").textContent =
     user.email || "Not provided";
 
@@ -1025,6 +988,7 @@ async function loadLatest() {
     message.textContent = error.message;
 
     host.appendChild(message);
+
     document.getElementById("articleCount").textContent =
       "Unable to load";
   }
