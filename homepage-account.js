@@ -1,4 +1,3 @@
-
 /* WF PUNDIT — HOMEPAGE READER SESSION */
 
 async function updateHomepageAccount() {
