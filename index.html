@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -254,6 +253,23 @@ color:#fff;
 background:#2869b3;
 border-color:#2869b3
 }
+
+.homepage-account-logged-out,
+.homepage-account-logged-in{
+display:flex;
+align-items:center;
+gap:7px
+}
+.homepage-account-logged-in{gap:9px}
+.homepage-account-greeting{
+color:var(--muted);
+font-size:11px;
+font-weight:700;
+white-space:nowrap
+}
+.homepage-account-greeting strong{color:var(--text)}
+[hidden]{display:none!important}
+
 .search{
 width:175px;
 background:#121e2e;
@@ -980,8 +996,7 @@ font-weight:700
 .placeholder{
 color:#b9c6d8;
 font-size:13px;
-font-weight:600;
-line-height:1.7;
+font-weight:600;line-height:1.7;
 margin-top:16px
 }
 
@@ -1354,10 +1369,6 @@ LIVE
 <a href="#matchday">Matchday</a>
 <a href="#about">About</a>
 
-<div class="account-actions" aria-label="Reader account">
-<a class="account-link login" href="/account.html">LOG IN</a>
-<a class="account-link signup" href="/account.html?mode=register">SIGN UP</a>
-</div>
 </nav>
 
 <div class="navright">
@@ -1484,9 +1495,7 @@ Welcome to WF Pundit — your destination for the latest women's football news, 
 <a class="player-card" href="https://www.juventus.com/en/teams/first-team-women/squad/martina-rosucci" target="_blank" rel="noopener noreferrer" aria-label="View Martina Rosucci at Juventus" tabindex="-1">
 <img src="https://www.juventus.com/images/image/private/t_portrait_mobile/f_png/dev/riarjdwbxcetuet3y972.png" alt="Martina Rosucci" loading="eager" decoding="async">
 <span class="player-label">Martina Rosucci<small>Juventus · Serie A Women · Italy</small></span>
-</a>
-
-<a class="player-card" href="https://washingtonspirit.com/team-member/sofia-cantore/" target="_blank" rel="noopener noreferrer" aria-label="View Sofia Cantore at Washington Spirit" tabindex="-1">
+</a><a class="player-card" href="https://washingtonspirit.com/team-member/sofia-cantore/" target="_blank" rel="noopener noreferrer" aria-label="View Sofia Cantore at Washington Spirit" tabindex="-1">
 <img src="https://washingtonspirit.com/wp-content/uploads/2026/02/02192026_cantoresofia_cc_0051_1_2x.webp" alt="Sofia Cantore" loading="eager" decoding="async">
 <span class="player-label">Sofia Cantore<small>Washington Spirit · NWSL · Italy</small></span>
 </a>
@@ -1984,8 +1993,7 @@ resumePlayerCarousel();
 playerPrev.addEventListener('click',()=>{
 showPlayer(activePlayer-1);
 pausePlayerCarousel();
-resumePlayerAfterInteraction();
-});
+resumePlayerAfterInteraction();});
 
 playerNext.addEventListener('click',()=>{
 showPlayer(activePlayer+1);
@@ -2214,7 +2222,7 @@ const formattedDate=publishedDate&&!Number.isNaN(publishedDate.getTime())
 date.textContent=
 (formattedDate?formattedDate+' · ':'')+
 'WF PUNDIT · READ STORY ↗';
-    
+
 body.append(meta,title,summary,date);
 card.append(thumb,body);
 newsGrid.append(card);
