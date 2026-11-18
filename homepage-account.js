@@ -24,8 +24,9 @@ async function updateHomepageAccount() {
 
         <div class="homepage-account-logged-in" hidden>
           <span class="homepage-account-greeting">
-            Hi, <strong class="homepage-reader-name">Reader</strong>
-          </span>
+  Hi, <strong class="homepage-reader-name">Reader</strong>
+  <span class="wave" aria-hidden="true">👋</span>
+</span>
 
           <a class="account-link signup" href="/dashboard.html">
             VIEW DASHBOARD
