@@ -194,8 +194,6 @@ main {
   background: #192b40;
 }
 
-/* FACE-FRIENDLY PHOTO DISPLAY */
-
 .player-photo img {
   display: block;
   width: 100%;
@@ -686,7 +684,7 @@ footer {
         </p>
 
         <div class="profile-actions">
-          <a class="primary" href="/account.html">ACCOUNT SETTINGS</a>
+          <a class="primary" href="/settings.html">ACCOUNT SETTINGS</a>
           <a href="/">BACK TO HOMEPAGE</a>
         </div>
       </div>
@@ -787,11 +785,7 @@ themeButton.addEventListener("click", () => {
 });
 
 
-/* PLAYER CAROUSEL
-   One player per slide.
-   Automatic change every 3.5 seconds.
-   Crossfade duration: 450 milliseconds.
-*/
+/* PLAYER CAROUSEL */
 
 const playerSlides = Array.from(
   document.querySelectorAll(".player-slide")
