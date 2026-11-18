@@ -552,6 +552,41 @@ async function removeSaved(id, button) {
     button.disabled = false;
     alert(e.message);
   }
+}async function loadMyComments() {
+  const host = document.getElementById("myComments");
+
+  try {
+    const data = await getJson("/api/my-comments");
+    const comments = data.comments || [];
+
+    host.replaceChildren();
+
+    if (!comments.length) {
+      host.textContent = "You haven't posted any comments yet.";
+      return;
+    }
+
+    comments.forEach(comment => {
+      const item = document.createElement("article");
+      item.className = "saved";
+
+      const article = document.createElement("h3");
+      article.textContent = comment.article_title || "Article";
+
+      const text = document.createElement("p");
+      text.textContent = comment.comment;
+
+      const link = document.createElement("a");
+      link.href = "/article.html?id=" + encodeURIComponent(comment.article_id);
+      link.textContent = "VIEW ARTICLE →";
+
+      item.append(article, text, link);
+      host.appendChild(item);
+    });
+
+  } catch (error) {
+    host.textContent = error.message;
+  }
 }
 document.getElementById("logoutButton").addEventListener("click", async () => {
   const confirmed = confirm("Are you sure you want to log out?");
@@ -575,9 +610,12 @@ async function start() {
     if (!data.loggedIn) {
       window.location.replace(
         "/account.html?returnTo=" +
-        encodeURIComponent("/dashboard.html")
-      );
-      return;
+        <div class="comments-section" style="margin-top:24px">
+  <h3>My Comments</h3>
+  <div id="myComments">
+    <div class="status">Loading your comments…</div>
+  </div>
+</div>
     }
 
     const user = data.user || {};
@@ -592,8 +630,7 @@ document.getElementById("pageTitle").textContent =
     document.getElementById("profileEmail").textContent =
       user.email || "Not provided";
 
-    await Promise.all([loadLatest(), loadSaved()]);
-
+    await Promise.all([loadLatest(), loadSaved(), loadMyComments()]);
   } catch(e) {
     document.getElementById("latestArticles").innerHTML =
       '<div class="status"></div>';
