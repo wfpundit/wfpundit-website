@@ -554,7 +554,8 @@ async function removeSaved(id, button) {
   }
 }
 
-document.getElementById("logoutButton").addEventListener("click", async () => {
+  const confirmed = confirm("Are you sure you want to log out?");
+  if (!confirmed) return;
   const button = document.getElementById("logoutButton");
   button.disabled = true;
 
