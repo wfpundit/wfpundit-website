@@ -126,15 +126,19 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
   <section class="panel">
     <h2>Security</h2>
     <p class="description">Keep your account protected.</p>
+
     <div class="setting-row">
       <div>
         <strong>Password</strong>
-        <small>Use the password recovery option if you need to reset it.</small>
+        <small>Request a secure password reset link sent to your account email.</small>
       </div>
-      <a href="/account.html" style="color:var(--cyan);font-size:12px;font-weight:800">
-        ACCOUNT HELP
-      </a>
     </div>
+
+    <button class="primary" id="resetPasswordButton" type="button">
+      SEND PASSWORD RESET LINK
+    </button>
+
+    <div class="message" id="resetPasswordMessage" role="status" aria-live="polite"></div>
   </section>
 
   <section class="panel">
@@ -224,10 +228,12 @@ function showMessage(message,type){
 async function loadProfile(){
   try{
     const data=await api("/api/me");
+
     if(!data.loggedIn || !data.user){
       location.replace("/account.html?returnTo="+encodeURIComponent("/settings.html"));
       return;
     }
+
     $("displayName").value=data.user.displayName || "";
     $("email").value=data.user.email || "";
   }catch(error){
@@ -237,6 +243,7 @@ async function loadProfile(){
 
 $("profileForm").addEventListener("submit",async event=>{
   event.preventDefault();
+
   const button=$("saveButton");
   const name=$("displayName").value.trim();
 
@@ -254,6 +261,7 @@ $("profileForm").addEventListener("submit",async event=>{
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({displayName:name})
     });
+
     showMessage(data.message || "Profile updated successfully.","success");
   }catch(error){
     showMessage(error.message,"error");
@@ -262,6 +270,42 @@ $("profileForm").addEventListener("submit",async event=>{
     button.textContent="SAVE CHANGES";
   }
 });
+
+async function requestPasswordReset(){
+  const button=$("resetPasswordButton");
+  const message=$("resetPasswordMessage");
+  const email=$("email").value.trim();
+
+  if(!email){
+    message.textContent="Your account email address has not loaded. Please refresh the page and try again.";
+    message.className="message error";
+    return;
+  }
+
+  button.disabled=true;
+  button.textContent="SENDING…";
+  message.textContent="";
+  message.className="message";
+
+  try{
+    const data=await api("/api/request-password-reset",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({email})
+    });
+
+    message.textContent=data.message || "If an eligible account exists for that email, a password-reset link will be sent.";
+    message.className="message success";
+  }catch(error){
+    message.textContent=error.message || "We couldn't request a password reset. Please try again.";
+    message.className="message error";
+  }finally{
+    button.disabled=false;
+    button.textContent="SEND PASSWORD RESET LINK";
+  }
+}
+
+$("resetPasswordButton").addEventListener("click",requestPasswordReset);
 
 loadProfile();
 </script>
