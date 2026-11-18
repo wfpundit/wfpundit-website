@@ -773,178 +773,9 @@ min-width:58px;
 text-align:center;
 letter-spacing:.1em;
 color:#e2efff
-}left:22%;
-width:56%;
-display:block;
-overflow:hidden;
-border:1px solid rgba(130,180,230,.35);
-border-radius:20px;
-background:radial-gradient(ellipse at 50% 35%,#254b72 0%,#152b44 48%,#0b1422 100%);
-color:#fff;
-isolation:isolate;
-opacity:0;
-visibility:hidden;
-pointer-events:none;
-transform-style:preserve-3d;
-transform:translateX(0) scale(.7) rotateY(0deg);
-transition:transform .72s cubic-bezier(.2,.75,.2,1),opacity .55s ease,filter .55s ease,visibility 0s linear .72s;
-box-shadow:inset 0 0 35px rgba(83,159,235,.16);
-will-change:transform,opacity
-}
-.player-card.is-active{
-opacity:1;
-visibility:visible;
-pointer-events:auto;
-z-index:3;
-transform:translateX(0) scale(1) rotateY(0deg);
-filter:brightness(1.08);
-transition:transform .72s cubic-bezier(.2,.75,.2,1),opacity .55s ease,filter .55s ease,visibility 0s
-}
-.player-card.is-side{
-opacity:.72;
-visibility:visible;
-pointer-events:auto;
-z-index:2;
-filter:brightness(.72) saturate(.85)
-}
-.player-card.is-left{transform:translateX(-83%) scale(.77) rotateY(34deg)}
-.player-card.is-right{transform:translateX(83%) scale(.77) rotateY(-34deg)}
-.player-card.is-far{opacity:0;visibility:hidden;pointer-events:none}
-.player-card.is-left.is-far{transform:translateX(-135%) scale(.58) rotateY(48deg)}
-.player-card.is-right.is-far{transform:translateX(135%) scale(.58) rotateY(-48deg)}
-.player-card.is-active{animation:rotaryArrival .65s cubic-bezier(.2,.75,.25,1) both}
-@keyframes rotaryArrival{
-0%{filter:brightness(.65);box-shadow:inset 0 0 15px #3978c8}
-65%{filter:brightness(1.2)}
-100%{filter:brightness(1.08)}
 }
 
-/* HOLOGRAPHIC CARD SHINE */
-.player-card:before{
-content:"";
-position:absolute;
-z-index:3;
-inset:-40%;
-pointer-events:none;
-background:linear-gradient(112deg,transparent 38%,rgba(124,199,255,.05) 43%,rgba(255,255,255,.4) 49%,rgba(105,190,255,.15) 54%,transparent 61%);
-transform:translateX(-75%) rotate(12deg);
-opacity:0;
-mix-blend-mode:screen
-}
-.player-card.is-active:before{opacity:1;animation:holoGlint 2s ease-out .15s 1}
-@keyframes holoGlint{
-0%{transform:translateX(-75%) rotate(12deg);opacity:0}
-18%{opacity:.9}
-75%{opacity:.65}
-100%{transform:translateX(75%) rotate(12deg);opacity:0}
-}
-
-/* PLAYER PORTRAITS */
-.player-card img{
-position:absolute;
-z-index:1;
-width:clamp(260px,29vw,330px);
-height:clamp(260px,29vw,330px);
-max-width:82%;
-max-height:72%;
-left:50%;
-top:44%;
-transform:translate(-50%,-50%);
-display:block;
-object-fit:cover;
-object-position:center 24%;
-border-radius:50%;
-border:6px solid rgba(177,218,255,.88);
-outline:2px solid rgba(73,151,235,.85);
-outline-offset:6px;
-background:radial-gradient(circle,#254b72,#0b1422);
-box-shadow:0 0 0 10px rgba(57,120,200,.14),0 0 25px rgba(74,164,255,.55),0 0 65px rgba(57,120,200,.34),inset 0 0 18px rgba(255,255,255,.16);filter:saturate(1.08) contrast(1.04);
-backface-visibility:hidden;
--webkit-backface-visibility:hidden;
-transition:filter .4s ease,box-shadow .4s ease
-}
-.player-card.is-side img{
-width:clamp(190px,22vw,245px);
-height:clamp(190px,22vw,245px);
-border-width:4px;
-outline-offset:4px
-}
-.player-card.is-active img{animation:portraitPop .75s cubic-bezier(.2,.8,.2,1) both}
-@keyframes portraitPop{
-0%{opacity:.55;transform:translate(-50%,-50%) scale(.92)}
-70%{opacity:1;transform:translate(-50%,-50%) scale(1.025)}
-100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-}
-.player-card:after{
-content:"";
-position:absolute;
-z-index:2;
-inset:66% 0 0;
-background:linear-gradient(transparent,rgba(3,8,16,.5) 30%,rgba(3,8,16,.96) 100%);
-pointer-events:none
-}
-.player-label{
-position:absolute;
-z-index:4;
-left:8px;
-right:8px;
-bottom:17px;
-color:#fff;
-font-size:22px;
-font-weight:950;
-line-height:1.2;
-text-align:center;
-text-shadow:0 2px 9px #000,0 0 16px rgba(68,150,235,.6);
-pointer-events:none
-}
-.player-label small{
-display:block;
-color:#e0edfb;
-font-size:10px;
-font-weight:850;
-letter-spacing:.12em;
-text-transform:uppercase;
-margin-top:6px
-}
-.player-card.is-side .player-label{font-size:16px;bottom:13px}
-.player-card.is-side .player-label small{font-size:8px;letter-spacing:.07em}
-.player-card:focus-visible{outline:3px solid var(--cyan);outline-offset:-3px}
-
-.player-controls{
-display:flex;
-align-items:center;
-justify-content:center;
-gap:16px;
-padding:12px 14px;
-background:#080e18;
-color:#c7d6e8
-}
-.player-controls button{
-width:42px;
-height:42px;
-border:1px solid #6485aa;
-border-radius:50%;
-background:linear-gradient(145deg,#1d3857,#101d30);
-color:#fff;
-font-size:25px;
-line-height:1;
-box-shadow:0 0 14px #3978c833;
-transition:background .2s,transform .2s,box-shadow .2s
-}
-.player-controls button:hover{
-background:var(--blue);
-box-shadow:0 0 18px #3978c8;
-transform:scale(1.08)
-}
-.player-status{
-font-size:12px;
-font-weight:950;
-min-width:58px;
-text-align:center;
-letter-spacing:.1em;
-color:#e2efff
-}/* BREAKING STRIP */
-.breaking{
+/* BREAKING STRIP */.breaking{
 margin:10px 0 32px;
 background:var(--panel);
 border:1px solid var(--line);
@@ -1497,8 +1328,7 @@ body.light-mode .nav nav{background:#fff}
 .theme-label{display:none}
 .hero{padding-top:22px}
 .welcome-hero{padding:25px 20px;border-radius:14px}
-.welcome-hero h1{
-font-size:clamp(36px,9vw,53px);
+.welcome-hero h1{font-size:clamp(36px,9vw,53px);
 letter-spacing:-1.8px;
 margin-top:17px
 }
@@ -1825,12 +1655,23 @@ Welcome to WF Pundit — your destination for the latest women's football news, 
 </div>
 
 <div class="filters" id="filters">
-<button class="filter active" data-filter="all" type="button">All stories</button>
+<button class="filter active" data-filter="all" type="button">All Stories</button>
+<button class="filter" data-filter="latest" type="button">Latest Stories</button>
+<button class="filter" data-filter="for-you" type="button" id="forYouFilter" hidden>For You</button>
 <button class="filter" data-filter="wsl" type="button">WSL</button>
+<button class="filter" data-filter="championship" type="button">Women's Championship</button>
+<button class="filter" data-filter="nwsl" type="button">NWSL</button>
+<button class="filter" data-filter="liga-f" type="button">Liga F</button>
+<button class="filter" data-filter="premiere-ligue" type="button">Première Ligue</button>
+<button class="filter" data-filter="serie-a-femminile" type="button">Serie A Femminile</button>
+<button class="filter" data-filter="bundesliga-women" type="button">Bundesliga Women</button>
 <button class="filter" data-filter="uwcl" type="button">UWCL</button>
-<button class="filter" data-filter="transfers" type="button">Transfers</button>
+<button class="filter" data-filter="world-cup" type="button">Women's World Cup</button>
+<button class="filter" data-filter="wafcon" type="button">WAFCON</button>
 <button class="filter" data-filter="international" type="button">International</button>
-<button class="filter" data-filter="analysis" type="button">Analysis</button>
+<button class="filter" data-filter="transfers" type="button">Transfers</button>
+<button class="filter" data-filter="interviews" type="button">Interviews</button>
+<button class="filter" data-filter="analysis" type="button">Analysis & Match Reports</button>
 </div>
 
 <div class="carousel-controls">
@@ -2041,8 +1882,7 @@ userInteracting=true;
 stopNewsAuto();
 }
 
-function resumeNews(){
-userInteracting=false;
+function resumeNews(){ userInteracting=false;
 startNewsAuto();
 }
 
@@ -2062,13 +1902,17 @@ return;
 cards.forEach(card=>{
 const cats=(card.dataset.category||'').split(' ');
 const hay=((card.dataset.search||'')+' '+card.innerText).toLowerCase();
-const ok=(active==='all'||cats.includes(active))&&(!q||hay.includes(q));
+const categoryMatch=active==='all'||active==='latest'||
+(active==='for-you'?card.dataset.forYou==='true':cats.includes(active));
+const ok=categoryMatch&&(!q||hay.includes(q));
 
 card.style.display=ok?'':'none';
 if(ok)shown++;
 });
 
-empty.textContent='No published stories match that search. Try another keyword or category.';
+empty.textContent=active==='for-you'
+?'No stories match your reading preferences yet. Follow clubs and competitions in Reading Preferences to personalise this feed.'
+:'No published stories match that search. Try another keyword or category.';
 empty.style.display=shown?'none':'block';
 newsGrid.scrollTo({left:0,behavior:'auto'});
 updateCarouselControls();
@@ -2413,7 +2257,10 @@ startPlayerCarousel();
 /* NEWS ARTICLE FEED */
 async function loadWFArticles(){
 try{
-const r=await fetch('/api/articles');
+const [r,preferencesResponse]=await Promise.all([
+fetch('/api/articles'),
+fetch('/api/settings-preferences').catch(()=>null)
+]);
 
 if(!r.ok)throw Error('Could not load articles');
 
@@ -2421,6 +2268,23 @@ const data=await r.json();
 
 if(!data.success||!Array.isArray(data.articles)){
 throw Error('Invalid article response');
+}
+
+let preferenceTerms=[];
+const forYouButton=$('#forYouFilter');
+if(preferencesResponse&&preferencesResponse.ok){
+try{
+const preferenceData=await preferencesResponse.json();
+const reading=preferenceData.reading||{};
+preferenceTerms=[
+...(Array.isArray(reading.clubs)?reading.clubs:[]),
+...(Array.isArray(reading.competitions)?reading.competitions:[]),
+...(Array.isArray(reading.topics)?reading.topics:[])
+].map(value=>String(value).trim().toLowerCase()).filter(Boolean);
+if(preferenceTerms.length&&forYouButton)forYouButton.hidden=false;
+}catch(preferenceError){
+console.warn('Could not read WF Pundit reading preferences:',preferenceError);
+}
 }
 
 newsGrid.innerHTML='';
@@ -2443,13 +2307,29 @@ const low=cat.toLowerCase();
 const cats=[];
 
 if(low.includes('wsl')||low.includes("women's super league"))cats.push('wsl');
+if(low.includes('championship'))cats.push('championship');
+if(low.includes('nwsl'))cats.push('nwsl');
+if(low.includes('liga f'))cats.push('liga-f');
+if(low.includes('première ligue')||low.includes('premiere ligue'))cats.push('premiere-ligue');
+if(low.includes('serie a femminile')||low.includes('serie a women'))cats.push('serie-a-femminile');
+if(low.includes('bundesliga')||low.includes('frauen-bundesliga'))cats.push('bundesliga-women');
 if(low.includes('uwcl')||low.includes('champions league'))cats.push('uwcl');
+if(low.includes('world cup')||low.includes('world-cup'))cats.push('world-cup');
+if(low.includes('wafcon'))cats.push('wafcon');
+if(low.includes('international')||low.includes('national team')||low.includes('euro')||low.includes('olympic'))cats.push('international');
 if(low.includes('transfer'))cats.push('transfers');
-if(low.includes('international')||low.includes('national team'))cats.push('international');
-if(low.includes('analysis'))cats.push('analysis');
+if(low.includes('interview')||low.includes('feature'))cats.push('interviews');
+if(low.includes('analysis')||low.includes('match report'))cats.push('analysis');
 
+const searchableText=[
+article.title,article.summary,article.content,article.body,cat,
+Array.isArray(article.tags)?article.tags.join(' '):''
+].filter(Boolean).join(' ').toLowerCase();
+
+const matchesPreferences=preferenceTerms.some(term=>searchableText.includes(term));
 card.dataset.category=cats.join(' ');
-card.dataset.search=[article.title,article.summary,cat].filter(Boolean).join(' ').toLowerCase();
+card.dataset.forYou=String(matchesPreferences);
+card.dataset.search=searchableText;
 
 const thumb=document.createElement('div');
 thumb.className='thumb';
