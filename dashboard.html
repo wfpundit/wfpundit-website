@@ -1,0 +1,608 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0b1220">
+<title>Reader Dashboard | WF Pundit</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg:#08111e;
+  --panel:#101d2d;
+  --panel2:#14243a;
+  --line:#263a53;
+  --text:#f4f7fb;
+  --muted:#9eafc4;
+  --blue:#4388d4;
+  --cyan:#a9d3ff;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  min-height:100vh;
+}
+body.light-mode {
+  color-scheme:light;
+  --bg:#f2f5f9;
+  --panel:#fff;
+  --panel2:#edf3fa;
+  --line:#dce4ee;
+  --text:#172538;
+  --muted:#65758a;
+  --blue:#286fbd;
+  --cyan:#286fbd;
+}
+a {color:inherit}
+.topbar {
+  min-height:72px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 max(22px,calc((100% - 1180px)/2));
+  background:var(--panel);
+}
+.brand {
+  font-weight:950;
+  font-size:22px;
+  letter-spacing:-1px;
+  text-decoration:none;
+}
+.brand span {color:var(--cyan)}
+.nav {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.nav a,.nav button {
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:9px 13px;
+  text-decoration:none;
+  background:transparent;
+  color:var(--text);
+  font-weight:750;
+  font-size:12px;
+  cursor:pointer;
+}
+.nav .home {
+  background:var(--blue);
+  border-color:var(--blue);
+  color:#fff;
+}
+main {
+  max-width:1180px;
+  margin:0 auto;
+  padding:30px 22px 60px;
+}
+.welcome {
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  gap:20px;
+  margin-bottom:22px;
+}
+.eyebrow {
+  color:var(--cyan);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+h1 {
+  font-size:clamp(26px,4vw,38px);
+  letter-spacing:-1.4px;
+  margin:8px 0 5px;
+}
+.welcome p {
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+}
+.hero {
+  position:relative;
+  overflow:hidden;
+  min-height:265px;
+  border:1px solid #314760;
+  border-radius:18px;
+  background:linear-gradient(110deg,#101d2d 0%,#173657 48%,#0e1929 100%);
+  display:flex;
+  align-items:end;
+  padding:26px;
+  margin-bottom:28px;
+}
+.hero:before {
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(ellipse at 20% 20%,#5599d455,transparent 42%),
+    radial-gradient(ellipse at 80% 90%,#a9d3ff22,transparent 42%);
+}
+.player-strip {
+  position:absolute;
+  inset:0;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  opacity:.32;
+}
+.player {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-left:1px solid #ffffff18;
+  font-size:clamp(14px,2vw,24px);
+  font-weight:950;
+  letter-spacing:-1px;
+  text-align:center;
+  color:#fff;
+  text-shadow:0 3px 18px #000;
+}
+.hero-copy {
+  position:relative;
+  z-index:1;
+  max-width:520px;
+}
+.hero-copy .eyebrow {color:#c5e2ff}
+.hero-copy h2 {
+  font-size:clamp(25px,4vw,38px);
+  line-height:1.05;
+  margin:9px 0;
+}
+.hero-copy p {
+  color:#d5e2f0;
+  margin:0;
+  font-size:13px;
+}
+.section-head {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:28px 0 14px;
+}
+.section-head h2 {
+  font-size:19px;
+  margin:0;
+  letter-spacing:-.4px;
+}
+.section-head span {
+  font-size:12px;
+  color:var(--muted);
+}
+.grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:15px;
+}
+.article,.saved,.profile {
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:13px;
+  overflow:hidden;
+}
+.article {
+  padding:17px;
+  min-height:160px;
+  display:flex;
+  flex-direction:column;
+}
+.tag {
+  font-size:10px;
+  color:var(--cyan);
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:1px;
+}
+.article h3,.saved h3 {
+  font-size:16px;
+  line-height:1.35;
+  margin:9px 0;
+}
+.article p,.saved p {
+  font-size:12px;
+  line-height:1.55;
+  color:var(--muted);
+  margin:0 0 13px;
+}
+.article a,.saved a {
+  color:var(--cyan);
+  font-size:12px;
+  font-weight:850;
+  text-decoration:none;
+  margin-top:auto;
+}
+.lower {
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:16px;
+}
+.saved-panel,.profile {padding:18px}
+.saved-list {
+  display:grid;
+  gap:10px;
+}
+.saved {padding:13px}
+.saved h3 {margin:0 0 7px}
+.saved-actions {
+  display:flex;
+  gap:14px;
+  align-items:center;
+}
+.remove {
+  background:transparent;
+  border:0;
+  color:#e58a98;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+.profile p {
+  font-size:13px;
+  color:var(--muted);
+  overflow-wrap:anywhere;
+}
+.profile strong {color:var(--text)}
+.profile-actions {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.profile-actions a {
+  padding:9px 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  text-decoration:none;
+  font-size:12px;
+  font-weight:800;
+}
+.status {
+  padding:12px;
+  border:1px dashed var(--line);
+  border-radius:9px;
+  color:var(--muted);
+  font-size:13px;
+}
+footer {
+  text-align:center;
+  color:var(--muted);
+  font-size:11px;
+  padding:28px 10px;
+}
+[hidden] {display:none!important}
+@media(max-width:760px) {
+  .grid {grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lower {grid-template-columns:1fr}
+  .welcome {align-items:start;flex-direction:column}
+  .hero {min-height:225px}
+  .topbar {padding:0 15px}
+  .nav {gap:6px}
+  .nav a,.nav button {padding:8px 9px;font-size:11px}
+}
+@media(max-width:480px) {
+  main {padding:22px 14px 45px}
+  .grid {grid-template-columns:1fr}
+  .player {
+    font-size:12px;
+    writing-mode:vertical-rl;
+  }
+  .hero {padding:18px}
+  .brand {font-size:19px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="brand" href="/">WF <span>PUNDIT</span></a>
+  <nav class="nav">
+    <a class="home" href="/">HOME</a>
+    <button id="themeButton" type="button">LIGHT MODE</button>
+    <button id="logoutButton" type="button">LOG OUT</button>
+  </nav>
+</header>
+
+<main>
+
+<section class="welcome">
+  <div>
+    <div class="eyebrow">Reader dashboard</div>
+    <h1>Welcome back, <span id="readerName">Reader</span></h1>
+    <p>Your home for the latest women's football stories.</p>
+  </div>
+</section>
+
+<section class="hero" aria-label="Featured players Alessia Russo, Hannah Hampton and Aitana Bonmatí">
+  <div class="player-strip" aria-hidden="true">
+    <div class="player">ALESSIA<br>RUSSO</div>
+    <div class="player">HANNAH<br>HAMPTON</div>
+    <div class="player">AITANA<br>BONMATÍ</div>
+  </div>
+  <div class="hero-copy">
+    <div class="eyebrow">The game. The stories. The people.</div>
+    <h2>Women's football, closer than ever.</h2>
+    <p>Follow the stories shaping the game.</p>
+  </div>
+</section>
+
+<div class="section-head">
+  <h2>Latest stories</h2>
+  <span id="articleCount">Loading articles…</span>
+</div>
+
+<section id="latestArticles" class="grid">
+  <div class="status">Loading the latest stories…</div>
+</section>
+
+<div class="section-head">
+  <h2>Your account</h2>
+  <span>Personal space</span>
+</div>
+
+<section class="lower">
+
+  <div class="saved-panel">
+    <div class="section-head" style="margin:0 0 13px">
+      <h2>Saved articles</h2>
+      <span id="savedCount"></span>
+    </div>
+    <div id="savedList" class="saved-list">
+      <div class="status">Loading your saved articles…</div>
+    </div>
+  </div>
+
+  <aside class="profile">
+    <div class="eyebrow">Your profile</div>
+    <h2 style="font-size:19px;margin:8px 0">Account details</h2>
+
+    <p>
+      <strong>Name</strong><br>
+      <span id="profileName">Loading…</span>
+    </p>
+
+    <p>
+      <strong>Email</strong><br>
+      <span id="profileEmail">Loading…</span>
+    </p>
+
+    <div class="profile-actions">
+      <a href="/account.html">Account settings</a>
+      <a href="/">Back to homepage</a>
+    </div>
+
+    <p style="margin-top:18px">
+      My Comments: Personal comment history is not available in this dashboard yet.
+    </p>
+  </aside>
+
+</section>
+</main>
+
+<footer>WF Pundit · Women's football, every day.</footer>
+
+<script>
+const themeButton = document.getElementById("themeButton");
+
+try {
+  if (localStorage.getItem("wf-theme") === "light") {
+    document.body.classList.add("light-mode");
+  }
+} catch(e) {}
+
+function updateThemeLabel() {
+  themeButton.textContent =
+    document.body.classList.contains("light-mode")
+      ? "DARK MODE"
+      : "LIGHT MODE";
+}
+
+updateThemeLabel();
+
+themeButton.addEventListener("click", () => {
+  document.body.classList.toggle("light-mode");
+
+  const mode = document.body.classList.contains("light-mode")
+    ? "light"
+    : "dark";
+
+  try {
+    localStorage.setItem("wf-theme", mode);
+  } catch(e) {}
+
+  updateThemeLabel();
+});
+
+async function getJson(url, options) {
+  const response = await fetch(url, {
+    credentials: "same-origin",
+    ...options
+  });
+
+  const result = await response.json();
+
+  if (!response.ok || !result.success) {
+    throw new Error(result.error || "Unable to load this section.");
+  }
+
+  return result;
+}
+
+function articleCard(article) {
+  const card = document.createElement("article");
+  card.className = "article";
+
+  const tag = document.createElement("div");
+  tag.className = "tag";
+  tag.textContent = article.category || "Women's Football";
+
+  const title = document.createElement("h3");
+  title.textContent = article.title || "Untitled article";
+
+  const summary = document.createElement("p");
+  summary.textContent = article.summary || "";
+
+  const link = document.createElement("a");
+  link.href = "/article.html?id=" + encodeURIComponent(article.id);
+  link.textContent = "READ STORY →";
+
+  card.append(tag, title, summary, link);
+
+  return card;
+}
+
+async function loadLatest() {
+  const host = document.getElementById("latestArticles");
+
+  try {
+    const data = await getJson("/api/articles");
+    const articles = (data.articles || []).slice(0, 6);
+
+    host.replaceChildren();
+
+    if (!articles.length) {
+      host.innerHTML = '<div class="status">No published stories yet.</div>';
+      return;
+    }
+
+    articles.forEach(article => {
+      host.appendChild(articleCard(article));
+    });
+
+    document.getElementById("articleCount").textContent =
+      articles.length + " recent stories";
+
+  } catch(e) {
+    host.innerHTML = '<div class="status"></div>';
+    host.firstChild.textContent = e.message;
+  }
+}
+
+async function loadSaved() {
+  const host = document.getElementById("savedList");
+
+  try {
+    const data = await getJson("/api/saved");
+    const articles = data.articles || [];
+
+    host.replaceChildren();
+
+    document.getElementById("savedCount").textContent =
+      articles.length + " saved";
+
+    if (!articles.length) {
+      host.innerHTML = '<div class="status">You have not saved any articles yet. Save a story from the homepage to find it here.</div>';
+      return;
+    }
+
+    articles.forEach(article => {
+      const item = document.createElement("article");
+      item.className = "saved";
+
+      const title = document.createElement("h3");
+      title.textContent = article.title || "Untitled article";
+
+      const category = document.createElement("p");
+      category.textContent = article.category || "Women's Football";
+
+      const actions = document.createElement("div");
+      actions.className = "saved-actions";
+
+      const link = document.createElement("a");
+      link.href = "/article.html?id=" + encodeURIComponent(article.id);
+      link.textContent = "Read article";
+
+      const remove = document.createElement("button");
+      remove.className = "remove";
+      remove.type = "button";
+      remove.textContent = "Remove";
+
+      remove.addEventListener("click", () => {
+        removeSaved(article.id, remove);
+      });
+
+      actions.append(link, remove);
+      item.append(title, category, actions);
+      host.append(item);
+    });
+
+  } catch(e) {
+    host.innerHTML = '<div class="status"></div>';
+    host.firstChild.textContent = e.message;
+  }
+}
+
+async function removeSaved(id, button) {
+  button.disabled = true;
+
+  try {
+    await getJson("/api/saved", {
+      method: "DELETE",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({articleId:id})
+    });
+
+    await loadSaved();
+
+  } catch(e) {
+    button.disabled = false;
+    alert(e.message);
+  }
+}
+
+document.getElementById("logoutButton").addEventListener("click", async () => {
+  const button = document.getElementById("logoutButton");
+  button.disabled = true;
+
+  try {
+    await getJson("/api/logout", {method:"POST"});
+    window.location.replace("/");
+  } catch(e) {
+    alert(e.message);
+    button.disabled = false;
+  }
+});
+
+async function start() {
+  try {
+    const data = await getJson("/api/me");
+
+    if (!data.loggedIn) {
+      window.location.replace(
+        "/account.html?returnTo=" +
+        encodeURIComponent("/dashboard.html")
+      );
+      return;
+    }
+
+    const user = data.user || {};
+
+    document.getElementById("readerName").textContent =
+      (user.displayName || "Reader").split(" ")[0];
+
+    document.getElementById("profileName").textContent =
+      user.displayName || "Not provided";
+
+    document.getElementById("profileEmail").textContent =
+      user.email || "Not provided";
+
+    await Promise.all([loadLatest(), loadSaved()]);
+
+  } catch(e) {
+    document.getElementById("latestArticles").innerHTML =
+      '<div class="status"></div>';
+
+    document.getElementById("latestArticles").firstChild.textContent =
+      e.message;
+  }
+}
+
+start();
+</script>
+
+</body>
+</html>
