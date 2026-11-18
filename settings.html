@@ -6,88 +6,309 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#08111e">
 <title>Account Settings | WF Pundit</title>
+
 <style>
 :root {
   color-scheme: dark;
-  --bg:#08111e; --panel:#101d2d; --panel2:#14243a;
-  --line:#263a53; --text:#f4f7fb; --muted:#9eafc4;
-  --blue:#4388d4; --cyan:#a9d3ff;
+  --bg:#08111e;
+  --panel:#101d2d;
+  --panel2:#14243a;
+  --line:#263a53;
+  --text:#f4f7fb;
+  --muted:#9eafc4;
+  --blue:#4388d4;
+  --cyan:#a9d3ff;
 }
-*{box-sizing:border-box}
-body{
-  margin:0;background:var(--bg);color:var(--text);
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
   font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
-body.light-mode{
-  color-scheme:light;--bg:#f2f5f9;--panel:#fff;
-  --panel2:#edf3fa;--line:#dce4ee;--text:#172538;
-  --muted:#65758a;--blue:#286fbd;--cyan:#286fbd;
+
+body.light-mode {
+  color-scheme:light;
+  --bg:#f2f5f9;
+  --panel:#fff;
+  --panel2:#edf3fa;
+  --line:#dce4ee;
+  --text:#172538;
+  --muted:#65758a;
+  --blue:#286fbd;
+  --cyan:#286fbd;
 }
-.topbar{
-  min-height:70px;padding:0 max(18px,calc((100% - 1050px)/2));
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--panel);border-bottom:1px solid var(--line);
+
+.topbar {
+  min-height:70px;
+  padding:0 max(18px,calc((100% - 1050px)/2));
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--panel);
+  border-bottom:1px solid var(--line);
 }
-.brand{font-size:21px;font-weight:950;letter-spacing:-1px;text-decoration:none;color:var(--text)}
-.brand span{color:var(--cyan)}
-.nav{display:flex;gap:8px;align-items:center}
-.nav a,.nav button{
-  padding:9px 12px;border:1px solid var(--line);border-radius:8px;
-  background:transparent;color:var(--text);font-size:12px;
-  font-weight:800;text-decoration:none;cursor:pointer;
+
+.brand {
+  font-size:21px;
+  font-weight:950;
+  letter-spacing:-1px;
+  text-decoration:none;
+  color:var(--text);
 }
-main{max-width:900px;margin:0 auto;padding:35px 20px 65px}
-.eyebrow{color:var(--cyan);font-size:11px;font-weight:900;letter-spacing:2px}
-h1{margin:8px 0;font-size:clamp(27px,5vw,38px);letter-spacing:-1px}
-.intro{color:var(--muted);font-size:14px;margin:0 0 27px}
-.panel{
-  padding:22px;margin-bottom:17px;background:var(--panel);
-  border:1px solid var(--line);border-radius:14px;
+
+.brand span { color:var(--cyan); }
+
+.nav {
+  display:flex;
+  gap:8px;
+  align-items:center;
 }
-.panel h2{font-size:18px;margin:0 0 6px}
-.description{font-size:13px;color:var(--muted);margin:0 0 19px}
-label{display:block;font-size:12px;font-weight:800;margin:0 0 8px}
-input{
-  width:100%;padding:13px;border:1px solid var(--line);
-  border-radius:9px;background:var(--panel2);color:var(--text);
-  font:inherit;font-size:14px;outline:none;
+
+.nav a,.nav button {
+  padding:9px 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:transparent;
+  color:var(--text);
+  font-size:12px;
+  font-weight:800;
+  text-decoration:none;
+  cursor:pointer;
 }
-input:focus{border-color:var(--blue)}
-input[readonly]{opacity:.75;cursor:not-allowed}
-.field{margin-bottom:17px}
-button.primary{
-  padding:12px 17px;border:0;border-radius:9px;
-  background:var(--blue);color:white;font-weight:850;cursor:pointer;
+
+main {
+  max-width:900px;
+  margin:0 auto;
+  padding:35px 20px 65px;
 }
-button:disabled{opacity:.6;cursor:wait}
-.message{margin-top:13px;font-size:13px;line-height:1.5}
-.message.success{color:#54c99a}
-.message.error{color:#f08c99}
-.setting-row{
-  display:flex;justify-content:space-between;align-items:center;
-  gap:15px;padding:14px 0;border-top:1px solid var(--line);
+
+.eyebrow {
+  color:var(--cyan);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:2px;
 }
-.setting-row strong{display:block;font-size:14px}
-.setting-row small{display:block;color:var(--muted);margin-top:4px;font-size:12px}
-.setting-row button{
-  border:1px solid var(--line);background:var(--panel2);
-  color:var(--text);border-radius:8px;padding:9px 12px;
-  font-weight:750;cursor:pointer;white-space:nowrap;
+
+h1 {
+  margin:8px 0;
+  font-size:clamp(27px,5vw,38px);
+  letter-spacing:-1px;
 }
-.note{color:var(--muted);font-size:12px;line-height:1.6}
-footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
-@media(max-width:520px){
-  .topbar{padding:0 13px}.brand{font-size:18px}
-  .nav a,.nav button{padding:8px;font-size:10px}
-  main{padding:25px 14px 45px}
-  .panel{padding:17px}
+
+.intro {
+  color:var(--muted);
+  font-size:14px;
+  margin:0 0 27px;
+}
+
+.panel {
+  padding:22px;
+  margin-bottom:17px;
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:14px;
+}
+
+.panel h2 {
+  font-size:18px;
+  margin:0 0 6px;
+}
+
+.description {
+  font-size:13px;
+  color:var(--muted);
+  margin:0 0 19px;
+}
+
+label {
+  display:block;
+  font-size:12px;
+  font-weight:800;
+  margin:0 0 8px;
+}
+
+input[type="text"],
+input[type="email"] {
+  width:100%;
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:9px;
+  background:var(--panel2);
+  color:var(--text);
+  font:inherit;
+  font-size:14px;
+  outline:none;
+}
+
+input:focus { border-color:var(--blue); }
+
+input[readonly] {
+  opacity:.75;
+  cursor:not-allowed;
+}
+
+.field { margin-bottom:17px; }
+
+button.primary {
+  padding:12px 17px;
+  border:0;
+  border-radius:9px;
+  background:var(--blue);
+  color:white;
+  font-weight:850;
+  cursor:pointer;
+}
+
+button:disabled {
+  opacity:.6;
+  cursor:wait;
+}
+
+.message {
+  margin-top:13px;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.message.success { color:#54c99a; }
+.message.error { color:#f08c99; }
+
+.setting-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px;
+  padding:14px 0;
+  border-top:1px solid var(--line);
+}
+
+.setting-row strong {
+  display:block;
+  font-size:14px;
+}
+
+.setting-row small {
+  display:block;
+  color:var(--muted);
+  margin-top:4px;
+  font-size:12px;
+}
+
+.setting-row button {
+  border:1px solid var(--line);
+  background:var(--panel2);
+  color:var(--text);
+  border-radius:8px;
+  padding:9px 12px;
+  font-weight:750;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.switch-group {
+  display:flex;
+  gap:18px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.switch-label {
+  display:flex;
+  align-items:center;
+  gap:7px;
+  margin:0;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.switch-label input {
+  width:17px;
+  height:17px;
+  accent-color:var(--blue);
+  cursor:pointer;
+}
+
+.preference-section {
+  margin-top:22px;
+}
+
+.preference-section h3 {
+  font-size:14px;
+  margin:0 0 12px;
+}
+
+.choice-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(145px,1fr));
+  gap:9px;
+}
+
+.choice {
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:11px;
+  background:var(--panel2);
+  border:1px solid var(--line);
+  border-radius:9px;
+  font-size:12px;
+  font-weight:650;
+  cursor:pointer;
+  margin:0;
+}
+
+.choice input {
+  width:16px;
+  height:16px;
+  accent-color:var(--blue);
+  flex-shrink:0;
+}
+
+.save-preferences {
+  margin-top:23px;
+}
+
+.note {
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.6;
+}
+
+footer {
+  text-align:center;
+  color:var(--muted);
+  font-size:11px;
+  padding:25px;
+}
+
+@media(max-width:520px) {
+  .topbar { padding:0 13px; }
+  .brand { font-size:18px; }
+  .nav a,.nav button {
+    padding:8px;
+    font-size:10px;
+  }
+  main { padding:25px 14px 45px; }
+  .panel { padding:17px; }
+  .setting-row {
+    align-items:flex-start;
+    flex-direction:column;
+  }
+  .switch-group { gap:13px; }
 }
 </style>
 </head>
+
 <body>
 
 <header class="topbar">
   <a class="brand" href="/">WF <span>PUNDIT</span></a>
+
   <nav class="nav">
     <a href="/dashboard.html">BACK TO DASHBOARD</a>
     <button id="themeButton" type="button">LIGHT MODE</button>
@@ -95,20 +316,31 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
 </header>
 
 <main>
+
   <div class="eyebrow">YOUR ACCOUNT</div>
   <h1>Account Settings</h1>
   <p class="intro">Manage your WF Pundit profile and preferences.</p>
 
+  <!-- PROFILE -->
+
   <section class="panel">
     <h2>Profile Information</h2>
-    <p class="description">Update the name displayed on your WF Pundit account.</p>
+    <p class="description">
+      Update the name displayed on your WF Pundit account.
+    </p>
 
     <form id="profileForm">
       <div class="field">
         <label for="displayName">Display name</label>
-        <input id="displayName" name="displayName"
-          type="text" minlength="2" maxlength="50"
-          autocomplete="name" required>
+        <input
+          id="displayName"
+          name="displayName"
+          type="text"
+          minlength="2"
+          maxlength="50"
+          autocomplete="name"
+          required
+        >
       </div>
 
       <div class="field">
@@ -119,9 +351,12 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
       <button class="primary" id="saveButton" type="submit">
         SAVE CHANGES
       </button>
+
       <div class="message" id="profileMessage" role="status"></div>
     </form>
   </section>
+
+  <!-- SECURITY -->
 
   <section class="panel">
     <h2>Security</h2>
@@ -130,7 +365,9 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
     <div class="setting-row">
       <div>
         <strong>Password</strong>
-        <small>Request a secure password reset link sent to your account email.</small>
+        <small>
+          Request a secure password reset link sent to your account email.
+        </small>
       </div>
     </div>
 
@@ -138,51 +375,157 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
       SEND PASSWORD RESET LINK
     </button>
 
-    <div class="message" id="resetPasswordMessage" role="status" aria-live="polite"></div>
+    <div
+      class="message"
+      id="resetPasswordMessage"
+      role="status"
+      aria-live="polite"
+    ></div>
   </section>
+
+  <!-- NOTIFICATIONS -->
 
   <section class="panel">
     <h2>Notifications</h2>
-    <p class="description">Notification preferences will be available in a future update.</p>
+    <p class="description">
+      Choose how you want to receive updates from WF Pundit.
+    </p>
+
     <div class="setting-row">
       <div>
         <strong>Breaking football news</strong>
-        <small>Get notified about important stories.</small>
+        <small>Get notified about important football stories.</small>
       </div>
-      <span class="note">Coming soon</span>
+
+      <div class="switch-group">
+        <label class="switch-label">
+          <input type="checkbox" id="breakingNewsInApp" checked>
+          In-app
+        </label>
+
+        <label class="switch-label">
+          <input type="checkbox" id="breakingNewsEmail" checked>
+          Email
+        </label>
+      </div>
     </div>
+
     <div class="setting-row">
       <div>
         <strong>Comment replies</strong>
-        <small>Keep up with conversations on your comments.</small>
+        <small>Know when someone replies to your comments.</small>
       </div>
-      <span class="note">Coming soon</span>
+
+      <div class="switch-group">
+        <label class="switch-label">
+          <input type="checkbox" id="commentRepliesInApp" checked>
+          In-app
+        </label>
+
+        <label class="switch-label">
+          <input type="checkbox" id="commentRepliesEmail" checked>
+          Email
+        </label>
+      </div>
     </div>
   </section>
 
+  <!-- APPEARANCE -->
+
   <section class="panel">
     <h2>Appearance</h2>
-    <p class="description">Choose the theme you prefer for your dashboard.</p>
+    <p class="description">
+      Choose the theme you prefer for your dashboard.
+    </p>
+
     <div class="setting-row">
       <div>
         <strong>Colour theme</strong>
         <small>Switch between dark and light mode.</small>
       </div>
-      <button id="appearanceButton" type="button">SWITCH THEME</button>
+
+      <button id="appearanceButton" type="button">
+        SWITCH THEME
+      </button>
     </div>
   </section>
 
+  <!-- READING PREFERENCES -->
+
   <section class="panel">
     <h2>Reading Preferences</h2>
-    <p class="description">Personalise your football reading experience.</p>
-    <div class="setting-row">
-      <div>
-        <strong>Favourite competitions and topics</strong>
-        <small>Choose the football stories you want to follow.</small>
+    <p class="description">
+      Personalise your football reading experience by following your
+      favourite competitions, clubs and topics.
+    </p>
+
+    <div class="preference-section">
+      <h3>Favourite competitions</h3>
+
+      <div class="choice-grid" id="competitions">
+        <label class="choice"><input type="checkbox" value="Women's Super League"> Women's Super League</label>
+        <label class="choice"><input type="checkbox" value="Women's Champions League"> Women's Champions League</label>
+        <label class="choice"><input type="checkbox" value="NWSL"> NWSL</label>
+        <label class="choice"><input type="checkbox" value="Women's Championship"> Women's Championship</label>
+        <label class="choice"><input type="checkbox" value="Liga F"> Liga F</label>
+        <label class="choice"><input type="checkbox" value="Première Ligue"> Première Ligue</label>
+        <label class="choice"><input type="checkbox" value="International Football"> International Football</label>
+        <label class="choice"><input type="checkbox" value="European Championships"> European Championships</label>
       </div>
-      <span class="note">Coming soon</span>
     </div>
+
+    <div class="preference-section">
+      <h3>Favourite clubs</h3>
+
+      <div class="choice-grid" id="clubs">
+        <label class="choice"><input type="checkbox" value="Chelsea"> Chelsea</label>
+        <label class="choice"><input type="checkbox" value="Arsenal"> Arsenal</label>
+        <label class="choice"><input type="checkbox" value="Manchester City"> Manchester City</label>
+        <label class="choice"><input type="checkbox" value="Manchester United"> Manchester United</label>
+        <label class="choice"><input type="checkbox" value="Liverpool"> Liverpool</label>
+        <label class="choice"><input type="checkbox" value="Tottenham Hotspur"> Tottenham Hotspur</label>
+        <label class="choice"><input type="checkbox" value="London City Lionesses"> London City Lionesses</label>
+        <label class="choice"><input type="checkbox" value="Barcelona"> Barcelona</label>
+        <label class="choice"><input type="checkbox" value="Real Madrid"> Real Madrid</label>
+        <label class="choice"><input type="checkbox" value="Lyon"> Lyon</label>
+        <label class="choice"><input type="checkbox" value="Gotham FC"> Gotham FC</label>
+        <label class="choice"><input type="checkbox" value="Bayern Munich"> Bayern Munich</label>
+      </div>
+    </div>
+
+    <div class="preference-section">
+      <h3>Favourite topics</h3>
+
+      <div class="choice-grid" id="topics">
+        <label class="choice"><input type="checkbox" value="Breaking News"> Breaking News</label>
+        <label class="choice"><input type="checkbox" value="Transfers"> Transfers</label>
+        <label class="choice"><input type="checkbox" value="Match Reports"> Match Reports</label>
+        <label class="choice"><input type="checkbox" value="Player Interviews"> Player Interviews</label>
+        <label class="choice"><input type="checkbox" value="Player News"> Player News</label>
+        <label class="choice"><input type="checkbox" value="Injury Updates"> Injury Updates</label>
+        <label class="choice"><input type="checkbox" value="Academy Football"> Academy Football</label>
+        <label class="choice"><input type="checkbox" value="International Football"> International Football</label>
+        <label class="choice"><input type="checkbox" value="Awards"> Awards</label>
+        <label class="choice"><input type="checkbox" value="Analysis"> Analysis</label>
+      </div>
+    </div>
+
+    <button
+      class="primary save-preferences"
+      id="savePreferencesButton"
+      type="button"
+    >
+      SAVE PREFERENCES
+    </button>
+
+    <div
+      class="message"
+      id="preferencesMessage"
+      role="status"
+      aria-live="polite"
+    ></div>
   </section>
+
 </main>
 
 <footer>WF Pundit · Women's football, every day.</footer>
@@ -190,124 +533,294 @@ footer{text-align:center;color:var(--muted);font-size:11px;padding:25px}
 <script>
 const $ = id => document.getElementById(id);
 
-function applyTheme(){
+/* THEME */
+
+function applyTheme() {
   let mode = "dark";
-  try { mode = localStorage.getItem("wf-theme") || "dark"; } catch(e){}
-  document.body.classList.toggle("light-mode",mode==="light");
-  $("themeButton").textContent = mode==="light" ? "DARK MODE" : "LIGHT MODE";
+
+  try {
+    mode = localStorage.getItem("wf-theme") || "dark";
+  } catch (error) {}
+
+  document.body.classList.toggle("light-mode", mode === "light");
+
+  $("themeButton").textContent =
+    mode === "light" ? "DARK MODE" : "LIGHT MODE";
 }
 
-function toggleTheme(){
-  const next = document.body.classList.contains("light-mode") ? "dark" : "light";
-  try { localStorage.setItem("wf-theme",next); } catch(e){}
+function toggleTheme() {
+  const next = document.body.classList.contains("light-mode")
+    ? "dark"
+    : "light";
+
+  try {
+    localStorage.setItem("wf-theme", next);
+  } catch (error) {}
+
   applyTheme();
 }
 
-$("themeButton").addEventListener("click",toggleTheme);
-$("appearanceButton").addEventListener("click",toggleTheme);
+$("themeButton").addEventListener("click", toggleTheme);
+$("appearanceButton").addEventListener("click", toggleTheme);
+
 applyTheme();
 
-async function api(url,options={}){
-  const response=await fetch(url,{
-    credentials:"same-origin",
+/* API */
+
+async function api(url, options = {}) {
+  const response = await fetch(url, {
+    credentials: "same-origin",
     ...options
   });
-  const data=await response.json();
-  if(!response.ok || !data.success){
+
+  let data;
+
+  try {
+    data = await response.json();
+  } catch {
+    throw new Error("The server returned an unexpected response.");
+  }
+
+  if (!response.ok || !data.success) {
     throw new Error(data.error || "Something went wrong.");
   }
+
   return data;
 }
 
-function showMessage(message,type){
-  const box=$("profileMessage");
-  box.textContent=message;
-  box.className="message "+type;
+/* MESSAGES */
+
+function showMessage(id, message, type) {
+  const box = $(id);
+  box.textContent = message;
+  box.className = "message " + type;
 }
 
-async function loadProfile(){
-  try{
-    const data=await api("/api/me");
+/* PROFILE */
 
-    if(!data.loggedIn || !data.user){
-      location.replace("/account.html?returnTo="+encodeURIComponent("/settings.html"));
+async function loadProfile() {
+  try {
+    const data = await api("/api/me");
+
+    if (!data.loggedIn || !data.user) {
+      location.replace(
+        "/account.html?returnTo=" +
+        encodeURIComponent("/settings.html")
+      );
       return;
     }
 
-    $("displayName").value=data.user.displayName || "";
-    $("email").value=data.user.email || "";
-  }catch(error){
-    showMessage(error.message,"error");
+    $("displayName").value = data.user.displayName || "";
+    $("email").value = data.user.email || "";
+
+    await loadPreferences();
+
+  } catch (error) {
+    showMessage("profileMessage", error.message, "error");
   }
 }
 
-$("profileForm").addEventListener("submit",async event=>{
+$("profileForm").addEventListener("submit", async event => {
   event.preventDefault();
 
-  const button=$("saveButton");
-  const name=$("displayName").value.trim();
+  const button = $("saveButton");
+  const name = $("displayName").value.trim();
 
-  if(name.length<2 || name.length>50){
-    showMessage("Enter a name between 2 and 50 characters.","error");
+  if (name.length < 2 || name.length > 50) {
+    showMessage(
+      "profileMessage",
+      "Enter a name between 2 and 50 characters.",
+      "error"
+    );
     return;
   }
 
-  button.disabled=true;
-  button.textContent="SAVING…";
+  button.disabled = true;
+  button.textContent = "SAVING…";
 
-  try{
-    const data=await api("/api/update-profile",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({displayName:name})
+  try {
+    const data = await api("/api/update-profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ displayName: name })
     });
 
-    showMessage(data.message || "Profile updated successfully.","success");
-  }catch(error){
-    showMessage(error.message,"error");
-  }finally{
-    button.disabled=false;
-    button.textContent="SAVE CHANGES";
+    showMessage(
+      "profileMessage",
+      data.message || "Profile updated successfully.",
+      "success"
+    );
+
+  } catch (error) {
+    showMessage("profileMessage", error.message, "error");
+
+  } finally {
+    button.disabled = false;
+    button.textContent = "SAVE CHANGES";
   }
 });
 
-async function requestPasswordReset(){
-  const button=$("resetPasswordButton");
-  const message=$("resetPasswordMessage");
-  const email=$("email").value.trim();
+/* PASSWORD RESET */
 
-  if(!email){
-    message.textContent="Your account email address has not loaded. Please refresh the page and try again.";
-    message.className="message error";
+async function requestPasswordReset() {
+  const button = $("resetPasswordButton");
+  const message = $("resetPasswordMessage");
+  const email = $("email").value.trim();
+
+  if (!email) {
+    showMessage(
+      "resetPasswordMessage",
+      "Your account email has not loaded. Please refresh and try again.",
+      "error"
+    );
     return;
   }
 
-  button.disabled=true;
-  button.textContent="SENDING…";
-  message.textContent="";
-  message.className="message";
+  button.disabled = true;
+  button.textContent = "SENDING…";
+  message.textContent = "";
 
-  try{
-    const data=await api("/api/request-password-reset",{
-      method:"POST",
-      headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({email})
+  try {
+    const data = await api("/api/request-password-reset", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email })
     });
 
-    message.textContent=data.message || "If an eligible account exists for that email, a password-reset link will be sent.";
-    message.className="message success";
-  }catch(error){
-    message.textContent=error.message || "We couldn't request a password reset. Please try again.";
-    message.className="message error";
-  }finally{
-    button.disabled=false;
-    button.textContent="SEND PASSWORD RESET LINK";
+    showMessage(
+      "resetPasswordMessage",
+      data.message ||
+      "If an eligible account exists, a password reset link will be sent.",
+      "success"
+    );
+
+  } catch (error) {
+    showMessage(
+      "resetPasswordMessage",
+      error.message,
+      "error"
+    );
+
+  } finally {
+    button.disabled = false;
+    button.textContent = "SEND PASSWORD RESET LINK";
   }
 }
 
-$("resetPasswordButton").addEventListener("click",requestPasswordReset);
+$("resetPasswordButton").addEventListener(
+  "click",
+  requestPasswordReset
+);
+
+/* READING PREFERENCE HELPERS */
+
+function getSelected(groupId) {
+  return Array.from(
+    document.querySelectorAll(
+      "#" + groupId + " input[type='checkbox']:checked"
+    )
+  ).map(input => input.value);
+}
+
+function setSelected(groupId, values) {
+  const selected = Array.isArray(values) ? values : [];
+
+  document.querySelectorAll(
+    "#" + groupId + " input[type='checkbox']"
+  ).forEach(input => {
+    input.checked = selected.includes(input.value);
+  });
+}
+
+/* LOAD PREFERENCES */
+
+async function loadPreferences() {
+  try {
+    const data = await api("/api/settings-preferences");
+
+    $("breakingNewsInApp").checked =
+      data.notifications.breakingNewsInApp;
+
+    $("breakingNewsEmail").checked =
+      data.notifications.breakingNewsEmail;
+
+    $("commentRepliesInApp").checked =
+      data.notifications.commentRepliesInApp;
+
+    $("commentRepliesEmail").checked =
+      data.notifications.commentRepliesEmail;
+
+    setSelected("competitions", data.reading.competitions);
+    setSelected("clubs", data.reading.clubs);
+    setSelected("topics", data.reading.topics);
+
+  } catch (error) {
+    showMessage(
+      "preferencesMessage",
+      error.message,
+      "error"
+    );
+  }
+}
+
+/* SAVE PREFERENCES */
+
+async function savePreferences() {
+  const button = $("savePreferencesButton");
+
+  const preferences = {
+    notifications: {
+      breakingNewsInApp: $("breakingNewsInApp").checked,
+      breakingNewsEmail: $("breakingNewsEmail").checked,
+      commentRepliesInApp: $("commentRepliesInApp").checked,
+      commentRepliesEmail: $("commentRepliesEmail").checked
+    },
+
+    reading: {
+      competitions: getSelected("competitions"),
+      clubs: getSelected("clubs"),
+      topics: getSelected("topics")
+    }
+  };
+
+  button.disabled = true;
+  button.textContent = "SAVING…";
+
+  try {
+    const data = await api("/api/settings-preferences", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(preferences)
+    });
+
+    showMessage(
+      "preferencesMessage",
+      data.message || "Your preferences have been saved.",
+      "success"
+    );
+
+  } catch (error) {
+    showMessage(
+      "preferencesMessage",
+      error.message,
+      "error"
+    );
+
+  } finally {
+    button.disabled = false;
+    button.textContent = "SAVE PREFERENCES";
+  }
+}
+
+$("savePreferencesButton").addEventListener(
+  "click",
+  savePreferences
+);
+
+/* START */
 
 loadProfile();
 </script>
+
 </body>
 </html>
