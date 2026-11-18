@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -320,7 +319,7 @@ function getReturnToTarget() {
 }
 
 function returnToRequestedPage() {
-  const target = getReturnToTarget() || "/dashboard.html";
+  const target = getReturnToTarget() || "/";
   window.location.replace(target);
 }
 
@@ -399,7 +398,7 @@ if (window.google && window.google.accounts) {
   initializeGoogleButtons();
 }
 
-/* REDIRECT DIRECTLY TO THE NEW DASHBOARD */
+/* RETURN TO THE REQUESTED PAGE, OR THE HOMEPAGE BY DEFAULT. */
 function displayUser(user) {
   returnToRequestedPage();
 }
