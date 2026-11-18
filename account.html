@@ -323,6 +323,7 @@ function returnToRequestedPage() {
   const target = getReturnToTarget() || "/dashboard.html";
   window.location.replace(target);
 }
+
 async function sendRequest(url, data) {
   const response = await fetch(url, {
     method: "POST",
@@ -398,14 +399,8 @@ if (window.google && window.google.accounts) {
   initializeGoogleButtons();
 }
 
+/* REDIRECT DIRECTLY TO THE NEW DASHBOARD */
 function displayUser(user) {
-  accountForms.hidden = true;
-  loggedIn.hidden = false;
-
-  document.getElementById("readerDetails").textContent =
-    user.displayName + " · " + user.email;
-
-  loadSavedArticles();
   returnToRequestedPage();
 }
 
@@ -571,6 +566,7 @@ registerForm.addEventListener("submit", async (event) => {
   }
 });
 
+/* LOG OUT */
 document.getElementById("logoutButton").addEventListener("click", async () => {
   const confirmed = confirm("Are you sure you want to log out?");
 
@@ -612,6 +608,7 @@ document.getElementById("logoutButton").addEventListener("click", async () => {
   }
 });
 
+/* CHECK EXISTING LOGIN */
 async function checkLogin() {
   try {
     const response = await fetch("/api/me", {
