@@ -17,14 +17,15 @@
 --blue:#3978c8;
 --cyan:#a9d3ff;
 --gold:#e0bd7c;
---max:1220px
+--max:1400px
 }
+html{scroll-behavior:smooth}
 html,body{
   width:100%;
   max-width:100%;
-  overflow-x:hidden;
+  overflow-x:clip;
 }
-html{scroll-behavior:smooth}
+body{min-width:0}
 body{
 margin:0;
 background:var(--bg);
@@ -271,17 +272,6 @@ gap:7px
   gap:3px;
 }
 
-.homepage-account-greeting .wave{
-  display:inline-block;
-  transform-origin:70% 70%;
-  animation:homepageWave 1.8s ease-in-out infinite;
-}
-
-@keyframes homepageWave{
-  0%,60%,100%{transform:rotate(0deg)}
-  10%,30%,50%{transform:rotate(14deg)}
-  20%,40%{transform:rotate(-8deg)}
-}
 .homepage-account-greeting{
 color:var(--muted);
 font-size:11px;
@@ -289,16 +279,15 @@ font-weight:700;
 white-space:nowrap
 }
 .homepage-account-greeting strong{color:var(--text)}
-  .wave{
- display:inline-block;
- transform-origin:70% 70%;
- animation:homepageWave 1.5s ease-in-out infinite;
+.homepage-account-greeting .wave{
+display:inline-block;
+transform-origin:70% 70%;
+animation:homepageWave 1.8s ease-in-out infinite;
 }
-
 @keyframes homepageWave{
- 0%,60%,100%{transform:rotate(0deg)}
- 10%,30%{transform:rotate(14deg)}
- 20%,40%{transform:rotate(-8deg)}
+0%,60%,100%{transform:rotate(0deg)}
+10%,30%,50%{transform:rotate(14deg)}
+20%,40%{transform:rotate(-8deg)}
 }
 [hidden]{display:none!important}
 
@@ -778,9 +767,7 @@ min-width:58px;
 text-align:center;
 letter-spacing:.1em;
 color:#e2efff
-}
-
-/* BREAKING STRIP */
+}/* BREAKING STRIP */
 .breaking{
 margin:10px 0 32px;
 background:var(--panel);
@@ -1168,16 +1155,34 @@ border-color:#d4deea
 }
 body.light-mode .newsletter h2{color:#1c2939}
 body.light-mode .newsletter p{color:#526078}
-body.light-mode .foot .brand{color:#1c2939}
-
-/* MOBILE AND TABLET */
+body.light-mode .foot .brand{color:#1c2939}/* TABLET, SMALL LAPTOP AND PHONE DESKTOP-SITE HEADER */
 @media(max-width:1000px){
-nav{gap:13px;font-size:11px}
-.search{width:140px}
-.news-card{flex-basis:calc((100% - 17px)/2)}
-.player-card{left:17%;width:66%}
-.player-card.is-left{transform:translateX(-78%) scale(.75) rotateY(32deg)}
-.player-card.is-right{transform:translateX(78%) scale(.75) rotateY(-32deg)}
+  .nav{position:relative;min-height:70px;justify-content:flex-start;gap:12px}
+  .menu{display:block;flex:0 0 auto}
+  .nav nav{
+    display:none;position:absolute;top:100%;left:0;right:0;z-index:60;
+    padding:17px 20px;background:#0d1727;border-bottom:1px solid var(--line);
+    flex-direction:column;align-items:flex-start;gap:17px
+  }
+  .nav.open nav{display:flex}
+  .navright{
+    display:flex;align-items:center;justify-content:flex-end;gap:8px;
+    margin-left:auto;min-width:0;flex:0 1 auto
+  }
+  .navright>.search{display:none}
+  .account-actions{flex:0 0 auto}
+  .language-box,.theme-toggle{display:inline-flex;flex:0 0 auto}
+  .language-box label{display:none}
+  .language-select{width:auto;max-width:112px;min-width:82px}
+  .theme-toggle{min-height:40px;padding:5px 9px;gap:7px}
+  .theme-track{flex:0 0 40px;width:40px;height:24px}
+  .theme-thumb{width:16px;height:16px}
+  .theme-toggle[aria-pressed=true] .theme-thumb{transform:translateX(16px)}
+  .theme-label{display:inline;min-width:52px;font-size:10px}
+  .news-card{flex-basis:calc((100% - 17px)/2)}
+  .player-card{left:17%;width:66%}
+  .player-card.is-left{transform:translateX(-78%) scale(.75) rotateY(32deg)}
+  .player-card.is-right{transform:translateX(78%) scale(.75) rotateY(-32deg)}
 }
 @media(max-width:720px){
 .wrap{width:calc(100% - 24px)}
@@ -1436,8 +1441,8 @@ LIVE
 <option value="ja">🇯🇵 Japanese</option>
 <option value="ko">🇰🇷 Korean</option>
 <option value="hi">Hindi</option>
-<option value="tr">🇹🇷 Turkish</option>
-<option value="ru">🇷🇺 Russian</option>
+<option value="tr">Turkish</option>
+<option value="ru">Russian</option>
 </select>
 </div>
 
@@ -1727,9 +1732,7 @@ const empty=$('#empty');
 const newsGrid=$('#newsGrid');
 const newsPrev=$('#newsPrev');
 const newsNext=$('#newsNext');
-const carouselStatus=$('#carouselStatus');
-
-let active='all';
+const carouselStatus=$('#carouselStatus');let active='all';
 let newsAutoTimer=null;
 let userInteracting=false;
 let feedMessage='No published stories yet. New WF Pundit articles will appear here.';
