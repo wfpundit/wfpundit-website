@@ -1,3 +1,4 @@
+
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, character => ({
     "&": "&amp;",
@@ -22,6 +23,29 @@ export async function ensureNotificationTables(env) {
       UNIQUE(user_id, article_id)
     )
   `).run();
+
+  // FIX: Upgrade older notifications tables that lack read_at.
+  const columns = await env.DB.prepare(`
+    PRAGMA table_info(notifications)
+  `).all();
+
+  const hasReadAt = (columns.results || []).some(
+    column => column.name === "read_at"
+  );
+
+  if (!hasReadAt) {
+    try {
+      await env.DB.prepare(`
+        ALTER TABLE notifications
+        ADD COLUMN read_at TEXT
+      `).run();
+    } catch (error) {
+      // Ignore only if another request added the column simultaneously.
+      if (!String(error.message || error).toLowerCase().includes("duplicate column")) {
+        throw error;
+      }
+    }
+  }
 
   await env.DB.prepare(`
     CREATE TABLE IF NOT EXISTS article_notification_deliveries (
