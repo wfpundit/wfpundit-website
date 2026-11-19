@@ -10,790 +10,823 @@
 <style>
 :root {
   color-scheme: dark;
-  --bg: #08111e;
-  --panel: #101d2d;
-  --panel2: #14243a;
-  --line: #263a53;
-  --text: #f4f7fb;
-  --muted: #9eafc4;
-  --blue: #4388d4;
-  --cyan: #a9d3ff;
-  --accent: #65aaff;
-  --shadow: 0 12px 32px rgba(0,0,0,.18);
+  --bg:#08111e;
+  --panel:#101d2d;
+  --panel2:#14243a;
+  --line:#263a53;
+  --text:#f4f7fb;
+  --muted:#9eafc4;
+  --blue:#4388d4;
+  --cyan:#a9d3ff;
+  --shadow:0 12px 32px rgba(0,0,0,.18);
 }
 
-* { box-sizing: border-box; }
+* {box-sizing:border-box}
 
 body {
-  margin: 0;
-  min-height: 100vh;
+  margin:0;
+  min-height:100vh;
   background:
-    radial-gradient(ellipse at top right, rgba(45,105,170,.13), transparent 38%),
+    radial-gradient(ellipse at top right,rgba(45,105,170,.13),transparent 38%),
     var(--bg);
-  color: var(--text);
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color:var(--text);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 
 body.light-mode {
-  color-scheme: light;
-  --bg: #f2f5f9;
-  --panel: #ffffff;
-  --panel2: #edf3fa;
-  --line: #dce4ee;
-  --text: #172538;
-  --muted: #65758a;
-  --blue: #286fbd;
-  --cyan: #286fbd;
-  --accent: #286fbd;
-  --shadow: 0 12px 30px rgba(27,52,82,.08);
+  color-scheme:light;
+  --bg:#f2f5f9;
+  --panel:#fff;
+  --panel2:#edf3fa;
+  --line:#dce4ee;
+  --text:#172538;
+  --muted:#65758a;
+  --blue:#286fbd;
+  --cyan:#286fbd;
+  --shadow:0 12px 30px rgba(27,52,82,.08);
 }
 
-a { color: inherit; }
+a {color:inherit}
 
 /* HEADER */
 
 .topbar {
-  min-height: 70px;
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0 max(18px, calc((100% - 1180px) / 2));
-  background: var(--panel);
-  position: sticky;
-  top: 0;
-  z-index: 20;
+  min-height:70px;
+  border-bottom:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:0 max(18px,calc((100% - 1180px)/2));
+  background:var(--panel);
+  position:sticky;
+  top:0;
+  z-index:20;
 }
 
 .brand {
-  font-size: 22px;
-  font-weight: 950;
-  letter-spacing: -1px;
-  text-decoration: none;
-  white-space: nowrap;
+  font-size:22px;
+  font-weight:950;
+  letter-spacing:-1px;
+  text-decoration:none;
+  white-space:nowrap;
 }
 
-.brand span { color: var(--cyan); }
+.brand span {color:var(--cyan)}
 
 .nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  display:flex;
+  align-items:center;
+  gap:8px;
 }
 
-.nav a,
-.nav button {
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 9px 13px;
-  background: transparent;
-  color: var(--text);
-  font-size: 11px;
-  font-weight: 850;
-  text-decoration: none;
-  cursor: pointer;
-  transition: .2s ease;
+.nav a,.nav button {
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:9px 13px;
+  background:transparent;
+  color:var(--text);
+  font-size:11px;
+  font-weight:850;
+  text-decoration:none;
+  cursor:pointer;
+  transition:.2s ease;
 }
 
-.nav a:hover,
-.nav button:hover {
-  border-color: var(--blue);
-  transform: translateY(-1px);
+.nav a:hover,.nav button:hover {
+  border-color:var(--blue);
+  transform:translateY(-1px);
 }
 
 .nav .home {
-  background: var(--blue);
-  border-color: var(--blue);
-  color: #fff;
+  background:var(--blue);
+  border-color:var(--blue);
+  color:#fff;
 }
 
 /* MAIN */
 
 main {
-  max-width: 1180px;
-  margin: 0 auto;
-  padding: 30px 22px 60px;
+  max-width:1180px;
+  margin:0 auto;
+  padding:25px 22px 60px;
 }
+
+/* COMPACT WELCOME */
 
 .welcome {
-  margin-bottom: 25px;
-  padding: 27px;
-  border: 1px solid var(--line);
-  border-radius: 18px;
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  margin-bottom:22px;
+  padding:19px 23px;
+  min-height:0;
+  border:1px solid var(--line);
+  border-radius:15px;
   background:
-    linear-gradient(115deg, rgba(50,112,180,.20), transparent 65%),
+    linear-gradient(110deg,rgba(43,105,170,.19),transparent 70%),
     var(--panel);
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
+  box-shadow:var(--shadow);
 }
 
-.welcome::after {
-  content: "WF";
-  position: absolute;
-  right: 25px;
-  bottom: -34px;
-  color: var(--cyan);
-  opacity: .055;
-  font-size: 150px;
-  font-weight: 950;
-  line-height: 1;
-  pointer-events: none;
+.welcome::before {
+  content:"WF PUNDIT";
+  position:absolute;
+  z-index:-1;
+  right:17px;
+  bottom:-15px;
+  color:var(--cyan);
+  opacity:.055;
+  font-size:clamp(45px,8vw,86px);
+  font-weight:1000;
+  letter-spacing:-5px;
+  white-space:nowrap;
+  pointer-events:none;
 }
 
 .eyebrow {
-  color: var(--cyan);
-  font-size: 10px;
-  font-weight: 950;
-  letter-spacing: 2px;
-  text-transform: uppercase;
+  color:var(--cyan);
+  font-size:9px;
+  font-weight:950;
+  letter-spacing:1.8px;
+  text-transform:uppercase;
 }
 
 .welcome h1 {
-  margin: 9px 0 7px;
-  font-size: clamp(26px, 4vw, 38px);
-  letter-spacing: -1.4px;
+  margin:6px 0 4px;
+  font-size:clamp(23px,3.5vw,31px);
+  letter-spacing:-1px;
 }
 
 .welcome p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.6;
-  max-width: 540px;
+  margin:0;
+  max-width:540px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.5;
 }
 
-/* PLAYER CAROUSEL */
+/* PLAYER SHOWCASE */
 
-.player-showcase { margin-bottom: 32px; }
+.player-showcase {margin-bottom:30px}
 
 .player-showcase-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 13px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:13px;
 }
 
 .player-showcase-heading h2 {
-  margin: 0;
-  font-size: 19px;
-  letter-spacing: -.4px;
+  margin:0;
+  font-size:19px;
+  letter-spacing:-.4px;
 }
 
 .player-showcase-heading span {
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 750;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:750;
 }
 
 .carousel-stage {
-  position: relative;
-  width: 100%;
-  height: 390px;
-  overflow: hidden;
-  isolation: isolate;
-  border: 1px solid #314760;
-  border-radius: 17px;
-  background: #08111e;
-  box-shadow: 0 18px 45px #02081355;
+  position:relative;
+  width:100%;
+  height:390px;
+  overflow:hidden;
+  isolation:isolate;
+  border:1px solid #314760;
+  border-radius:17px;
+  background:
+    radial-gradient(ellipse at center, #263e59 0%, #14263b 58%, #08111e 100%);
+  box-shadow:0 18px 45px #02081355;
+}
+
+.carousel-stage::before {
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+  background:linear-gradient(
+    115deg,
+    transparent 25%,
+    rgba(255,255,255,.045) 48%,
+    transparent 70%
+  );
+  transform:translateX(-120%);
+  animation:stageShimmer 8s ease-in-out infinite;
 }
 
 .player-slide {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-  padding: 12px;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition: opacity 450ms ease, visibility 0s linear 450ms;
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:stretch;
+  justify-content:center;
+  padding:12px;
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transform:scale(.985);
+  transition:
+    opacity 850ms ease,
+    transform 1100ms cubic-bezier(.2,.7,.2,1),
+    visibility 0s linear 850ms;
 }
 
 .player-slide.active {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-  transition: opacity 450ms ease, visibility 0s;
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+  transform:scale(1);
+  transition:
+    opacity 850ms ease,
+    transform 1100ms cubic-bezier(.2,.7,.2,1),
+    visibility 0s;
 }
 
 .player-card {
-  display: flex;
-  flex-direction: column;
-  width: min(100%, 520px);
-  min-width: 0;
-  min-height: 0;
-  margin: 0;
-  overflow: hidden;
-  border: 1px solid #314760;
-  border-radius: 12px;
-  background: #15263b;
+  display:flex;
+  flex-direction:column;
+  width:min(100%,520px);
+  min-width:0;
+  min-height:0;
+  margin:0;
+  overflow:hidden;
+  border:1px solid rgba(169,211,255,.22);
+  border-radius:13px;
+  background:linear-gradient(145deg,#1c344e,#0c1929);
+  box-shadow:0 12px 32px rgba(0,0,0,.25);
+  position:relative;
 }
 
 .player-photo {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-  background: #192b40;
+  flex:1;
+  min-height:0;
+  overflow:hidden;
+  position:relative;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:
+    radial-gradient(ellipse at 50% 35%,#385776 0%,#1b3048 54%,#102035 100%);
+}
+
+.player-photo::after {
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(to top,rgba(8,17,30,.34),transparent 32%),
+    radial-gradient(ellipse at center,transparent 45%,rgba(8,17,30,.16) 100%);
 }
 
 .player-photo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center center;
-  background: #192b40;
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center center;
+  background:transparent;
+  filter:drop-shadow(0 12px 18px rgba(0,0,0,.22));
+  transform:scale(1);
 }
 
 .player-slide.active .player-photo img {
-  animation: slowZoomIn 2000ms ease-out both;
+  animation:playerReveal 3.5s ease-out both;
 }
 
 .player-name {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 58px;
-  padding: 8px;
-  background: var(--panel);
-  color: var(--text);
-  font-size: clamp(13px, 1.5vw, 17px);
-  font-weight: 900;
-  text-align: center;
-  letter-spacing: .3px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  min-height:58px;
+  padding:8px;
+  background:linear-gradient(110deg,#12243a,#1a3049,#12243a);
+  color:#f4f7fb;
+  font-size:clamp(13px,1.5vw,17px);
+  font-weight:900;
+  text-align:center;
+  letter-spacing:.3px;
+  position:relative;
+  overflow:hidden;
+}
+
+.player-name::after {
+  content:"";
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:60%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,#a9d3ff,transparent);
+  animation:nameShimmer 5s ease-in-out infinite;
 }
 
 .player-club {
-  margin-top: 4px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 650;
-  letter-spacing: 0;
-}
-
-@keyframes slowZoomIn {
-  from { transform: scale(1); }
-  to { transform: scale(1.015); }
+  margin-top:4px;
+  color:#a9c4df;
+  font-size:11px;
+  font-weight:650;
+  letter-spacing:0;
 }
 
 .carousel-dots {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  padding-top: 13px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  padding-top:13px;
 }
 
 .carousel-dot {
-  width: 8px;
-  height: 8px;
-  padding: 0;
-  border: 0;
-  border-radius: 20px;
-  background: #71839a;
-  cursor: pointer;
-  transition: width 450ms ease, background 450ms ease;
+  width:8px;
+  height:8px;
+  padding:0;
+  border:0;
+  border-radius:20px;
+  background:#71839a;
+  cursor:pointer;
+  transition:width 450ms ease,background 450ms ease;
 }
 
 .carousel-dot.active {
-  width: 25px;
-  background: var(--blue);
+  width:25px;
+  background:var(--blue);
+  box-shadow:0 0 12px rgba(67,136,212,.6);
+}
+
+@keyframes playerReveal {
+  from {transform:scale(1.015);filter:brightness(.88) drop-shadow(0 12px 18px rgba(0,0,0,.22))}
+  to {transform:scale(1);filter:brightness(1) drop-shadow(0 12px 18px rgba(0,0,0,.22))}
+}
+
+@keyframes stageShimmer {
+  0%,65% {transform:translateX(-120%)}
+  100% {transform:translateX(120%)}
+}
+
+@keyframes nameShimmer {
+  0%,70% {left:-100%}
+  100% {left:150%}
 }
 
 /* SECTION HEADINGS */
 
 .section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 30px 0 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin:30px 0 14px;
 }
 
 .section-head h2 {
-  margin: 0;
-  font-size: 19px;
-  letter-spacing: -.4px;
+  margin:0;
+  font-size:19px;
+  letter-spacing:-.4px;
 }
 
 .section-head span {
-  color: var(--muted);
-  font-size: 11px;
-  text-align: right;
+  color:var(--muted);
+  font-size:11px;
+  text-align:right;
 }
 
 /* PROFILE */
 
-.profile-section { margin-bottom: 30px; }
+.profile-section {margin-bottom:30px}
 
 .profile-card {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  padding: 21px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--panel);
-  box-shadow: var(--shadow);
+  display:flex;
+  align-items:center;
+  gap:18px;
+  padding:21px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:var(--panel);
+  box-shadow:var(--shadow);
 }
 
 .profile-avatar {
-  display: flex;
-  flex: 0 0 65px;
-  width: 65px;
-  height: 65px;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--panel2);
-  border: 2px solid var(--blue);
-  color: var(--cyan);
-  font-size: 21px;
-  font-weight: 900;
+  display:flex;
+  flex:0 0 65px;
+  width:65px;
+  height:65px;
+  align-items:center;
+  justify-content:center;
+  border-radius:50%;
+  background:var(--panel2);
+  border:2px solid var(--blue);
+  color:var(--cyan);
+  font-size:21px;
+  font-weight:900;
 }
 
-.profile-details {
-  flex: 1;
-  min-width: 0;
-}
+.profile-details {flex:1;min-width:0}
 
 .profile-details h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
+  margin:0 0 8px;
+  font-size:18px;
 }
 
 .profile-details p {
-  margin: 5px 0;
-  color: var(--muted);
-  font-size: 13px;
-  overflow-wrap: anywhere;
+  margin:5px 0;
+  color:var(--muted);
+  font-size:13px;
+  overflow-wrap:anywhere;
 }
 
-.profile-details strong { color: var(--text); }
+.profile-details strong {color:var(--text)}
 
 .profile-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
-  margin-top: 14px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:14px;
 }
 
 .profile-actions a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px 14px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  color: var(--text);
-  font-size: 11px;
-  font-weight: 850;
-  text-decoration: none;
-  transition: .2s ease;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 14px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  color:var(--text);
+  font-size:11px;
+  font-weight:850;
+  text-decoration:none;
+  transition:.2s ease;
 }
 
 .profile-actions a:hover {
-  transform: translateY(-2px);
-  border-color: var(--blue);
+  transform:translateY(-2px);
+  border-color:var(--blue);
 }
 
 .profile-actions a.primary {
-  border-color: var(--blue);
-  background: linear-gradient(135deg, var(--blue), #2864a7);
-  color: #fff;
-  box-shadow: 0 5px 14px rgba(40,111,189,.22);
+  border-color:var(--blue);
+  background:linear-gradient(135deg,var(--blue),#2864a7);
+  color:#fff;
+  box-shadow:0 5px 14px rgba(40,111,189,.22);
 }
 
-/* LATEST ARTICLES */
-
-.latest-section { margin-bottom: 30px; }
+/* LATEST STORIES */
 
 .grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 17px;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:17px;
 }
 
-.article,
-.saved {
-  overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  background: var(--panel);
-  box-shadow: var(--shadow);
+.article,.saved {
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:var(--panel);
+  box-shadow:var(--shadow);
 }
 
 .article {
-  display: flex;
-  min-height: 205px;
-  flex-direction: column;
-  padding: 20px;
-  position: relative;
-  transition: transform .22s ease, border-color .22s ease;
+  display:flex;
+  min-height:205px;
+  flex-direction:column;
+  padding:20px;
+  position:relative;
+  transition:transform .22s ease,border-color .22s ease;
 }
 
 .article:hover {
-  transform: translateY(-3px);
-  border-color: var(--blue);
+  transform:translateY(-3px);
+  border-color:var(--blue);
 }
 
 .article::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: linear-gradient(var(--blue), var(--cyan));
+  content:"";
+  position:absolute;
+  top:0;
+  left:0;
+  width:4px;
+  height:100%;
+  background:linear-gradient(var(--blue),var(--cyan));
 }
 
 .tag {
-  color: var(--cyan);
-  font-size: 10px;
-  font-weight: 950;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
+  color:var(--cyan);
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:1.2px;
+  text-transform:uppercase;
 }
 
-.article h3,
-.saved h3 {
-  margin: 11px 0;
-  font-size: 17px;
-  line-height: 1.4;
+.article h3,.saved h3 {
+  margin:11px 0;
+  font-size:17px;
+  line-height:1.4;
 }
 
-.article p,
-.saved p {
-  margin: 0 0 17px;
-  color: var(--muted);
-  font-size: 12px;
-  line-height: 1.65;
+.article p,.saved p {
+  margin:0 0 17px;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.65;
 }
 
-.article-link,
-.comment-card .comment-actions a {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  align-self: flex-start;
-  gap: 9px;
-  margin-top: auto;
-  padding: 11px 16px;
-  border: 1px solid var(--blue);
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--blue), #2864a7);
-  color: #fff !important;
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: .4px;
-  text-decoration: none;
-  box-shadow: 0 5px 14px rgba(40,111,189,.20);
-  transition: transform .2s ease, box-shadow .2s ease;
+.article-link,.comment-card .comment-actions a {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  align-self:flex-start;
+  gap:9px;
+  margin-top:auto;
+  padding:11px 16px;
+  border:1px solid var(--blue);
+  border-radius:10px;
+  background:linear-gradient(135deg,var(--blue),#2864a7);
+  color:#fff!important;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.4px;
+  text-decoration:none;
+  box-shadow:0 5px 14px rgba(40,111,189,.20);
+  transition:transform .2s ease,box-shadow .2s ease;
 }
 
-.article-link:hover,
-.comment-card .comment-actions a:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 18px rgba(40,111,189,.28);
+.article-link:hover,.comment-card .comment-actions a:hover {
+  transform:translateY(-2px);
+  box-shadow:0 8px 18px rgba(40,111,189,.28);
 }
 
-.article-link span { font-size: 15px; }
+.article-link span {font-size:15px}
 
 /* SAVED ARTICLES */
 
-.saved-list {
-  display: grid;
-  gap: 11px;
-}
+.saved-list {display:grid;gap:11px}
 
-.saved { padding: 17px; }
+.saved {padding:17px}
 
-.saved h3 { margin: 0 0 7px; }
+.saved h3 {margin:0 0 7px}
 
 .saved-actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-top: 10px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-top:10px;
 }
 
 .saved-actions a {
-  color: var(--cyan);
-  font-size: 12px;
-  font-weight: 850;
-  text-decoration: none;
+  color:var(--cyan);
+  font-size:12px;
+  font-weight:850;
+  text-decoration:none;
 }
 
 .remove {
-  border: 0;
-  background: transparent;
-  color: #e58a98;
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
+  border:0;
+  background:transparent;
+  color:#e58a98;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
 }
 
 /* COMMENTS */
 
-.comments-list {
-  display: grid;
-  gap: 12px;
-}
+.comments-list {display:grid;gap:12px}
 
 .comment-date {
-  display: block;
-  margin: 0 0 10px;
-  color: var(--muted);
-  font-size: 11px;
+  display:block;
+  margin:0 0 10px;
+  color:var(--muted);
+  font-size:11px;
 }
 
 .comment-text {
-  margin: 0 0 10px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.6;
+  margin:0 0 10px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
 }
 
-/* COMMENT CARDS */
-
 .comment-card {
-  padding: 18px;
-  border: 1px solid var(--line);
-  border-radius: 15px;
-  background: var(--panel);
-  box-shadow: var(--shadow);
-  display: grid;
-  gap: 10px;
+  padding:18px;
+  border:1px solid var(--line);
+  border-radius:15px;
+  background:var(--panel);
+  box-shadow:var(--shadow);
+  display:grid;
+  gap:10px;
 }
 
 .comment-card h3 {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
+  margin:0;
+  font-size:14px;
+  line-height:1.5;
 }
 
 .comment-card .comment-text {
-  white-space: pre-wrap;
-  overflow-wrap: anywhere;
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
 }
 
 .comment-card .comment-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
 }
 
-.comment-card .comment-actions a {
-  margin-top: 0;
-}
+.comment-card .comment-actions a {margin-top:0}
 
 /* REPLIES */
 
 .comment-replies {
-  display: grid;
-  gap: 9px;
-  margin: 2px 0 0 14px;
-  padding-left: 13px;
-  border-left: 2px solid var(--blue);
+  display:grid;
+  gap:9px;
+  margin:2px 0 0 14px;
+  padding-left:13px;
+  border-left:2px solid var(--blue);
 }
 
 .reply-card {
-  padding: 13px;
-  border: 1px solid var(--line);
-  border-radius: 11px;
-  background: var(--panel2);
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:var(--panel2);
 }
 
 .reply-author {
-  margin: 0 0 5px;
-  font-size: 12px;
-  font-weight: 850;
-  color: var(--cyan);
+  margin:0 0 5px;
+  font-size:12px;
+  font-weight:850;
+  color:var(--cyan);
 }
 
-.reply-card .comment-text { margin-bottom: 7px; }
+.reply-card .comment-text {margin-bottom:7px}
 
 .replies-heading {
-  color: var(--cyan);
-  font-size: 11px;
-  font-weight: 900;
-  letter-spacing: .5px;
+  color:var(--cyan);
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.5px;
 }
 
 /* REACTIONS */
 
 .reaction-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  align-items: center;
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+  align-items:center;
 }
 
 .reaction-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 9px;
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  color: var(--muted);
-  font-size: 11px;
-  font-weight: 750;
-  background: var(--panel2);
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:6px 9px;
+  border:1px solid var(--line);
+  border-radius:20px;
+  color:var(--muted);
+  font-size:11px;
+  font-weight:750;
+  background:var(--panel2);
 }
 
 /* GENERAL */
 
 .status {
-  padding: 17px;
-  border: 1px dashed var(--line);
-  border-radius: 12px;
-  background: var(--panel);
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.6;
+  padding:17px;
+  border:1px dashed var(--line);
+  border-radius:12px;
+  background:var(--panel);
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.6;
 }
 
 footer {
-  padding: 28px 10px;
-  border-top: 1px solid var(--line);
-  color: var(--muted);
-  font-size: 11px;
-  text-align: center;
+  padding:28px 10px;
+  border-top:1px solid var(--line);
+  color:var(--muted);
+  font-size:11px;
+  text-align:center;
 }
 
-[hidden] { display: none !important; }
+[hidden] {display:none!important}
 
-button:disabled {
-  opacity: .6;
-  cursor: not-allowed;
-}
+button:disabled {opacity:.6;cursor:not-allowed}
 
 /* TABLET */
 
-@media (max-width: 760px) {
-  .topbar { padding: 0 15px; }
-  .nav { gap: 6px; }
-
-  .nav a,
-  .nav button {
-    padding: 8px 9px;
-    font-size: 10px;
-  }
-
-  .carousel-stage { height: 330px; }
-  .player-slide { padding: 9px; }
-  .player-name { min-height: 52px; }
+@media(max-width:760px) {
+  .topbar {padding:0 15px}
+  .nav {gap:6px}
+  .nav a,.nav button {padding:8px 9px;font-size:10px}
+  .carousel-stage {height:330px}
+  .player-slide {padding:9px}
+  .player-name {min-height:52px}
 }
 
 /* MOBILE */
 
-@media (max-width: 480px) {
-  main { padding: 20px 14px 42px; }
+@media(max-width:480px) {
+  main {padding:19px 14px 42px}
 
-  .topbar {
-    min-height: 62px;
-    gap: 7px;
-  }
+  .topbar {min-height:62px;gap:7px}
+  .brand {font-size:18px}
+  .nav {gap:5px}
 
-  .brand { font-size: 18px; }
-
-  .nav { gap: 5px; }
-
-  .nav a,
-  .nav button {
-    padding: 8px 7px;
-    font-size: 9px;
-    border-radius: 8px;
+  .nav a,.nav button {
+    padding:8px 7px;
+    font-size:9px;
+    border-radius:8px;
   }
 
   .welcome {
-    padding: 21px 17px;
-    border-radius: 14px;
+    padding:15px 17px;
+    margin-bottom:19px;
+    border-radius:13px;
   }
 
-  .welcome::after {
-    font-size: 105px;
-    right: 10px;
+  .welcome::before {
+    right:9px;
+    bottom:-7px;
+    font-size:43px;
+    letter-spacing:-2px;
   }
 
-  .welcome h1 { font-size: 27px; }
+  .welcome h1 {font-size:25px}
+  .welcome p {font-size:11px}
 
-  .grid { grid-template-columns: 1fr; }
-
-  .article { min-height: 185px; padding: 18px; }
+  .grid {grid-template-columns:1fr}
+  .article {min-height:185px;padding:18px}
 
   .carousel-stage {
-    height: 280px;
-    border-radius: 13px;
+    height:280px;
+    border-radius:13px;
   }
 
-  .player-slide { padding: 7px; }
+  .player-slide {padding:7px}
 
   .player-name {
-    min-height: 48px;
-    padding: 7px 3px;
-    font-size: 12px;
+    min-height:48px;
+    padding:7px 3px;
+    font-size:12px;
   }
 
-  .player-club { font-size: 10px; }
+  .player-club {font-size:10px}
 
   .profile-card {
-    align-items: flex-start;
-    gap: 12px;
-    padding: 15px;
+    align-items:flex-start;
+    gap:12px;
+    padding:15px;
   }
 
   .profile-avatar {
-    flex-basis: 48px;
-    width: 48px;
-    height: 48px;
-    font-size: 16px;
+    flex-basis:48px;
+    width:48px;
+    height:48px;
+    font-size:16px;
   }
 
-  .profile-details h3 { font-size: 16px; }
-  .profile-details p { font-size: 12px; }
+  .profile-details h3 {font-size:16px}
+  .profile-details p {font-size:12px}
 
   .profile-actions a {
-    padding: 9px 10px;
-    font-size: 10px;
+    padding:9px 10px;
+    font-size:10px;
   }
 
-  .section-head h2 { font-size: 17px; }
-  .section-head span { font-size: 10px; }
-
-  .comment-card { padding: 13px; }
+  .section-head h2 {font-size:17px}
+  .section-head span {font-size:10px}
+  .comment-card {padding:13px}
 
   .comment-replies {
-    margin-left: 5px;
-    padding-left: 9px;
+    margin-left:5px;
+    padding-left:9px;
   }
 }
 
-@media (max-width: 350px) {
-  .brand { font-size: 16px; }
-
-  .nav a,
-  .nav button {
-    padding: 7px 5px;
-    font-size: 8px;
+@media(max-width:350px) {
+  .brand {font-size:16px}
+  .nav a,.nav button {
+    padding:7px 5px;
+    font-size:8px;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    scroll-behavior: auto !important;
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .01ms !important;
+@media(prefers-reduced-motion:reduce) {
+  *,*::before,*::after {
+    scroll-behavior:auto!important;
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
   }
 }
 </style>
@@ -803,7 +836,6 @@ button:disabled {
 
 <header class="topbar">
   <a class="brand" href="/">WF <span>PUNDIT</span></a>
-
   <nav class="nav">
     <a class="home" href="/">HOME</a>
     <button id="themeButton" type="button">LIGHT MODE</button>
@@ -893,11 +925,7 @@ button:disabled {
 
     </div>
 
-    <div
-      class="carousel-dots"
-      id="carouselDots"
-      aria-label="Choose featured player"
-    ></div>
+    <div class="carousel-dots" id="carouselDots" aria-label="Choose featured player"></div>
   </section>
 
   <section class="profile-section">
@@ -908,15 +936,9 @@ button:disabled {
 
     <div class="profile-card">
       <div class="profile-avatar" id="profileAvatar">R</div>
-
       <div class="profile-details">
         <h3 id="profileName">Loading your profile…</h3>
-
-        <p>
-          <strong>Email:</strong>
-          <span id="profileEmail">Loading…</span>
-        </p>
-
+        <p><strong>Email:</strong> <span id="profileEmail">Loading…</span></p>
         <div class="profile-actions">
           <a class="primary" href="/settings.html">ACCOUNT SETTINGS</a>
           <a href="/">BACK TO HOMEPAGE</a>
@@ -930,7 +952,6 @@ button:disabled {
       <h2>Latest stories</h2>
       <span id="articleCount">Loading articles…</span>
     </div>
-
     <div id="latestArticles" class="grid">
       <div class="status">Loading your two latest stories…</div>
     </div>
@@ -941,7 +962,6 @@ button:disabled {
       <h2>Saved articles</h2>
       <span id="savedCount"></span>
     </div>
-
     <div id="savedList" class="saved-list">
       <div class="status">Loading your saved articles…</div>
     </div>
@@ -952,7 +972,6 @@ button:disabled {
       <h2>My Comments & Replies</h2>
       <span>Your conversations on WF Pundit</span>
     </div>
-
     <div id="myComments" class="comments-list">
       <div class="status">Loading your comments…</div>
     </div>
@@ -960,9 +979,7 @@ button:disabled {
 
 </main>
 
-<footer>
-  WF Pundit · Women's football, every day.
-</footer>
+<footer>WF Pundit · Women's football, every day.</footer>
 
 <script>
 
@@ -988,10 +1005,9 @@ updateThemeLabel();
 themeButton.addEventListener("click", () => {
   document.body.classList.toggle("light-mode");
 
-  const mode =
-    document.body.classList.contains("light-mode")
-      ? "light"
-      : "dark";
+  const mode = document.body.classList.contains("light-mode")
+    ? "light"
+    : "dark";
 
   try {
     localStorage.setItem("wf-theme", mode);
@@ -1017,10 +1033,8 @@ function buildCarouselDots() {
 
   playerSlides.forEach((slide, index) => {
     const dot = document.createElement("button");
-
     dot.type = "button";
     dot.className = "carousel-dot";
-
     dot.setAttribute(
       "aria-label",
       "Show featured player " + (index + 1)
@@ -1039,7 +1053,6 @@ function buildCarouselDots() {
 function updateCarousel() {
   playerSlides.forEach((slide, index) => {
     const active = index === currentSlide;
-
     slide.classList.toggle("active", active);
     slide.setAttribute("aria-hidden", String(!active));
   });
@@ -1055,11 +1068,10 @@ function nextSlide() {
 }
 
 function restartCarousel() {
-  if (carouselTimer) {
-    clearInterval(carouselTimer);
-  }
+  if (carouselTimer) clearInterval(carouselTimer);
 
-  carouselTimer = setInterval(nextSlide, 2000);
+  /* EACH PLAYER STAYS ON SCREEN FOR 3.5 SECONDS */
+  carouselTimer = setInterval(nextSlide, 3500);
 }
 
 buildCarouselDots();
@@ -1091,9 +1103,7 @@ async function getJson(url, options = {}) {
   }
 
   if (!response.ok || !result.success) {
-    throw new Error(
-      result.error || "Unable to load this section."
-    );
+    throw new Error(result.error || "Unable to load this section.");
   }
 
   return result;
@@ -1108,9 +1118,7 @@ function getInitials(name) {
     .split(/\s+/)
     .filter(Boolean);
 
-  if (parts.length === 0) {
-    return "R";
-  }
+  if (!parts.length) return "R";
 
   return parts
     .slice(0, 2)
@@ -1124,19 +1132,16 @@ function showProfile(user) {
 
   document.getElementById("readerName").textContent = firstName;
   document.getElementById("profileName").textContent = displayName;
-
   document.getElementById("profileEmail").textContent =
     user.email || "Not provided";
-
   document.getElementById("profileAvatar").textContent =
     getInitials(displayName);
-
   document.getElementById("pageTitle").textContent =
     firstName + "'s Dashboard | WF Pundit";
 }
 
 
-/* LATEST STORIES */
+/* LATEST STORIES: TWO ONLY */
 
 function articleCard(article) {
   const card = document.createElement("article");
@@ -1154,12 +1159,10 @@ function articleCard(article) {
 
   const link = document.createElement("a");
   link.className = "article-link";
-  link.href =
-    "/article.html?id=" + encodeURIComponent(article.id);
+  link.href = "/article.html?id=" + encodeURIComponent(article.id);
   link.innerHTML = 'VIEW ARTICLE <span aria-hidden="true">→</span>';
 
   card.append(tag, title, summary, link);
-
   return card;
 }
 
@@ -1168,8 +1171,6 @@ async function loadLatest() {
 
   try {
     const data = await getJson("/api/articles");
-
-    /* ONLY THE TWO LATEST ARTICLES */
     const articles = (data.articles || []).slice(0, 2);
 
     host.replaceChildren();
@@ -1178,12 +1179,10 @@ async function loadLatest() {
       const empty = document.createElement("div");
       empty.className = "status";
       empty.textContent = "No published stories yet.";
-
       host.appendChild(empty);
 
       document.getElementById("articleCount").textContent =
-        "0 recent stories";
-
+        "0 latest stories";
       return;
     }
 
@@ -1200,7 +1199,6 @@ async function loadLatest() {
     const message = document.createElement("div");
     message.className = "status";
     message.textContent = error.message;
-
     host.appendChild(message);
 
     document.getElementById("articleCount").textContent =
@@ -1228,7 +1226,6 @@ async function loadSaved() {
       empty.className = "status";
       empty.textContent =
         "You have not saved any articles yet. Save a story from the homepage to find it here.";
-
       host.appendChild(empty);
       return;
     }
@@ -1248,8 +1245,7 @@ async function loadSaved() {
       actions.className = "saved-actions";
 
       const link = document.createElement("a");
-      link.href =
-        "/article.html?id=" + encodeURIComponent(article.id);
+      link.href = "/article.html?id=" + encodeURIComponent(article.id);
       link.textContent = "Read article";
 
       const remove = document.createElement("button");
@@ -1263,7 +1259,6 @@ async function loadSaved() {
 
       actions.append(link, remove);
       item.append(title, category, actions);
-
       host.appendChild(item);
     });
 
@@ -1273,7 +1268,6 @@ async function loadSaved() {
     const message = document.createElement("div");
     message.className = "status";
     message.textContent = error.message;
-
     host.appendChild(message);
   }
 }
@@ -1284,12 +1278,8 @@ async function removeSaved(id, button) {
   try {
     await getJson("/api/saved", {
       method: "DELETE",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        articleId: id
-      })
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({articleId:id})
     });
 
     await loadSaved();
@@ -1301,57 +1291,45 @@ async function removeSaved(id, button) {
 }
 
 
-/* MY COMMENTS AND REPLIES */
+/* COMMENTS AND REPLIES */
 
 function formatCommentDate(value) {
-  if (!value) {
-    return "Date unavailable";
-  }
+  if (!value) return "Date unavailable";
 
   const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return "Date unavailable";
-  }
+  if (Number.isNaN(date.getTime())) return "Date unavailable";
 
   return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-    timeZone: "Africa/Lagos"
+    day:"2-digit",
+    month:"short",
+    year:"numeric",
+    hour:"numeric",
+    minute:"2-digit",
+    hour12:true,
+    timeZone:"Africa/Lagos"
   }).format(date);
 }
-
-
-/* REACTION COUNTS */
 
 function createReactionSummary(counts) {
   const row = document.createElement("div");
   row.className = "reaction-row";
 
   const labels = [
-    ["like", "👍", "Like"],
-    ["love", "❤️", "Love"],
-    ["laugh", "😂", "Laugh"],
-    ["support", "🙌", "Support"]
+    ["like","👍","Like"],
+    ["love","❤️","Love"],
+    ["laugh","😂","Laugh"],
+    ["support","🙌","Support"]
   ];
 
   let hasReactions = false;
 
-  labels.forEach(([key, emoji, label]) => {
+  labels.forEach(([key,emoji,label]) => {
     const total = Number((counts && counts[key]) || 0);
-
-    if (total > 0) {
-      hasReactions = true;
-    }
+    if (total > 0) hasReactions = true;
 
     const chip = document.createElement("span");
     chip.className = "reaction-chip";
     chip.textContent = emoji + " " + label + " " + total;
-
     row.appendChild(chip);
   });
 
@@ -1359,15 +1337,11 @@ function createReactionSummary(counts) {
     const empty = document.createElement("span");
     empty.className = "reaction-chip";
     empty.textContent = "No reactions yet";
-
     row.appendChild(empty);
   }
 
   return row;
 }
-
-
-/* REPLY CARD */
 
 function createReplyCard(reply) {
   const card = document.createElement("div");
@@ -1375,77 +1349,65 @@ function createReplyCard(reply) {
 
   const author = document.createElement("p");
   author.className = "reply-author";
-  author.textContent =
-    reply.display_name || "WF Pundit reader";
+  author.textContent = reply.display_name || "WF Pundit reader";
 
   const date = document.createElement("time");
   date.className = "comment-date";
   date.textContent = formatCommentDate(reply.created_at);
 
-  if (reply.created_at) {
-    date.dateTime = reply.created_at;
-  }
+  if (reply.created_at) date.dateTime = reply.created_at;
 
   const body = document.createElement("p");
   body.className = "comment-text";
   body.textContent = reply.comment || "";
 
-  const reactions =
-    createReactionSummary(reply.reaction_counts);
-
-  card.append(author, date, body, reactions);
+  card.append(
+    author,
+    date,
+    body,
+    createReactionSummary(reply.reaction_counts)
+  );
 
   return card;
 }
-
-
-/* ORIGINAL COMMENT CARD */
 
 function createCommentCard(comment) {
   const item = document.createElement("article");
   item.className = "comment-card";
 
   const article = document.createElement("h3");
-  article.textContent =
-    comment.article_title || "Article";
+  article.textContent = comment.article_title || "Article";
 
   const date = document.createElement("time");
   date.className = "comment-date";
-  date.textContent =
-    formatCommentDate(comment.created_at);
+  date.textContent = formatCommentDate(comment.created_at);
 
-  if (comment.created_at) {
-    date.dateTime = comment.created_at;
-  }
+  if (comment.created_at) date.dateTime = comment.created_at;
 
   const body = document.createElement("p");
   body.className = "comment-text";
   body.textContent = comment.comment || "";
 
-  const reactions =
-    createReactionSummary(comment.reaction_counts);
-
   const actions = document.createElement("div");
   actions.className = "comment-actions";
 
   const link = document.createElement("a");
-  link.href =
-    "/article.html?id=" +
-    encodeURIComponent(comment.article_id);
-
+  link.href = "/article.html?id=" + encodeURIComponent(comment.article_id);
   link.textContent = "VIEW ARTICLE →";
-
   actions.appendChild(link);
 
-  item.append(article, date, body, reactions, actions);
+  item.append(
+    article,
+    date,
+    body,
+    createReactionSummary(comment.reaction_counts),
+    actions
+  );
 
-  const replies = Array.isArray(comment.replies)
-    ? comment.replies
-    : [];
+  const replies = Array.isArray(comment.replies) ? comment.replies : [];
 
   const heading = document.createElement("div");
   heading.className = "replies-heading";
-
   heading.textContent = replies.length
     ? "REPLIES (" + replies.length + ")"
     : "NO REPLIES YET";
@@ -1466,27 +1428,19 @@ function createCommentCard(comment) {
   return item;
 }
 
-
-/* LOAD COMMENTS */
-
 async function loadMyComments() {
   const host = document.getElementById("myComments");
 
   try {
     const data = await getJson("/api/my-comments");
-
-    const comments = Array.isArray(data.comments)
-      ? data.comments
-      : [];
+    const comments = Array.isArray(data.comments) ? data.comments : [];
 
     host.replaceChildren();
 
     if (!comments.length) {
       const empty = document.createElement("div");
       empty.className = "status";
-      empty.textContent =
-        "You haven't posted any comments yet.";
-
+      empty.textContent = "You haven't posted any comments yet.";
       host.appendChild(empty);
       return;
     }
@@ -1500,7 +1454,6 @@ async function loadMyComments() {
 
     const message = document.createElement("div");
     message.className = "status";
-
     message.textContent =
       error.message || "Unable to load your comments.";
 
@@ -1511,32 +1464,20 @@ async function loadMyComments() {
 
 /* LOG OUT */
 
-document
-  .getElementById("logoutButton")
-  .addEventListener("click", async () => {
+document.getElementById("logoutButton").addEventListener("click", async () => {
+  const confirmed = confirm("Are you sure you want to log out?");
+  if (!confirmed) return;
 
-    const confirmed = confirm(
-      "Are you sure you want to log out?"
-    );
+  const button = document.getElementById("logoutButton");
+  button.disabled = true;
 
-    if (!confirmed) {
-      return;
-    }
-
-    const button = document.getElementById("logoutButton");
-    button.disabled = true;
-
-    try {
-      await getJson("/api/logout", {
-        method: "POST"
-      });
-
-      window.location.replace("/");
-
-    } catch (error) {
-      alert(error.message);
-      button.disabled = false;
-    }
+  try {
+    await getJson("/api/logout", {method:"POST"});
+    window.location.replace("/");
+  } catch (error) {
+    alert(error.message);
+    button.disabled = false;
+  }
 });
 
 
@@ -1551,13 +1492,10 @@ async function startDashboard() {
         "/account.html?returnTo=" +
         encodeURIComponent("/dashboard.html")
       );
-
       return;
     }
 
-    const user = data.user || {};
-
-    showProfile(user);
+    showProfile(data.user || {});
 
     await Promise.all([
       loadLatest(),
@@ -1567,13 +1505,11 @@ async function startDashboard() {
 
   } catch (error) {
     const host = document.getElementById("latestArticles");
-
     host.replaceChildren();
 
     const message = document.createElement("div");
     message.className = "status";
     message.textContent = error.message;
-
     host.appendChild(message);
   }
 }
@@ -1582,7 +1518,6 @@ startDashboard();
 
 </script>
 
-<!-- IN-APP NOTIFICATIONS -->
 <script src="/notifications-ui.js"></script>
 
 </body>
