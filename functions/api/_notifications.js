@@ -24,26 +24,17 @@ export async function ensureNotificationTables(env) {
     )
   `).run();
 
-  // FIX: Upgrade older notifications tables that lack read_at.
-  const columns = await env.DB.prepare(`
-    PRAGMA table_info(notifications)
-  `).all();
+  // Add read_at to older tables without using PRAGMA.
+  try {
+    await env.DB.prepare(`
+      ALTER TABLE notifications
+      ADD COLUMN read_at TEXT
+    `).run();
+  } catch (error) {
+    const message = String(error.message || error).toLowerCase();
 
-  const hasReadAt = (columns.results || []).some(
-    column => column.name === "read_at"
-  );
-
-  if (!hasReadAt) {
-    try {
-      await env.DB.prepare(`
-        ALTER TABLE notifications
-        ADD COLUMN read_at TEXT
-      `).run();
-    } catch (error) {
-      // Ignore only if another request added the column simultaneously.
-      if (!String(error.message || error).toLowerCase().includes("duplicate column")) {
-        throw error;
-      }
+    if (!message.includes("duplicate column")) {
+      throw error;
     }
   }
 
