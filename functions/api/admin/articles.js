@@ -1,4 +1,6 @@
 
+import { notifyPublishedArticle } from "../_notifications.js";
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -8,6 +10,7 @@ function json(data, status = 200) {
 
 function authorised(request, env) {
   const token = request.headers.get("Authorization");
+
   return Boolean(
     env.ADMIN_TOKEN &&
     token === `Bearer ${env.ADMIN_TOKEN}`
@@ -40,6 +43,7 @@ export async function onRequestGet({ request, env }) {
     });
 
   } catch (error) {
+    console.error("Admin article loading failed:", error);
     return json({ error: "Unable to load articles" }, 500);
   }
 }
@@ -59,8 +63,11 @@ export async function onRequestPost({ request, env }) {
     }
 
     const slug = makeSlug(data.slug || title);
+
     if (!slug) {
-      return json({ error: "A valid article slug is required" }, 400);
+      return json({
+        error: "A valid article slug is required"
+      }, 400);
     }
 
     const status = data.status === "published"
@@ -87,13 +94,26 @@ export async function onRequestPost({ request, env }) {
       now
     ).run();
 
+    const articleId = result.meta.last_row_id;
+
+    // Notify readers only when the article is published.
+    if (status === "published") {
+      await notifyPublishedArticle(env, {
+        id: articleId,
+        title,
+        summary: data.summary || ""
+      });
+    }
+
     return json({
       success: true,
       message: "Article created",
-      id: result.meta.last_row_id
+      id: articleId
     }, 201);
 
   } catch (error) {
+    console.error("Article creation failed:", error);
+
     return json({
       error: "Unable to create article. Check that its slug is unique."
     }, 500);
@@ -112,10 +132,30 @@ export async function onRequestPut({ request, env }) {
     const title = String(data.title || "").trim();
 
     if (!Number.isInteger(id) || id < 1 || !title) {
-      return json({ error: "Valid article ID and title are required" }, 400);
+      return json({
+        error: "Valid article ID and title are required"
+      }, 400);
+    }
+
+    const existing = await env.DB.prepare(`
+      SELECT id, status
+      FROM articles
+      WHERE id = ?
+      LIMIT 1
+    `).bind(id).first();
+
+    if (!existing) {
+      return json({ error: "Article not found" }, 404);
     }
 
     const slug = makeSlug(data.slug || title);
+
+    if (!slug) {
+      return json({
+        error: "A valid article slug is required"
+      }, 400);
+    }
+
     const status = data.status === "published"
       ? "published"
       : "draft";
@@ -149,9 +189,26 @@ export async function onRequestPut({ request, env }) {
       return json({ error: "Article not found" }, 404);
     }
 
-    return json({ success: true, message: "Article updated" });
+    // Notify only when an existing draft becomes published.
+    if (
+      existing.status !== "published" &&
+      status === "published"
+    ) {
+      await notifyPublishedArticle(env, {
+        id,
+        title,
+        summary: data.summary || ""
+      });
+    }
+
+    return json({
+      success: true,
+      message: "Article updated"
+    });
 
   } catch (error) {
+    console.error("Article update failed:", error);
+
     return json({
       error: "Unable to update article. Check that its slug is unique."
     }, 500);
@@ -169,7 +226,9 @@ export async function onRequestDelete({ request, env }) {
     const id = Number(data.id);
 
     if (!Number.isInteger(id) || id < 1) {
-      return json({ error: "Valid article ID is required" }, 400);
+      return json({
+        error: "Valid article ID is required"
+      }, 400);
     }
 
     const result = await env.DB.prepare(
@@ -180,9 +239,16 @@ export async function onRequestDelete({ request, env }) {
       return json({ error: "Article not found" }, 404);
     }
 
-    return json({ success: true, message: "Article deleted" });
+    return json({
+      success: true,
+      message: "Article deleted"
+    });
 
   } catch (error) {
-    return json({ error: "Unable to delete article" }, 500);
+    console.error("Article deletion failed:", error);
+
+    return json({
+      error: "Unable to delete article"
+    }, 500);
   }
 }
