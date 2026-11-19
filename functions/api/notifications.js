@@ -1,131 +1,196 @@
-import {
-  currentUser,
-  json,
-  validOrigin,
-  readJson
-} from "./_auth.js";
 
-import {
-  ensureNotificationTables
-} from "./_notifications.js";
-
-// GET THE SIGNED-IN USER'S NOTIFICATIONS
-export async function onRequestGet({ request, env }) {
-  try {
-    const user = await currentUser(request, env);
-
-    if (!user) {
-      return json({ error: "Please sign in to view notifications." }, 401);
-    }
-
-    await ensureNotificationTables(env);
-
-    const result = await env.DB.prepare(`
-      SELECT
-        id,
-        article_id,
-        title,
-        message,
-        link,
-        created_at,
-        read_at
-      FROM notifications
-      WHERE user_id = ?
-      ORDER BY created_at DESC
-      LIMIT 50
-    `).bind(user.id).all();
-
-    const unread = await env.DB.prepare(`
-      SELECT COUNT(*) AS total
-      FROM notifications
-      WHERE user_id = ?
-        AND read_at IS NULL
-    `).bind(user.id).first();
-
-    return json({
-      success: true,
-      notifications: result.results || [],
-      unread_count: Number(unread?.total || 0)
-    });
-
-  } catch (error) {
-    console.error("Notification loading failed:", error);
-    return json({ error: "Unable to load notifications." }, 500);
-  }
+function escapeHtml(value) {
+  return String(value || "").replace(/[&<>"']/g, character => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[character]);
 }
 
-// MARK ONE NOTIFICATION OR ALL NOTIFICATIONS AS READ
-export async function onRequestPost({ request, env }) {
-  if (!validOrigin(request)) {
-    return json({ error: "Invalid request origin." }, 403);
+export async function ensureNotificationTables(env) {
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS notifications (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      article_id INTEGER NOT NULL,
+      title TEXT NOT NULL,
+      message TEXT NOT NULL,
+      link TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      read_at TEXT,
+      UNIQUE(user_id, article_id)
+    )
+  `).run();
+
+  // Add read_at to older tables without using PRAGMA.
+  try {
+    await env.DB.prepare(`
+      ALTER TABLE notifications
+      ADD COLUMN read_at TEXT
+    `).run();
+  } catch (error) {
+    const message = String(error.message || error).toLowerCase();
+
+    if (!message.includes("duplicate column")) {
+      throw error;
+    }
   }
 
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS article_notification_deliveries (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      article_id INTEGER NOT NULL,
+      channel TEXT NOT NULL,
+      delivered_at TEXT NOT NULL,
+      UNIQUE(user_id, article_id, channel)
+    )
+  `).run();
+}
+
+async function sendArticleEmail(env, user, article, articleUrl) {
+  if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) {
+    console.warn(
+      "Article email not sent: configure RESEND_API_KEY and RESEND_FROM_EMAIL."
+    );
+    return false;
+  }
+
+  const name = escapeHtml(user.display_name || "Football fan");
+  const title = escapeHtml(article.title);
+  const summary = escapeHtml(
+    article.summary || "A new story has been published on WF Pundit."
+  );
+
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer " + env.RESEND_API_KEY,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      from: env.RESEND_FROM_EMAIL,
+      to: [user.email],
+      subject: "New story on WF Pundit: " + article.title,
+      html: `
+        <div style="font-family:Arial,sans-serif;line-height:1.6;color:#172033;max-width:600px;margin:auto">
+          <h2 style="color:#1769e8">WF Pundit</h2>
+          <p>Hello ${name},</p>
+          <p>A new football story has just been published.</p>
+          <h2>${title}</h2>
+          <p>${summary}</p>
+          <p>
+            <a href="${articleUrl}"
+               style="display:inline-block;padding:12px 18px;background:#1769e8;color:#fff;text-decoration:none;border-radius:6px">
+              Read the full story
+            </a>
+          </p>
+          <p>Thank you for following WF Pundit.</p>
+        </div>
+      `,
+      text:
+        "Hello " + (user.display_name || "Football fan") +
+        ",\n\nA new story has been published on WF Pundit:\n\n" +
+        article.title + "\n\n" +
+        (article.summary || "") + "\n\nRead it here: " +
+        articleUrl
+    })
+  });
+
+  if (!response.ok) {
+    const details = await response.text();
+    console.error("Article email delivery failed:", response.status, details);
+    return false;
+  }
+
+  return true;
+}
+
+export async function notifyPublishedArticle(env, article) {
   try {
-    const user = await currentUser(request, env);
-
-    if (!user) {
-      return json({ error: "Please sign in first." }, 401);
-    }
-
-    const data = await readJson(request);
-
     await ensureNotificationTables(env);
 
-    if (data.action === "mark_all_read") {
-      await env.DB.prepare(`
-        UPDATE notifications
-        SET read_at = ?
-        WHERE user_id = ?
-          AND read_at IS NULL
-      `).bind(
-        new Date().toISOString(),
-        user.id
-      ).run();
+    const users = await env.DB.prepare(`
+      SELECT
+        u.id,
+        u.email,
+        u.display_name,
+        COALESCE(p.breaking_news_in_app, 1) AS in_app,
+        COALESCE(p.breaking_news_email, 1) AS email_enabled
+      FROM reader_accounts u
+      LEFT JOIN notification_preferences p
+        ON p.user_id = u.id
+    `).all();
 
-      return json({
-        success: true,
-        message: "All notifications marked as read."
-      });
-    }
+    const siteUrl = (
+      env.SITE_URL || "https://wfpundit.pages.dev"
+    ).replace(/\/+$/, "");
 
-    if (data.action === "mark_read") {
-      const id = Number(data.id);
+    const articleUrl =
+      siteUrl + "/article.html?id=" +
+      encodeURIComponent(article.id);
 
-      if (!Number.isInteger(id) || id < 1) {
-        return json({
-          error: "A valid notification ID is required."
-        }, 400);
+    const now = new Date().toISOString();
+
+    for (const user of users.results || []) {
+      if (Number(user.in_app) === 1) {
+        await env.DB.prepare(`
+          INSERT OR IGNORE INTO notifications (
+            user_id,
+            article_id,
+            title,
+            message,
+            link,
+            created_at
+          )
+          VALUES (?, ?, ?, ?, ?, ?)
+        `).bind(
+          user.id,
+          article.id,
+          article.title,
+          article.summary || "A new story has been published.",
+          articleUrl,
+          now
+        ).run();
       }
 
-      const result = await env.DB.prepare(`
-        UPDATE notifications
-        SET read_at = ?
-        WHERE id = ?
-          AND user_id = ?
-          AND read_at IS NULL
-      `).bind(
-        new Date().toISOString(),
-        id,
-        user.id
-      ).run();
+      if (
+        Number(user.email_enabled) === 1 &&
+        user.email
+      ) {
+        const claim = await env.DB.prepare(`
+          INSERT OR IGNORE INTO article_notification_deliveries (
+            user_id,
+            article_id,
+            channel,
+            delivered_at
+          )
+          VALUES (?, ?, 'email', ?)
+        `).bind(user.id, article.id, now).run();
 
-      if (!result.meta.changes) {
-        return json({
-          success: true,
-          message: "Notification is already read or unavailable."
-        });
+        if (!claim.meta.changes) continue;
+
+        const sent = await sendArticleEmail(
+          env,
+          user,
+          article,
+          articleUrl
+        );
+
+        if (!sent) {
+          await env.DB.prepare(`
+            DELETE FROM article_notification_deliveries
+            WHERE user_id = ?
+              AND article_id = ?
+              AND channel = 'email'
+          `).bind(user.id, article.id).run();
+        }
       }
-
-      return json({
-        success: true,
-        message: "Notification marked as read."
-      });
     }
-
-    return json({ error: "Invalid notification action." }, 400);
 
   } catch (error) {
-    console.error("Notification update failed:", error);
-    return json({ error: "Unable to update notifications." }, 500);
+    console.error("Article notification process failed:", error);
   }
-  }
+}
