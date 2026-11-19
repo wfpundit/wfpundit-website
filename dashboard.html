@@ -44,8 +44,6 @@ body.light-mode {
 
 a { color: inherit; }
 
-/* HEADER */
-
 .topbar {
   min-height: 72px;
   border-bottom: 1px solid var(--line);
@@ -95,8 +93,6 @@ main {
   margin: 0 auto;
   padding: 30px 22px 60px;
 }
-
-/* WELCOME */
 
 .welcome { margin-bottom: 22px; }
 
@@ -205,7 +201,7 @@ main {
 }
 
 .player-slide.active .player-photo img {
-  animation: slowZoomIn 3500ms ease-out both;
+  animation: slowZoomIn 2000ms ease-out both;
 }
 
 .player-name {
@@ -540,8 +536,6 @@ footer {
   .profile-details p { font-size: 12px; }
 }
 
-/* REDUCED MOTION */
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -569,18 +563,13 @@ footer {
 
 <main>
 
-  <!-- WELCOME -->
-
   <section class="welcome">
     <div class="eyebrow">YOUR PERSONAL SPACE</div>
     <h1>Welcome, <span id="readerName">Reader</span></h1>
     <p>Your home for the latest women's football stories.</p>
   </section>
 
-  <!-- PLAYER CAROUSEL -->
-
   <section class="player-showcase" aria-label="Featured players">
-
     <div class="player-showcase-heading">
       <h2>Featured players</h2>
       <span>WF Pundit</span>
@@ -659,20 +648,15 @@ footer {
       id="carouselDots"
       aria-label="Choose featured player"
     ></div>
-
   </section>
 
-  <!-- PROFILE -->
-
   <section class="profile-section">
-
     <div class="section-head">
       <h2>My Profile</h2>
       <span>Your account details</span>
     </div>
 
     <div class="profile-card">
-
       <div class="profile-avatar" id="profileAvatar">R</div>
 
       <div class="profile-details">
@@ -688,15 +672,10 @@ footer {
           <a href="/">BACK TO HOMEPAGE</a>
         </div>
       </div>
-
     </div>
-
   </section>
 
-  <!-- LATEST STORIES -->
-
   <section class="latest-section">
-
     <div class="section-head">
       <h2>Latest stories</h2>
       <span id="articleCount">Loading articles…</span>
@@ -705,13 +684,9 @@ footer {
     <div id="latestArticles" class="grid">
       <div class="status">Loading the latest stories…</div>
     </div>
-
   </section>
 
-  <!-- SAVED ARTICLES -->
-
   <section class="saved-section">
-
     <div class="section-head">
       <h2>Saved articles</h2>
       <span id="savedCount"></span>
@@ -720,13 +695,9 @@ footer {
     <div id="savedList" class="saved-list">
       <div class="status">Loading your saved articles…</div>
     </div>
-
   </section>
 
-  <!-- MY COMMENTS -->
-
   <section class="comments-section">
-
     <div class="section-head">
       <h2>My Comments</h2>
       <span>Your comments on WF Pundit</span>
@@ -735,7 +706,6 @@ footer {
     <div id="myComments" class="comments-list">
       <div class="status">Loading your comments…</div>
     </div>
-
   </section>
 
 </main>
@@ -754,9 +724,7 @@ try {
   if (localStorage.getItem("wf-theme") === "light") {
     document.body.classList.add("light-mode");
   }
-} catch (error) {
-  // Continue with default theme if storage is unavailable.
-}
+} catch (error) {}
 
 function updateThemeLabel() {
   themeButton.textContent =
@@ -777,9 +745,7 @@ themeButton.addEventListener("click", () => {
 
   try {
     localStorage.setItem("wf-theme", mode);
-  } catch (error) {
-    // Theme still changes for the current page.
-  }
+  } catch (error) {}
 
   updateThemeLabel();
 });
@@ -843,7 +809,7 @@ function restartCarousel() {
     clearInterval(carouselTimer);
   }
 
-  carouselTimer = setInterval(nextSlide, 3500);
+  carouselTimer = setInterval(nextSlide, 2000);
 }
 
 buildCarouselDots();
@@ -1239,6 +1205,9 @@ async function startDashboard() {
 startDashboard();
 
 </script>
+
+<!-- IN-APP NOTIFICATIONS -->
+<script src="/notifications-ui.js"></script>
 
 </body>
 </html>
