@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -260,6 +261,23 @@ h1{
   background:transparent;
   color:var(--muted);
 }
+
+/* REPLIES AND REACTIONS */
+.comment-tools{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:12px}
+.reaction-button,.reply-toggle{display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:6px 10px;border:1px solid #405a78;border-radius:20px;background:#17283d;color:#dcecff;font-size:11px;font-weight:850;transition:transform .18s,border-color .18s,background .18s}
+.reaction-button:hover,.reply-toggle:hover{transform:translateY(-1px);border-color:var(--cyan)}
+.reaction-button.active{background:#234c78;border-color:#72b8ff;color:#fff;box-shadow:0 3px 12px #3978c833}
+.comment-replies{display:grid;gap:9px;margin:13px 0 0 18px;padding-left:14px;border-left:2px solid #42658a}
+.reply-item{padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.reply-form{display:grid;gap:8px;margin-top:11px;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--panel)}
+.reply-form textarea{width:100%;min-height:76px;resize:vertical;padding:10px;border:1px solid #40536c;border-radius:8px;background:var(--panel-soft);color:var(--text);font:inherit}
+.reply-form-actions{display:flex;flex-wrap:wrap;gap:8px}
+.reply-status{font-size:12px;color:var(--muted)}
+body.light-mode .reaction-button,body.light-mode .reply-toggle{background:#fff;color:#245d9d;border-color:#b9cbe0}
+body.light-mode .reaction-button.active{background:#e3f1ff;border-color:#6aa4df;color:#174d83}
+body.light-mode .reply-form textarea{background:#fff;color:#1c2939;border-color:#cbd5e1}
+@media(max-width:480px){.comment-replies{margin-left:8px;padding-left:9px}.reaction-button,.reply-toggle{padding:6px 8px;font-size:10px}}
+
 [hidden]{display:none!important}
 body.light-mode{
   --bg:#f1f4f8;
@@ -377,7 +395,8 @@ body.light-mode .comment-edit-textarea{
   </div>
 </div>
 
-<script>const params = new URLSearchParams(window.location.search);
+<script>
+const params = new URLSearchParams(window.location.search);
 const articleId = Number(params.get("id"));
 
 const themeToggle = document.getElementById("themeToggle");
@@ -553,11 +572,10 @@ async function loadComments() {
       "/api/comments?articleId=" + encodeURIComponent(articleId),
       { credentials: "same-origin" }
     );
-
     const result = await readJsonResponse(response);
     const comments = result.comments || [];
 
-    if (comments.length === 0) {
+    if (!comments.length) {
       const empty = document.createElement("div");
       empty.className = "status-message";
       empty.textContent = "No comments yet. Be the first to comment.";
@@ -565,9 +583,34 @@ async function loadComments() {
       return;
     }
 
+    const byId = new Map();
+    const roots = [];
+
     comments.forEach(item => {
+      item.replies = [];
+      byId.set(String(item.id), item);
+    });
+
+    comments.forEach(item => {
+      const parent = item.parent_comment_id
+        ? byId.get(String(item.parent_comment_id))
+        : null;
+      if (parent) parent.replies.push(item);
+      else roots.push(item);
+    });
+
+    function makeButton(label, className, onClick) {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = className;
+      button.textContent = label;
+      button.addEventListener("click", onClick);
+      return button;
+    }
+
+    function renderComment(item, isReply) {
       const card = document.createElement("article");
-      card.className = "comment-item";
+      card.className = isReply ? "reply-item" : "comment-item";
 
       const meta = document.createElement("div");
       meta.className = "comment-meta";
@@ -578,9 +621,7 @@ async function loadComments() {
 
       const date = document.createElement("span");
       date.className = "comment-date";
-
       date.textContent = formatDateTime(item.created_at);
-
       if (item.edited_at) {
         date.textContent += " · Edited " + formatDateTime(item.edited_at);
       }
@@ -588,23 +629,16 @@ async function loadComments() {
       const content = document.createElement("p");
       content.className = "comment-text";
       content.textContent = item.comment || "";
-
       meta.append(name, date);
       card.append(meta, content);
 
-      // Only the owner of a comment sees the edit button.
       if (item.is_own) {
-        const editButton = document.createElement("button");
-        editButton.type = "button";
-        editButton.className = "comment-edit-button";
-        editButton.textContent = "EDIT COMMENT";
-
-        editButton.addEventListener("click", () => {
+        const editButton = makeButton("EDIT COMMENT", "comment-edit-button", () => {
           editButton.hidden = true;
           content.hidden = true;
 
-          const editForm = document.createElement("form");
-          editForm.className = "comment-edit-form";
+          const form = document.createElement("form");
+          form.className = "comment-edit-form";
 
           const textarea = document.createElement("textarea");
           textarea.className = "comment-edit-textarea";
@@ -615,104 +649,74 @@ async function loadComments() {
           const actions = document.createElement("div");
           actions.className = "comment-edit-actions";
 
-          const saveChanges = document.createElement("button");
-          saveChanges.type = "submit";
-          saveChanges.className = "action-button primary";
-          saveChanges.textContent = "SAVE CHANGES";
+          const save = document.createElement("button");
+          save.type = "submit";
+          save.className = "action-button primary";
+          save.textContent = "SAVE CHANGES";
 
-          const cancelEdit = document.createElement("button");
-          cancelEdit.type = "button";
-          cancelEdit.className = "action-button";
-          cancelEdit.textContent = "CANCEL";
-
-          const editStatus = document.createElement("div");
-          editStatus.className = "comment-edit-status";
-
-          actions.append(saveChanges, cancelEdit);
-          editForm.append(textarea, actions, editStatus);
-          card.appendChild(editForm);
-
-          cancelEdit.addEventListener("click", () => {
-            editForm.remove();
+          const cancel = makeButton("CANCEL", "action-button", () => {
+            form.remove();
             content.hidden = false;
             editButton.hidden = false;
           });
 
-          editForm.addEventListener("submit", async event => {
+          const status = document.createElement("div");
+          status.className = "comment-edit-status";
+          actions.append(save, cancel);
+          form.append(textarea, actions, status);
+          card.appendChild(form);
+
+          form.addEventListener("submit", async event => {
             event.preventDefault();
+            const updated = textarea.value.trim();
 
-            const updatedComment = textarea.value.trim();
-
-            if (!updatedComment) {
-              editStatus.textContent = "Please write a comment.";
+            if (!updated) {
+              status.textContent = "Please write a comment.";
               textarea.focus();
               return;
             }
 
-            saveChanges.disabled = true;
-            cancelEdit.disabled = true;
-            saveChanges.textContent = "SAVING...";
+            save.disabled = true;
+            cancel.disabled = true;
+            save.textContent = "SAVING...";
 
             try {
-              const editResponse = await fetch("/api/comments", {
+              const res = await fetch("/api/comments", {
                 method: "POST",
                 credentials: "same-origin",
-                headers: {
-                  "Content-Type": "application/json"
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   action: "edit",
                   commentId: item.id,
-                  comment: updatedComment
+                  comment: updated
                 })
               });
-
-              await readJsonResponse(editResponse);
+              await readJsonResponse(res);
               await loadComments();
-
             } catch (error) {
-              editStatus.textContent =
-                error.message || "Unable to update your comment.";
-
-              saveChanges.disabled = false;
-              cancelEdit.disabled = false;
-              saveChanges.textContent = "SAVE CHANGES";
+              status.textContent = error.message || "Unable to update your comment.";
+              save.disabled = false;
+              cancel.disabled = false;
+              save.textContent = "SAVE CHANGES";
             }
           });
         });
 
-        card.appendChild(editButton);
-            const deleteButton = document.createElement("button");
-        deleteButton.type = "button";
-        deleteButton.className = "comment-edit-button";
-        deleteButton.textContent = "DELETE COMMENT";
-        deleteButton.style.color = "#e05252";
-        deleteButton.style.borderColor = "#a44";
-
-        deleteButton.addEventListener("click", async () => {
-          if (!window.confirm("Are you sure you want to delete this comment?")) {
-            return;
-          }
+        const deleteButton = makeButton("DELETE COMMENT", "comment-edit-button", async () => {
+          if (!window.confirm("Are you sure you want to delete this comment?")) return;
 
           deleteButton.disabled = true;
           deleteButton.textContent = "DELETING...";
 
           try {
-            const deleteResponse = await fetch("/api/comments", {
+            const res = await fetch("/api/comments", {
               method: "POST",
               credentials: "same-origin",
-              headers: {
-                "Content-Type": "application/json"
-              },
-              body: JSON.stringify({
-                action: "delete",
-                commentId: item.id
-              })
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ action: "delete", commentId: item.id })
             });
-
-            await readJsonResponse(deleteResponse);
+            await readJsonResponse(res);
             await loadComments();
-
           } catch (error) {
             deleteButton.disabled = false;
             deleteButton.textContent = "DELETE COMMENT";
@@ -720,21 +724,161 @@ async function loadComments() {
           }
         });
 
-        card.appendChild(deleteButton);
+        deleteButton.style.color = "#e05252";
+        deleteButton.style.borderColor = "#a44";
+        card.append(editButton, deleteButton);
       }
 
-      commentList.appendChild(card);
+      const tools = document.createElement("div");
+      tools.className = "comment-tools";
+
+      const counts = item.reaction_counts || {};
+      const reactions = [
+        ["like", "👍 Like"],
+        ["love", "❤️ Love"],
+        ["laugh", "😂 Laugh"],
+        ["support", "🙌 Support"]
+      ];
+
+      reactions.forEach(([key, label]) => {
+        const active = item.my_reaction === key;
+        const button = makeButton(
+          label + " " + Number(counts[key] || 0),
+          "reaction-button" + (active ? " active" : ""),
+          async () => {
+            if (!currentUser) {
+              openLoginModal();
+              return;
+            }
+
+            button.disabled = true;
+            try {
+              const res = await fetch("/api/comments", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  action: "react",
+                  commentId: item.id,
+                  reaction: active ? "remove" : key
+                })
+              });
+              await readJsonResponse(res);
+              await loadComments();
+            } catch (error) {
+              alert(error.message || "Unable to save your reaction.");
+              button.disabled = false;
+            }
+          }
+        );
+
+        if (active) button.setAttribute("aria-pressed", "true");
+        tools.appendChild(button);
+      });
+
+      if (!isReply) {
+        const replyButton = makeButton("↩ REPLY", "reply-toggle", () => {
+          if (!currentUser) {
+            openLoginModal();
+            return;
+          }
+
+          const existing = card.querySelector(".reply-form");
+          if (existing) {
+            existing.remove();
+            return;
+          }
+
+          const form = document.createElement("form");
+          form.className = "reply-form";
+
+          const textarea = document.createElement("textarea");
+          textarea.maxLength = 2000;
+          textarea.required = true;
+          textarea.placeholder = "Write a reply...";
+
+          const actions = document.createElement("div");
+          actions.className = "reply-form-actions";
+
+          const send = document.createElement("button");
+          send.type = "submit";
+          send.className = "action-button primary";
+          send.textContent = "POST REPLY";
+
+          const cancel = makeButton("CANCEL", "action-button", () => form.remove());
+          const status = document.createElement("div");
+          status.className = "reply-status";
+
+          actions.append(send, cancel);
+          form.append(textarea, actions, status);
+          card.appendChild(form);
+
+          form.addEventListener("submit", async event => {
+            event.preventDefault();
+            const reply = textarea.value.trim();
+
+            if (!reply) {
+              textarea.focus();
+              return;
+            }
+
+            send.disabled = true;
+            cancel.disabled = true;
+            send.textContent = "POSTING...";
+
+            try {
+              const res = await fetch("/api/comments", {
+                method: "POST",
+                credentials: "same-origin",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  action: "reply",
+                  articleId,
+                  parentCommentId: item.id,
+                  comment: reply
+                })
+              });
+              await readJsonResponse(res);
+              await loadComments();
+            } catch (error) {
+              status.textContent = error.message || "Unable to post your reply.";
+              send.disabled = false;
+              cancel.disabled = false;
+              send.textContent = "POST REPLY";
+            }
+          });
+        });
+
+        tools.appendChild(replyButton);
+      }
+
+      card.appendChild(tools);
+
+      if (item.replies && item.replies.length) {
+        const replies = document.createElement("div");
+        replies.className = "comment-replies";
+        item.replies.forEach(reply => {
+          replies.appendChild(renderComment(reply, true));
+        });
+        card.appendChild(replies);
+      }
+
+      return card;
+    }
+
+    roots.forEach(item => {
+      commentList.appendChild(renderComment(item, false));
     });
 
   } catch (error) {
     const message = document.createElement("div");
     message.className = "status-message error-message";
-    message.textContent =
-      error.message || "Comments could not be loaded.";
-
+    message.textContent = error.message || "Comments could not be loaded.";
     commentList.appendChild(message);
   }
-}async function loadArticle() {
+}
+
+async function loadArticle() {
   if (!Number.isInteger(articleId) || articleId < 1) {
     articleStatus.textContent =
       "No article was selected. Please return to the homepage.";
@@ -878,10 +1022,8 @@ if (saveButton) {
 }
 
 async function initialisePage() {
-  await Promise.all([
-    checkLogin(),
-    loadArticle()
-  ]);
+  await checkLogin();
+  await loadArticle();
 }
 
 initialisePage();
