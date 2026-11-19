@@ -446,7 +446,7 @@ button:disabled{opacity:.6;cursor:not-allowed}
     <span class="reminder-label">MAKE WF PUNDIT YOURS</span>
     <h2 id="settingsReminderTitle">Your experience, your settings.</h2>
     <p>Choose the notifications you receive and switch between dark and light mode. You can personalise your WF Pundit experience whenever you like.</p>
-    <a href="/settings.html" class="reminder-action">GO TO ACCOUNT SETTINGS →</a>
+    <a href="/settings.html" class="reminder-action" id="settingsReminderLink">GO TO ACCOUNT SETTINGS →</a>
     <button type="button" id="dismissSettingsReminder">Maybe later</button>
   </section>
 </div>
@@ -481,17 +481,31 @@ themeButton.addEventListener("click", () => {
 /* ACCOUNT SETTINGS REMINDER */
 const settingsReminder = document.getElementById("settingsReminder");
 const dismissSettingsReminder = document.getElementById("dismissSettingsReminder");
+const settingsReminderLink = document.getElementById("settingsReminderLink");
+
+function dismissReminderPermanently() {
+  settingsReminder.hidden = true;
+
+  try {
+    localStorage.setItem("wf-settings-reminder-dismissed", "yes");
+  } catch (error) {}
+}
 
 function showSettingsReminder() {
   try {
-    if (localStorage.getItem("wf-settings-reminder-dismissed") === "yes") return;
+    if (localStorage.getItem("wf-settings-reminder-dismissed") === "yes") {
+      return;
+    }
   } catch (error) {}
 
   settingsReminder.hidden = false;
 }
 
-dismissSettingsReminder.addEventListener("click", () => {
-  settingsReminder.hidden = true;
+/* Clicking MAYBE LATER permanently dismisses the reminder. */
+dismissSettingsReminder.addEventListener("click", dismissReminderPermanently);
+
+/* Clicking GO TO ACCOUNT SETTINGS also permanently dismisses it before navigation. */
+settingsReminderLink.addEventListener("click", () => {
   try {
     localStorage.setItem("wf-settings-reminder-dismissed", "yes");
   } catch (error) {}
