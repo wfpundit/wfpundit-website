@@ -435,7 +435,7 @@ main {
 
 .comments-list {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .comment-date {
@@ -450,6 +450,96 @@ main {
   color: var(--muted);
   font-size: 13px;
   line-height: 1.55;
+}
+
+/* COMMENT CARDS */
+
+.comment-card {
+  padding: 17px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel);
+  display: grid;
+  gap: 10px;
+}
+
+.comment-card h3 {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.comment-card .comment-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.comment-card .comment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.comment-card .comment-actions a {
+  margin-top: 0;
+}
+
+/* REPLIES */
+
+.comment-replies {
+  display: grid;
+  gap: 9px;
+  margin: 2px 0 0 14px;
+  padding-left: 13px;
+  border-left: 2px solid var(--blue);
+}
+
+.reply-card {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: var(--panel2);
+}
+
+.reply-author {
+  margin: 0 0 5px;
+  font-size: 12px;
+  font-weight: 850;
+  color: var(--cyan);
+}
+
+.reply-card .comment-text {
+  margin-bottom: 7px;
+}
+
+.replies-heading {
+  color: var(--cyan);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: .5px;
+}
+
+/* REACTIONS */
+
+.reaction-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  align-items: center;
+}
+
+.reaction-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 9px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  background: var(--panel2);
 }
 
 /* GENERAL */
@@ -534,6 +624,13 @@ footer {
   .profile-details h3 { font-size: 16px; }
 
   .profile-details p { font-size: 12px; }
+
+  .comment-card { padding: 13px; }
+
+  .comment-replies {
+    margin-left: 5px;
+    padding-left: 9px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -699,8 +796,8 @@ footer {
 
   <section class="comments-section">
     <div class="section-head">
-      <h2>My Comments</h2>
-      <span>Your comments on WF Pundit</span>
+      <h2>My Comments & Replies</h2>
+      <span>Your conversations on WF Pundit</span>
     </div>
 
     <div id="myComments" class="comments-list">
@@ -1048,7 +1145,7 @@ async function removeSaved(id, button) {
 }
 
 
-/* MY COMMENTS */
+/* MY COMMENTS AND REPLIES */
 
 function formatCommentDate(value) {
   if (!value) {
@@ -1072,12 +1169,159 @@ function formatCommentDate(value) {
   }).format(date);
 }
 
+
+/* REACTION COUNTS */
+
+function createReactionSummary(counts) {
+  const row = document.createElement("div");
+  row.className = "reaction-row";
+
+  const labels = [
+    ["like", "👍", "Like"],
+    ["love", "❤️", "Love"],
+    ["laugh", "😂", "Laugh"],
+    ["support", "🙌", "Support"]
+  ];
+
+  let hasReactions = false;
+
+  labels.forEach(([key, emoji, label]) => {
+    const total = Number((counts && counts[key]) || 0);
+
+    if (total > 0) {
+      hasReactions = true;
+    }
+
+    const chip = document.createElement("span");
+    chip.className = "reaction-chip";
+    chip.textContent = emoji + " " + label + " " + total;
+
+    row.appendChild(chip);
+  });
+
+  if (!hasReactions) {
+    const empty = document.createElement("span");
+    empty.className = "reaction-chip";
+    empty.textContent = "No reactions yet";
+
+    row.appendChild(empty);
+  }
+
+  return row;
+}
+
+
+/* REPLY CARD */
+
+function createReplyCard(reply) {
+  const card = document.createElement("div");
+  card.className = "reply-card";
+
+  const author = document.createElement("p");
+  author.className = "reply-author";
+  author.textContent =
+    reply.display_name || "WF Pundit reader";
+
+  const date = document.createElement("time");
+  date.className = "comment-date";
+  date.textContent = formatCommentDate(reply.created_at);
+
+  if (reply.created_at) {
+    date.dateTime = reply.created_at;
+  }
+
+  const body = document.createElement("p");
+  body.className = "comment-text";
+  body.textContent = reply.comment || "";
+
+  const reactions =
+    createReactionSummary(reply.reaction_counts);
+
+  card.append(author, date, body, reactions);
+
+  return card;
+}
+
+
+/* ORIGINAL COMMENT CARD */
+
+function createCommentCard(comment) {
+  const item = document.createElement("article");
+  item.className = "comment-card";
+
+  const article = document.createElement("h3");
+  article.textContent =
+    comment.article_title || "Article";
+
+  const date = document.createElement("time");
+  date.className = "comment-date";
+  date.textContent =
+    formatCommentDate(comment.created_at);
+
+  if (comment.created_at) {
+    date.dateTime = comment.created_at;
+  }
+
+  const body = document.createElement("p");
+  body.className = "comment-text";
+  body.textContent = comment.comment || "";
+
+  const reactions =
+    createReactionSummary(comment.reaction_counts);
+
+  const actions = document.createElement("div");
+  actions.className = "comment-actions";
+
+  const link = document.createElement("a");
+  link.href =
+    "/article.html?id=" +
+    encodeURIComponent(comment.article_id);
+
+  link.textContent = "VIEW ARTICLE →";
+
+  actions.appendChild(link);
+
+  item.append(article, date, body, reactions, actions);
+
+  const replies = Array.isArray(comment.replies)
+    ? comment.replies
+    : [];
+
+  const heading = document.createElement("div");
+  heading.className = "replies-heading";
+
+  heading.textContent = replies.length
+    ? "REPLIES (" + replies.length + ")"
+    : "NO REPLIES YET";
+
+  item.appendChild(heading);
+
+  if (replies.length) {
+    const replyList = document.createElement("div");
+    replyList.className = "comment-replies";
+
+    replies.forEach(reply => {
+      replyList.appendChild(createReplyCard(reply));
+    });
+
+    item.appendChild(replyList);
+  }
+
+  return item;
+}
+
+
+/* LOAD COMMENTS */
+
 async function loadMyComments() {
   const host = document.getElementById("myComments");
 
   try {
     const data = await getJson("/api/my-comments");
-    const comments = data.comments || [];
+
+    const comments = Array.isArray(data.comments)
+      ? data.comments
+      : [];
 
     host.replaceChildren();
 
@@ -1092,33 +1336,7 @@ async function loadMyComments() {
     }
 
     comments.forEach(comment => {
-      const item = document.createElement("article");
-      item.className = "saved";
-
-      const article = document.createElement("h3");
-      article.textContent =
-        comment.article_title || "Article";
-
-      const date = document.createElement("time");
-      date.className = "comment-date";
-      date.textContent = formatCommentDate(comment.created_at);
-
-      if (comment.created_at) {
-        date.dateTime = comment.created_at;
-      }
-
-      const text = document.createElement("p");
-      text.className = "comment-text";
-      text.textContent = comment.comment || "";
-
-      const link = document.createElement("a");
-      link.href =
-        "/article.html?id=" +
-        encodeURIComponent(comment.article_id);
-      link.textContent = "VIEW ARTICLE →";
-
-      item.append(article, date, text, link);
-      host.appendChild(item);
+      host.appendChild(createCommentCard(comment));
     });
 
   } catch (error) {
@@ -1126,7 +1344,9 @@ async function loadMyComments() {
 
     const message = document.createElement("div");
     message.className = "status";
-    message.textContent = error.message;
+
+    message.textContent =
+      error.message || "Unable to load your comments.";
 
     host.appendChild(message);
   }
