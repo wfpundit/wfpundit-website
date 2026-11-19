@@ -284,8 +284,6 @@ main {
     radial-gradient(ellipse at center,transparent 45%,rgba(8,17,30,.16) 100%);
 }
 
-/* PLAYER PHOTO BACKGROUND BLENDING */
-
 .player-photo img {
   display:block;
   width:100%;
@@ -293,10 +291,6 @@ main {
   object-fit:contain;
   object-position:center center;
   background:transparent;
-
-  /* Helps remove the appearance of a white photo rectangle */
-  mix-blend-mode:multiply;
-
   filter:drop-shadow(0 12px 18px rgba(0,0,0,.22));
   transform:scale(1);
 }
@@ -367,14 +361,8 @@ main {
 }
 
 @keyframes playerReveal {
-  from {
-    transform:scale(1.015);
-    filter:brightness(.88) drop-shadow(0 12px 18px rgba(0,0,0,.22))
-  }
-  to {
-    transform:scale(1);
-    filter:brightness(1) drop-shadow(0 12px 18px rgba(0,0,0,.22))
-  }
+  from {transform:scale(1.015);filter:brightness(.88) drop-shadow(0 12px 18px rgba(0,0,0,.22))}
+  to {transform:scale(1);filter:brightness(1) drop-shadow(0 12px 18px rgba(0,0,0,.22))}
 }
 
 @keyframes stageShimmer {
