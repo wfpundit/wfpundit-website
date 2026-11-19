@@ -9,12 +9,27 @@ function escapeHtml(value) {
   })[character]);
 }
 
+async function addColumnIfMissing(env, column, definition) {
+  try {
+    await env.DB.prepare(`
+      ALTER TABLE notifications
+      ADD COLUMN ${column} ${definition}
+    `).run();
+  } catch (error) {
+    const message = String(error.message || error).toLowerCase();
+
+    if (!message.includes("duplicate column")) {
+      throw error;
+    }
+  }
+}
+
 export async function ensureNotificationTables(env) {
   await env.DB.prepare(`
     CREATE TABLE IF NOT EXISTS notifications (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
-      article_id INTEGER NOT NULL,
+      article_id INTEGER,
       title TEXT NOT NULL,
       message TEXT NOT NULL,
       link TEXT NOT NULL,
@@ -24,19 +39,16 @@ export async function ensureNotificationTables(env) {
     )
   `).run();
 
-  // Add read_at to older tables without using PRAGMA.
-  try {
-    await env.DB.prepare(`
-      ALTER TABLE notifications
-      ADD COLUMN read_at TEXT
-    `).run();
-  } catch (error) {
-    const message = String(error.message || error).toLowerCase();
+  // Repair older notifications tables without deleting existing records.
+  await addColumnIfMissing(env, "article_id", "INTEGER");
+  await addColumnIfMissing(env, "read_at", "TEXT");
 
-    if (!message.includes("duplicate column")) {
-      throw error;
-    }
-  }
+  // Prevent duplicate notifications for the same user and article.
+  await env.DB.prepare(`
+    CREATE UNIQUE INDEX IF NOT EXISTS
+    notifications_user_article_unique
+    ON notifications(user_id, article_id)
+  `).run();
 
   await env.DB.prepare(`
     CREATE TABLE IF NOT EXISTS article_notification_deliveries (
