@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,7 +19,6 @@
   --cyan:#a9d3ff;
 }
 * { box-sizing:border-box; }
-
 html { scroll-behavior:smooth; }
 
 body {
@@ -455,7 +453,6 @@ body.light-mode footer {
   }
 
   .brand { font-size:18px; }
-
   .nav { gap:6px; }
 
   .nav a,.nav button {
@@ -546,7 +543,11 @@ body.light-mode footer {
 
   <section class="panel">
     <h2>Notifications</h2>
-    <p class="description">Choose how you want to receive updates from WF Pundit.</p>
+    <p class="description">
+      Choose how you want to receive updates from WF Pundit.
+      Your notification choices are saved when you select
+      SAVE ALL PREFERENCES below.
+    </p>
 
     <div class="setting-row">
       <div>
@@ -581,7 +582,12 @@ body.light-mode footer {
 
   <section class="panel">
     <h2>Appearance</h2>
-    <p class="description">Choose the theme you prefer for your dashboard.</p>
+    <p class="description">
+      Choose the theme you prefer across WF Pundit.
+      Your choice is saved automatically and stays active
+      when you move between the homepage, dashboard and account settings.
+    </p>
+
     <div class="setting-row">
       <div>
         <strong>Colour theme</strong>
@@ -639,7 +645,7 @@ body.light-mode footer {
     </div>
 
     <button class="primary save-preferences" id="savePreferencesButton" type="button">
-      SAVE PREFERENCES
+      SAVE ALL PREFERENCES
     </button>
     <div class="message" id="preferencesMessage" role="status" aria-live="polite"></div>
   </section>
@@ -942,7 +948,6 @@ function getSelected(groupId) {
 function setSelected(groupId, values) {
   const selected = Array.isArray(values) ? [...values] : [];
 
-  /* Keep an older saved Lyon selection matched to the current club name. */
   if (selected.includes("Lyon")) selected.push("OL Lyonnes");
 
   document.querySelectorAll(
@@ -958,28 +963,31 @@ async function loadPreferences() {
   try {
     const data = await api("/api/settings-preferences");
 
+    const notifications = data.notifications || {};
+    const reading = data.reading || {};
+
     $("breakingNewsInApp").checked =
-      data.notifications.breakingNewsInApp;
+      notifications.breakingNewsInApp !== false;
 
     $("breakingNewsEmail").checked =
-      data.notifications.breakingNewsEmail;
+      notifications.breakingNewsEmail !== false;
 
     $("commentRepliesInApp").checked =
-      data.notifications.commentRepliesInApp;
+      notifications.commentRepliesInApp !== false;
 
     $("commentRepliesEmail").checked =
-      data.notifications.commentRepliesEmail;
+      notifications.commentRepliesEmail !== false;
 
-    setSelected("competitions", data.reading.competitions);
-    setSelected("clubs", data.reading.clubs);
-    setSelected("topics", data.reading.topics);
+    setSelected("competitions", reading.competitions);
+    setSelected("clubs", reading.clubs);
+    setSelected("topics", reading.topics);
 
   } catch (error) {
     showMessage("preferencesMessage", error.message, "error");
   }
 }
 
-/* SAVE PREFERENCES */
+/* SAVE NOTIFICATION AND READING PREFERENCES */
 
 async function savePreferences() {
   const button = $("savePreferencesButton");
@@ -1010,7 +1018,7 @@ async function savePreferences() {
 
     showMessage(
       "preferencesMessage",
-      data.message || "Your preferences have been saved.",
+      data.message || "Your notification and reading preferences have been saved successfully.",
       "success"
     );
 
@@ -1019,7 +1027,7 @@ async function savePreferences() {
 
   } finally {
     button.disabled = false;
-    button.textContent = "SAVE PREFERENCES";
+    button.textContent = "SAVE ALL PREFERENCES";
   }
 }
 
