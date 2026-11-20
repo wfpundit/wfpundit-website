@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -222,6 +221,15 @@ body.light .theme-toggle {
 
 .hidden {display:none!important}
 
+
+/* NEWSLETTER COMPOSER */
+.newsletter-help{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.6}
+.newsletter-preview{margin-top:16px;padding:18px;border:1px solid var(--border);border-radius:10px;background:var(--input-bg)}
+.newsletter-preview-label{margin:0 0 9px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.newsletter-preview-subject{margin:0 0 12px;font-size:16px;font-weight:800;overflow-wrap:anywhere}
+.newsletter-preview-body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.7;font-size:14px}
+.newsletter-warning{padding:12px;border-left:3px solid #d49a37;border-radius:6px;background:rgba(212,154,55,.09);color:var(--muted);font-size:12px;line-height:1.6}
+
 @media(max-width:600px) {
   body {padding:12px}
   .panel {padding:15px}
@@ -238,8 +246,7 @@ body.light .theme-toggle {
 <body>
 <div class="container">
 
-<header>
-  <h1>WF Pundit Admin</h1>
+<header>  <h1>WF Pundit Admin</h1>
 
   <button type="button"
     class="theme-toggle"
@@ -330,6 +337,29 @@ body.light .theme-toggle {
   </form>
 
   <div id="message" role="status"></div>
+</section>
+
+
+<section class="panel" id="newsletterPanel">
+  <h2>Newsletter Composer</h2>
+  <p class="newsletter-help">Write an update for people who subscribed to the WF Pundit newsletter. Your message will be sent to the newsletter list in Brevo.</p>
+  <div class="newsletter-warning">Sending is immediate after confirmation. Review the subject and message carefully. Every campaign includes an unsubscribe link.</div>
+  <label for="newsletterSubject">Email subject</label>
+  <input id="newsletterSubject" type="text" maxlength="150" placeholder="e.g. This week's women's football headlines" autocomplete="off">
+  <label for="newsletterMessage">Your message</label>
+  <textarea id="newsletterMessage" rows="10" maxlength="15000" placeholder="Write your newsletter message here..." style="min-height:220px"></textarea>
+  <p class="muted"><span id="newsletterCharCount">0</span>/15,000 characters</p>
+  <div class="actions">
+    <button type="button" id="newsletterPreviewButton" class="secondary">Preview newsletter</button>
+    <button type="button" id="newsletterSendButton">Review &amp; Send</button>
+  </div>
+  <div id="newsletterPreview" class="newsletter-preview hidden" aria-live="polite">
+    <p class="newsletter-preview-label">Email preview</p>
+    <h3 id="newsletterPreviewSubject" class="newsletter-preview-subject"></h3>
+    <div id="newsletterPreviewBody" class="newsletter-preview-body"></div>
+    <p class="muted" style="margin:16px 0 0">WF Pundit · You are receiving this because you subscribed to our newsletter.</p>
+  </div>
+  <div id="newsletterStatus" role="status" aria-live="polite" style="margin-top:13px;font-size:14px"></div>
 </section>
 
 <section class="panel">
@@ -466,8 +496,7 @@ function setPreview(url) {
   } else {
     preview.removeAttribute("src");
     preview.style.display = "none";
-  }
-}
+  }}
 
 $("imageUrl").addEventListener("input", () => {
   setPreview($("imageUrl").value.trim());
@@ -517,7 +546,6 @@ $("uploadButton").addEventListener("click", async () => {
     }
 
     const uploadedUrl = result.image_url || result.url;
-
     if (!uploadedUrl) {
       throw new Error("Upload response did not contain an image URL.");
     }
@@ -717,8 +745,7 @@ function editArticle(article) {
   $("imageUrl").value = article.image_url || "";
 
   const knownCategories = [
-    "Latest News",
-    "Women's Leagues",
+    "Latest News",    "Women's Leagues",
     "Transfers",
     "Women's Champions League (UWCL)",
     "International Football",
@@ -791,6 +818,86 @@ async function deleteArticle(id, title) {
     showMessage(error.message, true);
   }
 }
+
+
+/* NEWSLETTER COMPOSER */
+const newsletterSubject = $("newsletterSubject");
+const newsletterMessage = $("newsletterMessage");
+const newsletterPreview = $("newsletterPreview");
+const newsletterStatus = $("newsletterStatus");
+const newsletterSendButton = $("newsletterSendButton");
+
+function setNewsletterStatus(text, isError = false) {
+  newsletterStatus.textContent = text;
+  newsletterStatus.style.color = isError ? "#ff6677" : "#35c98a";
+}
+
+function updateNewsletterPreview() {
+  const subject = newsletterSubject.value.trim();
+  const body = newsletterMessage.value.trim();
+  if (!subject || !body) {
+    setNewsletterStatus("Enter both a subject and a message before previewing.", true);
+    newsletterPreview.classList.add("hidden");
+    return false;
+  }
+  $("newsletterPreviewSubject").textContent = subject;
+  $("newsletterPreviewBody").textContent = body;
+  newsletterPreview.classList.remove("hidden");
+  setNewsletterStatus("Preview updated. Check the message before sending.");
+  return true;
+}
+
+newsletterMessage.addEventListener("input", () => {
+  $("newsletterCharCount").textContent = newsletterMessage.value.length;
+});
+$("newsletterPreviewButton").addEventListener("click", updateNewsletterPreview);
+
+newsletterSendButton.addEventListener("click", async () => {
+  if (!getToken()) {
+    setNewsletterStatus("Enter your admin token first.", true);
+    $("adminToken").focus();
+    return;
+  }
+  if (!updateNewsletterPreview()) return;
+
+  const subject = newsletterSubject.value.trim();
+  const body = newsletterMessage.value.trim();
+  const confirmed = confirm(
+    "FINAL CHECK\n\nSubject: " + subject +
+    "\n\nThis will send your newsletter to the WF Pundit subscriber list in Brevo. " +
+    "The send cannot be recalled. Have you checked the message and links?\n\nSend now?"
+  );
+  if (!confirmed) return;
+
+  newsletterSendButton.disabled = true;
+  setNewsletterStatus("Preparing and sending your newsletter. Please keep this page open...");
+  try {
+    const response = await fetch("/api/admin/newsletter-send", {
+      method: "POST",
+      headers: {
+        ...authHeaders(),
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ subject, message: body })
+    });
+    const result = await response.json();
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Newsletter could not be sent.");
+    }
+    setNewsletterStatus(
+      "Newsletter submitted to Brevo successfully. Campaign ID: " +
+      result.campaignId + ". Brevo will now process delivery."
+    );
+    newsletterSubject.value = "";
+    newsletterMessage.value = "";
+    $("newsletterCharCount").textContent = "0";
+    newsletterPreview.classList.add("hidden");
+  } catch (error) {
+    setNewsletterStatus(error.message || "Newsletter could not be sent.", true);
+  } finally {
+    newsletterSendButton.disabled = false;
+  }
+});
 
 /* BUTTON EVENTS */
 
