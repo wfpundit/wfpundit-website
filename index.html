@@ -2018,9 +2018,71 @@ e.target.value='en';
 });
 
 /* NEWSLETTER */
-$('#signup').addEventListener('submit',e=>{
-e.preventDefault();
-alert('Thanks for your interest! Newsletter sign-up will be enabled when the site is connected to an email service.');
+$('#signup').addEventListener('submit', async e => {
+  e.preventDefault();
+
+  const form = e.currentTarget;
+  const button = $('#signupButton');
+  const message = $('#signupMessage');
+
+  const firstName = $('#signupFirstName').value.trim();
+  const email = $('#signupEmail').value.trim();
+  const consent = $('#signupConsent').checked;
+  const website = form.elements.website.value;
+
+  message.textContent = '';
+
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    message.textContent = 'Invalid email';
+    return;
+  }
+
+  if (!firstName || !consent) {
+    message.textContent = 'Please complete all required fields.';
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = 'SUBMITTING...';
+
+  try {
+    const response = await fetch('/api/newsletter-subscribe', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        firstName,
+        email,
+        consent,
+        website
+      })
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      message.textContent =
+        result.error === 'Invalid email'
+          ? 'Invalid email'
+          : (result.error || 'Subscription could not be completed. Please try again.');
+      button.textContent = 'SUBSCRIBE';
+      button.disabled = false;
+      return;
+    }
+
+    button.textContent = 'Newsletter Subscribed';
+    message.textContent = result.alreadySubscribed
+      ? 'Newsletter Subscribed'
+      : 'Successfully subscribed! You will receive news mail updates from us';
+
+    form.reset();
+
+  } catch (error) {
+    message.textContent = 'Connection error. Please try again.';
+    button.textContent = 'SUBSCRIBE';
+    button.disabled = false;
+  }
 });
 
 /* FOOTER YEAR */
