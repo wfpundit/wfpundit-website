@@ -1,5 +1,10 @@
 
-import { json, readJson, validOrigin } from "./_auth.js";
+import {
+  currentUser,
+  json,
+  readJson,
+  validOrigin
+} from "./_auth.js";
 
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, character => ({
@@ -22,7 +27,8 @@ function toBase64Url(bytes) {
 }
 
 async function createUnsubscribeToken(email, env) {
-  const secret = env.NEWSLETTER_UNSUBSCRIBE_SECRET || env.BREVO_API_KEY;
+  const secret =
+    env.NEWSLETTER_UNSUBSCRIBE_SECRET || env.BREVO_API_KEY;
 
   const key = await crypto.subtle.importKey(
     "raw",
@@ -45,7 +51,8 @@ async function createUnsubscribeToken(email, env) {
     new TextEncoder().encode(payload)
   );
 
-  return payload + "." + toBase64Url(new Uint8Array(signature));
+  return payload + "." +
+    toBase64Url(new Uint8Array(signature));
 }
 
 async function sendWelcomeEmail(email, firstName, unsubscribeUrl, env) {
@@ -90,34 +97,39 @@ async function sendWelcomeEmail(email, firstName, unsubscribeUrl, env) {
   </body>
   </html>`;
 
-  const response = await fetch("https://api.brevo.com/v3/smtp/email", {
-    method: "POST",
-    headers: {
-      "api-key": env.BREVO_API_KEY,
-      "Content-Type": "application/json",
-      "accept": "application/json"
-    },
-    body: JSON.stringify({
-      sender: {
-        name: "WF Pundit",
-        email: "allwomenfootballupdatespundits@gmail.com"
+  const response = await fetch(
+    "https://api.brevo.com/v3/smtp/email",
+    {
+      method: "POST",
+      headers: {
+        "api-key": env.BREVO_API_KEY,
+        "Content-Type": "application/json",
+        "accept": "application/json"
       },
-      to: [{
-        email,
-        name: firstName || "Subscriber"
-      }],
-      subject: "Welcome to WF Pundit!",
-      htmlContent: html,
-      textContent:
-        "Hello " + (firstName || "there") +
-        ", thank you for subscribing to WF Pundit. " +
-        "You will receive women's football news and updates by email. " +
-        "Unsubscribe: " + unsubscribeUrl
-    })
-  });
+      body: JSON.stringify({
+        sender: {
+          name: "WF Pundit",
+          email: "allwomenfootballupdatespundits@gmail.com"
+        },
+        to: [{
+          email,
+          name: firstName || "Subscriber"
+        }],
+        subject: "Welcome to WF Pundit!",
+        htmlContent: html,
+        textContent:
+          "Hello " + (firstName || "there") +
+          ", thank you for subscribing to WF Pundit. " +
+          "You will receive women's football news and updates by email. " +
+          "Unsubscribe: " + unsubscribeUrl
+      })
+    }
+  );
 
   if (!response.ok) {
-    throw new Error("Brevo welcome email failed: " + await response.text());
+    throw new Error(
+      "Brevo welcome email failed: " + await response.text()
+    );
   }
 }
 
@@ -129,72 +141,76 @@ export async function onRequestPost({ request, env }) {
     }, 403);
   }
 
-  if (!env.BREVO_API_KEY || !env.BREVO_LIST_ID) {
-    return json({
-      success: false,
-      error: "Newsletter service is not configured."
-    }, 500);
-  }
-
-  const listId = Number(env.BREVO_LIST_ID);
-
-  if (!Number.isSafeInteger(listId) || listId < 1) {
-    return json({
-      success: false,
-      error: "Newsletter list configuration is invalid."
-    }, 500);
-  }
-
-  let data;
-
   try {
-    data = await readJson(request);
-  } catch {
-    return json({
-      success: false,
-      error: "Please submit the form again."
-    }, 400);
-  }
+    const user = await currentUser(request, env);
 
-  // Honeypot field for basic bot protection.
-  if (String(data.website || "").trim()) {
-    return json({ success: true });
-  }
+    if (!user) {
+      return json({
+        success: false,
+        error: "Please log in to subscribe to the newsletter."
+      }, 401);
+    }
 
-  const firstName = String(data.firstName || "").trim().slice(0, 60);
-  const email = String(data.email || "").trim().toLowerCase();
+    if (!env.BREVO_API_KEY || !env.BREVO_LIST_ID) {
+      return json({
+        success: false,
+        error: "Newsletter service is not configured."
+      }, 500);
+    }
 
-  if (
-    email.length > 254 ||
-    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-  ) {
-    return json({
-      success: false,
-      error: "Invalid email"
-    }, 400);
-  }
+    const listId = Number(env.BREVO_LIST_ID);
 
-  if (!firstName) {
-    return json({
-      success: false,
-      error: "Please enter your first name."
-    }, 400);
-  }
+    if (!Number.isSafeInteger(listId) || listId < 1) {
+      return json({
+        success: false,
+        error: "Newsletter list configuration is invalid."
+      }, 500);
+    }
 
-  if (data.consent !== true) {
-    return json({
-      success: false,
-      error: "Please confirm your newsletter subscription."
-    }, 400);
-  }
+    let data;
 
-  const headers = {
-    "api-key": env.BREVO_API_KEY,
-    "Content-Type": "application/json",
-    "accept": "application/json"
-  };
+    try {
+      data = await readJson(request);
+    } catch {
+      return json({
+        success: false,
+        error: "Please submit the form again."
+      }, 400);
+    }
 
-  try {
+    if (String(data.website || "").trim()) {
+      return json({ success: true });
+    }
+
+    if (data.consent !== true) {
+      return json({
+        success: false,
+        error: "Please confirm your newsletter subscription."
+      }, 400);
+    }
+
+    // Identity comes from the authenticated account, not form inputs.
+    const displayName = String(user.display_name || "").trim();
+    const firstName = displayName.split(/\s+/)[0] || "Reader";
+    const email = String(user.email || "").trim().toLowerCase();
+
+    if (
+      !email ||
+      email.length > 254 ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      return json({
+        success: false,
+        error: "Invalid email"
+      }, 400);
+    }
+
+    const headers = {
+      "api-key": env.BREVO_API_KEY,
+      "Content-Type": "application/json",
+      "accept": "application/json"
+    };
+
     const contactUrl =
       "https://api.brevo.com/v3/contacts/" +
       encodeURIComponent(email);
@@ -209,7 +225,9 @@ export async function onRequestPost({ request, env }) {
     if (lookup.ok) {
       existingContact = await lookup.json();
     } else if (lookup.status !== 404) {
-      throw new Error("Brevo contact lookup failed: " + await lookup.text());
+      throw new Error(
+        "Brevo contact lookup failed: " + await lookup.text()
+      );
     }
 
     if (existingContact) {
@@ -243,7 +261,9 @@ export async function onRequestPost({ request, env }) {
       });
 
       if (!update.ok) {
-        throw new Error("Brevo contact update failed: " + await update.text());
+        throw new Error(
+          "Brevo contact update failed: " + await update.text()
+        );
       }
 
     } else {
@@ -264,14 +284,17 @@ export async function onRequestPost({ request, env }) {
       );
 
       if (!create.ok) {
-        throw new Error("Brevo contact creation failed: " + await create.text());
+        throw new Error(
+          "Brevo contact creation failed: " + await create.text()
+        );
       }
     }
 
     const token = await createUnsubscribeToken(email, env);
 
     const unsubscribeUrl = new URL(
-      "/api/newsletter-unsubscribe?token=" + encodeURIComponent(token),
+      "/api/newsletter-unsubscribe?token=" +
+      encodeURIComponent(token),
       new URL(request.url).origin
     ).toString();
 
@@ -287,7 +310,10 @@ export async function onRequestPost({ request, env }) {
 
       welcomeEmailSent = true;
     } catch (emailError) {
-      console.error("Newsletter welcome email error:", emailError);
+      console.error(
+        "Newsletter welcome email error:",
+        emailError
+      );
     }
 
     return json({
