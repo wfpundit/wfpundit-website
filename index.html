@@ -1045,7 +1045,15 @@ font-weight:950;
 color:#fff
 }
 .newsletter p{margin:0;color:#d0dced;font-size:14px;font-weight:600}
-.signup{display:flex;gap:8px;min-width:330px}
+.signup{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  min-width:330px;
+  max-width:420px;
+  width:100%;
+}
+
 /* Keep account buttons separate from newsletter styling */
 .account-actions .account-link.signup{
   display:inline-flex;
@@ -1053,23 +1061,52 @@ color:#fff
   width:auto;
   gap:0;
 }
-.signup input{
-min-width:0;
-flex:1;
-background:#0b1422;
-border:1px solid #536b87;
-color:white;
-border-radius:7px;
-padding:11px 12px
+
+.signup input:not([type="checkbox"]){
+  box-sizing:border-box;
+  width:100%;
+  min-width:0;
+  background:#0b1422;
+  border:1px solid #536b87;
+  color:white;
+  border-radius:7px;
+  padding:12px;
 }
+
+.signup .newsletter-consent{
+  display:flex;
+  align-items:center;
+  gap:9px;
+  color:#d0dced;
+  font-size:12px;
+  line-height:1.5;
+  cursor:pointer;
+}
+
+.signup .newsletter-consent input[type="checkbox"]{
+  flex:0 0 16px;
+  width:16px;
+  height:16px;
+  margin:0;
+  accent-color:var(--blue);
+}
+
 .signup button{
-border:0;
-background:var(--blue);
-color:#fff;
-border-radius:7px;
-padding:0 16px;
-font-weight:950;
-font-size:11px
+  width:100%;
+  min-height:43px;
+  border:0;
+  background:var(--blue);
+  color:#fff;
+  border-radius:7px;
+  padding:11px 16px;
+  font-weight:950;
+  font-size:11px;
+  cursor:pointer;
+}
+
+.signup button:disabled{
+  opacity:.7;
+  cursor:wait;
 }
 
 /* FOOTER */
