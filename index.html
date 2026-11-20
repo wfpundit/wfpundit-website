@@ -1773,9 +1773,21 @@ Welcome to WF Pundit — your destination for the latest women's football news, 
 <p>WF Pundit brings you the stories, updates and moments that matter.</p>
 </div>
 <form class="signup" id="signup">
-<input type="email" placeholder="Email address" aria-label="Email address" required>
-<button type="submit">COMING SOON</button>
+  <input
+    type="email"
+    id="signupEmail"
+    name="email"
+    placeholder="Email address"
+    aria-label="Email address"
+    autocomplete="email"
+    required
+  >
+  <button type="submit" id="signupButton">
+    SUBSCRIBE
+  </button>
 </form>
+
+<p id="signupMessage" role="status" aria-live="polite"></p>
 </section>
 </div>
 
