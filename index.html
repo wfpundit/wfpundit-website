@@ -2261,42 +2261,92 @@ e.target.value='en';
 });
 
 /* NEWSLETTER */
-$('#signup').addEventListener('submit', async e => {
-  e.preventDefault();
+const newsletterFormWrap = $('#newsletterFormWrap');
+const newsletterSignedOut = $('#newsletterSignedOut');
+const newsletterSubscribed = $('#newsletterSubscribed');
+const newsletterStatusError = $('#newsletterStatusError');
 
-  const form = e.currentTarget;
-  const button = $('#signupButton');
-  const message = $('#signupMessage');
+const newsletterAccountName = $('#newsletterAccountName');
+const newsletterAccountEmail = $('#newsletterAccountEmail');
+const newsletterSubscribedEmail = $('#newsletterSubscribedEmail');
 
-  const firstName = $('#signupFirstName').value.trim();
-  const email = $('#signupEmail').value.trim();
+const newsletterForm = $('#signup');
+const newsletterButton = $('#signupButton');
+const newsletterMessage = $('#signupMessage');
+const newsletterStateMessage = $('#newsletterStateMessage');
+const newsletterUnsubscribeButton = $('#newsletterUnsubscribeButton');
+
+function showNewsletterState(state) {
+  newsletterFormWrap.hidden = state !== 'form';
+  newsletterSignedOut.hidden = state !== 'signedout';
+  newsletterSubscribed.hidden = state !== 'subscribed';
+  newsletterStatusError.hidden = state !== 'error';
+}
+
+async function loadNewsletterStatus() {
+  showNewsletterState('error');
+
+  try {
+    const response = await fetch('/api/newsletter-status', {
+      method: 'GET',
+      credentials: 'same-origin',
+      cache: 'no-store'
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || 'Status unavailable');
+    }
+
+    if (!result.loggedIn) {
+      showNewsletterState('signedout');
+      return;
+    }
+
+    const firstName = result.firstName || 'Your account';
+    const email = result.email || '';
+
+    newsletterAccountName.textContent = firstName;
+    newsletterAccountEmail.textContent = email;
+    newsletterSubscribedEmail.textContent = email;
+
+    showNewsletterState(
+      result.subscribed ? 'subscribed' : 'form'
+    );
+
+  } catch (error) {
+    console.error('Newsletter status error:', error);
+    showNewsletterState('error');
+  }
+}
+
+/* SUBSCRIBE */
+newsletterForm.addEventListener('submit', async event => {
+  event.preventDefault();
+
   const consent = $('#signupConsent').checked;
-  const website = form.elements.website.value;
+  const website = newsletterForm.elements.website.value;
 
-  message.textContent = '';
+  newsletterMessage.textContent = '';
 
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    message.textContent = 'Invalid email';
+  if (!consent) {
+    newsletterMessage.textContent =
+      'Please confirm your newsletter subscription.';
     return;
   }
 
-  if (!firstName || !consent) {
-    message.textContent = 'Please complete all required fields.';
-    return;
-  }
-
-  button.disabled = true;
-  button.textContent = 'SUBMITTING...';
+  newsletterButton.disabled = true;
+  newsletterButton.textContent = 'SUBMITTING...';
 
   try {
     const response = await fetch('/api/newsletter-subscribe', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        firstName,
-        email,
         consent,
         website
       })
@@ -2305,28 +2355,89 @@ $('#signup').addEventListener('submit', async e => {
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      message.textContent =
+      newsletterMessage.textContent =
         result.error === 'Invalid email'
           ? 'Invalid email'
-          : (result.error || 'Subscription could not be completed. Please try again.');
-      button.textContent = 'SUBSCRIBE';
-      button.disabled = false;
+          : (
+              result.error ||
+              'Subscription could not be completed. Please try again.'
+            );
       return;
     }
 
-    button.textContent = 'Newsletter Subscribed';
-    message.textContent = result.alreadySubscribed
-      ? 'Newsletter Subscribed'
-      : 'Successfully subscribed! You will receive news mail updates from us';
+    newsletterForm.reset();
 
-    form.reset();
+    newsletterStateMessage.textContent =
+      result.alreadySubscribed
+        ? 'Newsletter Subscribed'
+        : 'Successfully subscribed! You will receive news mail updates from us';
+
+    newsletterSubscribedEmail.textContent =
+      newsletterAccountEmail.textContent;
+
+    showNewsletterState('subscribed');
 
   } catch (error) {
-    message.textContent = 'Connection error. Please try again.';
-    button.textContent = 'SUBSCRIBE';
-    button.disabled = false;
+    console.error('Newsletter subscription error:', error);
+
+    newsletterMessage.textContent =
+      'Connection error. Please try again.';
+
+  } finally {
+    newsletterButton.disabled = false;
+    newsletterButton.textContent = 'SUBSCRIBE';
   }
 });
+
+/* UNSUBSCRIBE */
+newsletterUnsubscribeButton.addEventListener('click', async () => {
+  newsletterUnsubscribeButton.disabled = true;
+  newsletterUnsubscribeButton.textContent = 'UNSUBSCRIBING...';
+  newsletterStateMessage.textContent = '';
+
+  try {
+    const response = await fetch(
+      '/api/newsletter-account-unsubscribe',
+      {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      }
+    );
+
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      newsletterStateMessage.textContent =
+        result.error ||
+        'We could not complete your request. Please try again.';
+      return;
+    }
+
+    newsletterForm.reset();
+
+    showNewsletterState('form');
+
+    newsletterMessage.textContent =
+      'You have been unsubscribed. You can subscribe again whenever you wish.';
+
+  } catch (error) {
+    console.error('Newsletter unsubscribe error:', error);
+
+    newsletterStateMessage.textContent =
+      'Connection error. Please try again.';
+
+  } finally {
+    newsletterUnsubscribeButton.disabled = false;
+    newsletterUnsubscribeButton.textContent = 'UNSUBSCRIBE';
+  }
+});
+
+/* CHECK SUBSCRIPTION ON PAGE LOAD */
+loadNewsletterStatus();
 
 /* FOOTER YEAR */
 $('#year').textContent=new Date().getFullYear();
