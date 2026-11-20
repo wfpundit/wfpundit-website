@@ -2003,58 +2003,65 @@ Welcome to WF Pundit — your destination for the latest women's football news, 
 <!-- NEWSLETTER -->
 <div class="wrap">
 <section class="newsletter" id="about">
-<div>
-<div class="section-kicker">Stay connected</div>
-<h2>Women's football, straight to your feed.</h2>
-<p>WF Pundit brings you the stories, updates and moments that matter.</p>
-</div>
-<form class="signup" id="signup">
-  <input
-    type="text"
-    id="signupFirstName"
-    name="firstName"
-    placeholder="First name"
-    aria-label="First name"
-    autocomplete="given-name"
-    maxlength="80"
-    required
-  >
 
-  <input
-    type="email"
-    id="signupEmail"
-    name="email"
-    placeholder="Email address"
-    aria-label="Email address"
-    autocomplete="email"
-    required
-  >
+  <div class="newsletter-copy">
+    <div class="section-kicker">Stay connected</div>
+    <h2>Women's football, straight to your feed.</h2>
+    <p>WF Pundit brings you the stories, updates and moments that matter.</p>
+  </div>
 
-  <label class="newsletter-consent">
-    <input
-      type="checkbox"
-      id="signupConsent"
-      name="consent"
-      required
-    >
-    I agree to receive WF Pundit newsletter updates.
-  </label>
+  <div class="newsletter-form-wrap" id="newsletterFormWrap" hidden>
+    <div class="newsletter-account-preview" id="newsletterAccountPreview">
+      <span class="newsletter-avatar" aria-hidden="true">WF</span>
+      <span>
+        <strong id="newsletterAccountName">Your account</strong>
+        <small id="newsletterAccountEmail"></small>
+      </span>
+    </div>
 
-  <input
-    type="text"
-    name="website"
-    tabindex="-1"
-    autocomplete="off"
-    aria-hidden="true"
-    style="position:absolute;left:-9999px"
-  >
+    <form class="signup" id="signup">
+      <label class="newsletter-consent">
+        <input type="checkbox" id="signupConsent" name="consent" required>
+        I agree to receive WF Pundit newsletter updates.
+      </label>
 
-  <button type="submit" id="signupButton">
-    SUBSCRIBE
-  </button>
-</form>
+      <input
+        type="text"
+        name="website"
+        tabindex="-1"
+        autocomplete="off"
+        aria-hidden="true"
+        style="position:absolute;left:-9999px"
+      >
 
-<p id="signupMessage" role="status" aria-live="polite"></p>
+      <button type="submit" id="signupButton">SUBSCRIBE</button>
+    </form>
+
+    <p class="newsletter-message" id="signupMessage" role="status" aria-live="polite"></p>
+  </div>
+
+  <div class="newsletter-state" id="newsletterSignedOut" hidden>
+    <span class="state-kicker">Your football updates</span>
+    <h3>Join the WF Pundit community</h3>
+    <p>Log in to your account to subscribe to our newsletter.</p>
+    <a class="account-link login" href="/account.html">LOG IN TO CONTINUE</a>
+  </div>
+
+  <div class="newsletter-state newsletter-subscribed" id="newsletterSubscribed" hidden>
+    <span class="state-kicker">✓ Subscription active</span>
+    <h3>You're on the list.</h3>
+    <p>You'll receive women's football news and updates from WF Pundit.</p>
+    <small class="state-email" id="newsletterSubscribedEmail"></small>
+    <button type="button" id="newsletterUnsubscribeButton">UNSUBSCRIBE</button>
+    <p class="newsletter-message" id="newsletterStateMessage" role="status" aria-live="polite"></p>
+  </div>
+
+  <div class="newsletter-state" id="newsletterStatusError" hidden>
+    <span class="state-kicker">Newsletter</span>
+    <h3>Unable to check your status</h3>
+    <p>Please refresh the page and try again.</p>
+  </div>
+
 </section>
 </div>
 
