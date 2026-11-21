@@ -57,9 +57,29 @@ export async function onRequestPost({ request, env }) {
   try {
     const data = await request.json();
     const title = String(data.title || "").trim();
+    const source = String(data.source || "").trim();
+    const sourceUrl = String(data.source_url || "").trim();
 
     if (!title) {
       return json({ error: "Article title is required" }, 400);
+    }
+
+    if (source.length > 180 || sourceUrl.length > 2048) {
+      return json({ error: "Article source information is too long" }, 400);
+    }
+
+    if (sourceUrl) {
+      let parsedSourceUrl;
+
+      try {
+        parsedSourceUrl = new URL(sourceUrl);
+      } catch {
+        return json({ error: "The source URL is invalid" }, 400);
+      }
+
+      if (parsedSourceUrl.protocol !== "https:") {
+        return json({ error: "The source URL must use HTTPS" }, 400);
+      }
     }
 
     const slug = makeSlug(data.slug || title);
@@ -78,14 +98,28 @@ export async function onRequestPost({ request, env }) {
 
     const result = await env.DB.prepare(`
       INSERT INTO articles
-      (title, slug, summary, content, image_url, category,
-       status, author, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      (
+        title,
+        slug,
+        summary,
+        content,
+        source,
+        source_url,
+        image_url,
+        category,
+        status,
+        author,
+        created_at,
+        updated_at
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).bind(
       title,
       slug,
       data.summary || "",
       data.content || "",
+      source,
+      sourceUrl,
       data.image_url || "",
       data.category || "Women's Football",
       status,
@@ -130,11 +164,31 @@ export async function onRequestPut({ request, env }) {
     const data = await request.json();
     const id = Number(data.id);
     const title = String(data.title || "").trim();
+    const source = String(data.source || "").trim();
+    const sourceUrl = String(data.source_url || "").trim();
 
     if (!Number.isInteger(id) || id < 1 || !title) {
       return json({
         error: "Valid article ID and title are required"
       }, 400);
+    }
+
+    if (source.length > 180 || sourceUrl.length > 2048) {
+      return json({ error: "Article source information is too long" }, 400);
+    }
+
+    if (sourceUrl) {
+      let parsedSourceUrl;
+
+      try {
+        parsedSourceUrl = new URL(sourceUrl);
+      } catch {
+        return json({ error: "The source URL is invalid" }, 400);
+      }
+
+      if (parsedSourceUrl.protocol !== "https:") {
+        return json({ error: "The source URL must use HTTPS" }, 400);
+      }
     }
 
     const existing = await env.DB.prepare(`
@@ -166,6 +220,8 @@ export async function onRequestPut({ request, env }) {
         slug = ?,
         summary = ?,
         content = ?,
+        source = ?,
+        source_url = ?,
         image_url = ?,
         category = ?,
         status = ?,
@@ -177,6 +233,8 @@ export async function onRequestPut({ request, env }) {
       slug,
       data.summary || "",
       data.content || "",
+      source,
+      sourceUrl,
       data.image_url || "",
       data.category || "Women's Football",
       status,
