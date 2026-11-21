@@ -27,6 +27,8 @@ export async function onRequestGet({ request, env }) {
         slug,
         summary,
         content,
+        source,
+        source_url,
         image_url,
         category,
         author,
