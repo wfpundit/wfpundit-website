@@ -24,11 +24,57 @@ function escapeHtml(value) {
   })[character]);
 }
 
+function getSafeHttpsUrl(value) {
+  try {
+    const parsed = new URL(String(value || "").trim());
+
+    if (parsed.protocol !== "https:") return null;
+    if (!parsed.hostname) return null;
+
+    return parsed.href;
+  } catch (error) {
+    return null;
+  }
+}
+
+// Converts unlimited [link text](https://example.com) links
+// into safe clickable email links.
 function messageToHtml(message) {
-  return escapeHtml(message)
-    .split(/\r?\n/)
-    .map(line => line ? line : "&nbsp;")
-    .join("<br>");
+  const lines = String(message || "").split(/\r?\n/);
+
+  return lines.map(line => {
+    if (!line) return "&nbsp;";
+
+    const linkPattern = /\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g;
+
+    let result = "";
+    let lastIndex = 0;
+    let match;
+
+    while ((match = linkPattern.exec(line)) !== null) {
+      result += escapeHtml(line.slice(lastIndex, match.index));
+
+      const label = match[1].trim();
+      const safeUrl = getSafeHttpsUrl(match[2]);
+
+      if (label && safeUrl) {
+        result +=
+          '<a href="' + escapeHtml(safeUrl) +
+          '" target="_blank" rel="noopener noreferrer" ' +
+          'style="color:#2878dc;text-decoration:underline">' +
+          escapeHtml(label) +
+          '</a>';
+      } else {
+        result += escapeHtml(match[0]);
+      }
+
+      lastIndex = linkPattern.lastIndex;
+    }
+
+    result += escapeHtml(line.slice(lastIndex));
+
+    return result;
+  }).join("<br>");
 }
 
 function buildEmailHtml(message, buttons) {
@@ -145,27 +191,18 @@ export async function onRequestPost({ request, env }) {
       }, 400);
     }
 
-    let parsedUrl;
+    const safeUrl = getSafeHttpsUrl(buttonUrl);
 
-    try {
-      parsedUrl = new URL(buttonUrl);
-    } catch {
+    if (!safeUrl) {
       return json({
         success: false,
-        error: "Button " + (i + 1) + " has an invalid link."
-      }, 400);
-    }
-
-    if (parsedUrl.protocol !== "https:") {
-      return json({
-        success: false,
-        error: "Button " + (i + 1) + " link must use HTTPS."
+        error: "Button " + (i + 1) + " must have a valid HTTPS link."
       }, 400);
     }
 
     buttons.push({
       text: buttonText,
-      url: parsedUrl.href
+      url: safeUrl
     });
   }
 
