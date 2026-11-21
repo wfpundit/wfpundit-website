@@ -87,17 +87,36 @@ h1{
   font-size:clamp(30px,5vw,48px);
   line-height:1.12;
   letter-spacing:-1.5px;
+  font-weight:950;
+  text-transform:uppercase;
 }
-.summary{margin:0;color:var(--muted);font-size:17px}
+.summary{
+  margin:0;
+  color:var(--muted);
+  font-size:17px;
+  font-style:italic;
+}
 .byline{
   display:flex;
   flex-wrap:wrap;
   gap:8px 18px;
-  margin:19px 0 22px;
+  margin:19px 0 10px;
   color:var(--muted);
   font-size:12px;
   font-weight:750;
 }
+.article-source{
+  margin:0 0 22px;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+}
+.article-source a{
+  color:var(--cyan);
+  text-decoration:underline;
+  text-underline-offset:3px;
+}
+.article-source a:hover{opacity:.8}
 .article-image{
   display:block;
   width:100%;
@@ -112,6 +131,14 @@ h1{
   white-space:pre-wrap;
   overflow-wrap:anywhere;
 }
+.article-content a{
+  color:var(--cyan);
+  text-decoration:underline;
+  text-decoration-thickness:1px;
+  text-underline-offset:3px;
+  overflow-wrap:anywhere;
+}
+.article-content a:hover{opacity:.8}
 .article-actions{
   display:flex;
   flex-wrap:wrap;
@@ -220,7 +247,8 @@ h1{
 }
 .comment-edit-status{margin-top:8px;color:var(--muted);font-size:12px}
 .status-message{padding:14px;color:var(--muted);font-size:13px}
-.error-message{color:#ffb5bf}.modal-backdrop{
+.error-message{color:#ffb5bf}
+.modal-backdrop{
   position:fixed;
   inset:0;
   z-index:30;
@@ -308,6 +336,8 @@ body.light-mode .comment-edit-textarea{
   color:#1c2939;
   border-color:#cbd5e1;
 }
+body.light-mode .article-content a,
+body.light-mode .article-source a{color:#245d9d}
 @media(max-width:600px){
   .site-header{padding:12px 15px}
   .brand{font-size:19px}
@@ -346,6 +376,8 @@ body.light-mode .comment-edit-textarea{
           <span id="articleAuthor"></span>
           <span id="articleDate"></span>
         </div>
+
+        <p class="article-source" id="articleSource" hidden></p>
 
         <img id="articleImage" class="article-image" alt="" hidden>
         <div class="article-content" id="articleBody"></div>
@@ -408,6 +440,7 @@ const articleTitle = document.getElementById("articleTitle");
 const articleSummary = document.getElementById("articleSummary");
 const articleAuthor = document.getElementById("articleAuthor");
 const articleDate = document.getElementById("articleDate");
+const articleSource = document.getElementById("articleSource");
 const articleImage = document.getElementById("articleImage");
 const articleBody = document.getElementById("articleBody");
 const saveButton = document.getElementById("saveButton");
@@ -538,6 +571,89 @@ async function readJsonResponse(response) {
   }
 
   return result;
+}
+
+// Accept only valid HTTPS URLs for article links.
+function getSafeHttpsUrl(value) {
+  try {
+    const parsed = new URL(String(value || "").trim());
+
+    if (parsed.protocol !== "https:") return null;
+    if (!parsed.hostname) return null;
+
+    return parsed.href;
+  } catch (error) {
+    return null;
+  }
+}
+
+// Render unlimited Markdown-style links safely.
+// Example: [Read the full interview](https://example.com)
+// All ordinary text is inserted as text nodes, never as raw HTML.
+function renderArticleText(target, value) {
+  target.replaceChildren();
+
+  const text = String(value || "");
+  const linkPattern = /\[([^\]]+)\]\((https:\/\/[^)\s]+)\)/g;
+
+  let lastIndex = 0;
+  let match;
+
+  while ((match = linkPattern.exec(text)) !== null) {
+    const before = text.slice(lastIndex, match.index);
+
+    if (before) {
+      target.appendChild(document.createTextNode(before));
+    }
+
+    const safeUrl = getSafeHttpsUrl(match[2]);
+
+    if (safeUrl && match[1].trim()) {
+      const link = document.createElement("a");
+      link.href = safeUrl;
+      link.textContent = match[1];
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      target.appendChild(link);
+    } else {
+      target.appendChild(document.createTextNode(match[0]));
+    }
+
+    lastIndex = linkPattern.lastIndex;
+  }
+
+  const remaining = text.slice(lastIndex);
+
+  if (remaining) {
+    target.appendChild(document.createTextNode(remaining));
+  }
+}
+
+// Display source attribution without trusting article data as HTML.
+function renderArticleSource(article) {
+  articleSource.replaceChildren();
+  articleSource.hidden = true;
+
+  const sourceName = String(article.source || "").trim();
+
+  if (!sourceName) return;
+
+  articleSource.appendChild(document.createTextNode("Source: "));
+
+  const safeUrl = getSafeHttpsUrl(article.source_url);
+
+  if (safeUrl) {
+    const link = document.createElement("a");
+    link.href = safeUrl;
+    link.textContent = sourceName;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    articleSource.appendChild(link);
+  } else {
+    articleSource.appendChild(document.createTextNode(sourceName));
+  }
+
+  articleSource.hidden = false;
 }
 
 async function checkLogin() {
@@ -914,8 +1030,8 @@ async function loadArticle() {
     articleDate.textContent =
       formatDateTime(article.created_at);
 
-    articleBody.textContent =
-      article.content || "";
+    renderArticleSource(article);
+    renderArticleText(articleBody, article.content || "");
 
     if (article.image_url) {
       articleImage.src = article.image_url;
