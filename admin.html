@@ -220,6 +220,16 @@ body.light .theme-toggle {
   border-radius:8px;
 }
 
+#title{font-weight:900;letter-spacing:.02em}
+#summary{font-style:italic;line-height:1.65}
+.editor-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:9px 0}
+.editor-toolbar button{background:linear-gradient(135deg,#2878dc,#1554a6);border:1px solid #5595e8;border-radius:9px;padding:10px 14px;font-size:12px;font-weight:900;box-shadow:0 5px 14px #0002}
+.editor-help{margin:7px 0 12px;color:var(--muted);font-size:12px;line-height:1.6}
+#uploadButton,#saveButton{min-height:46px;padding:13px 20px;border-radius:10px;font-weight:900;letter-spacing:.035em;box-shadow:0 7px 18px #1769e833}
+#uploadButton{background:linear-gradient(135deg,#13a6c7,#1769e8);border:1px solid #55c5e5}
+#saveButton{background:linear-gradient(135deg,#2679e8,#124aa0);border:1px solid #68a5f5}
+#photo{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+
 .hidden {display:none!important}
 
 /* NEWSLETTER COMPOSER */
@@ -378,7 +388,17 @@ body.light .theme-toggle {
     <textarea id="summary"></textarea>
 
     <label for="content">Article Content</label>
+    <div class="editor-toolbar">
+      <button type="button" data-link-editor="content">INSERT LINK IN ARTICLE</button>
+    </div>
+    <p class="editor-help">Highlight the words you want to link, then tap Insert Link. You can add unlimited links anywhere in the article.</p>
     <textarea id="content" rows="9"></textarea>
+
+    <label for="source">News Source</label>
+    <input id="source" type="text" maxlength="180" placeholder="e.g. Official club statement, BBC Sport">
+
+    <label for="sourceUrl">Source URL (optional)</label>
+    <input id="sourceUrl" type="url" maxlength="2048" placeholder="https://example.com/source">
 
     <label for="category">Main Category</label>
     <select id="category" required>
@@ -405,11 +425,11 @@ body.light .theme-toggle {
       <option value="published">Published</option>
     </select>
 
-    <label for="photo">Upload Article Photo</label>
+    <label for="photo">Featured Article Photo</label>
     <input id="photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
 
     <div class="actions">
-      <button type="button" id="uploadButton">Upload Photo</button>
+      <button type="button" id="uploadButton">CHOOSE &amp; UPLOAD PHOTO</button>
     </div>
 
     <img id="preview" alt="Article image preview">
@@ -418,7 +438,7 @@ body.light .theme-toggle {
     <input id="imageUrl" type="url" placeholder="Uploaded image URL">
 
     <div class="actions">
-      <button type="submit" id="saveButton">Publish / Save Article</button>
+      <button type="submit" id="saveButton">PUBLISH ARTICLE</button>
       <button type="button" class="secondary hidden" id="cancelButton">
         Cancel Edit
       </button>
@@ -447,6 +467,10 @@ body.light .theme-toggle {
     autocomplete="off">
 
   <label for="newsletterMessage">Your message</label>
+  <div class="editor-toolbar">
+    <button type="button" data-link-editor="newsletterMessage">INSERT LINK IN NEWSLETTER</button>
+  </div>
+  <p class="editor-help">Highlight any words in your message, then insert a link. Add as many inline links as you need. Your three newsletter buttons below remain unchanged.</p>
   <textarea id="newsletterMessage" rows="10" maxlength="15000"
     placeholder="Write your newsletter message here..."
     style="min-height:220px"></textarea>
@@ -670,29 +694,34 @@ $("imageUrl").addEventListener("input", () => {
 
 $("photo").addEventListener("change", () => {
   const file = $("photo").files[0];
-
   if (file) {
     setPreview(URL.createObjectURL(file));
+    uploadSelectedPhoto();
   }
 });
 
 /* PHOTO UPLOAD */
 
-$("uploadButton").addEventListener("click", async () => {
+$("uploadButton").addEventListener("click", () => {
+  if (!getToken()) {
+    showMessage("Enter your admin token first.", true);
+    return;
+  }
+  $("photo").click();
+});
+
+async function uploadSelectedPhoto() {
   if (!getToken()) {
     showMessage("Enter your admin token first.", true);
     return;
   }
 
   const file = $("photo").files[0];
-
-  if (!file) {
-    showMessage("Choose a photo first.", true);
-    return;
-  }
+  if (!file) return;
 
   const button = $("uploadButton");
   button.disabled = true;
+  button.textContent = "UPLOADING PHOTO...";
   showMessage("Uploading photo...");
 
   try {
@@ -706,13 +735,11 @@ $("uploadButton").addEventListener("click", async () => {
     });
 
     const result = await response.json();
-
     if (!response.ok || !result.success) {
       throw new Error(result.error || "Photo upload failed.");
     }
 
     const uploadedUrl = result.image_url || result.url;
-
     if (!uploadedUrl) {
       throw new Error("Upload response did not contain an image URL.");
     }
@@ -720,13 +747,13 @@ $("uploadButton").addEventListener("click", async () => {
     $("imageUrl").value = uploadedUrl;
     setPreview(uploadedUrl);
     showMessage("Photo uploaded successfully.");
-
   } catch (error) {
     showMessage(error.message, true);
   } finally {
     button.disabled = false;
+    button.textContent = "CHOOSE & UPLOAD PHOTO";
   }
-});
+}
 
 /* FORM RESET */
 
@@ -735,7 +762,9 @@ function resetForm() {
   $("articleId").value = "";
   $("author").value = "WF Pundit";
   $("formHeading").textContent = "Create New Article";
-  $("saveButton").textContent = "Publish / Save Article";
+  $("saveButton").textContent = "PUBLISH ARTICLE";
+  $("source").value = "";
+  $("sourceUrl").value = "";
   $("cancelButton").classList.add("hidden");
   setPreview("");
   updateSubcategories();
@@ -763,6 +792,8 @@ form.addEventListener("submit", async event => {
     title: $("title").value.trim(),
     summary: $("summary").value,
     content: $("content").value,
+    source: $("source").value.trim(),
+    source_url: $("sourceUrl").value.trim(),
     image_url: $("imageUrl").value.trim(),
     category: selectedCategory,
     author: $("author").value.trim() || "WF Pundit",
@@ -907,6 +938,8 @@ function editArticle(article) {
   $("title").value = article.title || "";
   $("summary").value = article.summary || "";
   $("content").value = article.content || "";
+  $("source").value = article.source || "";
+  $("sourceUrl").value = article.source_url || "";
   $("author").value = article.author || "WF Pundit";
   $("status").value = article.status || "draft";
   $("imageUrl").value = article.image_url || "";
@@ -946,7 +979,7 @@ function editArticle(article) {
   setPreview(article.image_url || "");
 
   $("formHeading").textContent = "Edit Article #" + article.id;
-  $("saveButton").textContent = "Update Article";
+  $("saveButton").textContent = "UPDATE ARTICLE";
   $("cancelButton").classList.remove("hidden");
 
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -994,6 +1027,69 @@ const newsletterMessage = $("newsletterMessage");
 const newsletterPreview = $("newsletterPreview");
 const newsletterStatus = $("newsletterStatus");
 const newsletterSendButton = $("newsletterSendButton");
+
+function insertLinkAtSelection(textarea) {
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const selected = textarea.value.slice(start, end);
+  const label = window.prompt("Text to display as the link:", selected || "");
+  if (label === null || !label.trim()) return;
+
+  const rawUrl = window.prompt("Paste the HTTPS link:", "https://");
+  if (rawUrl === null) return;
+
+  let parsedUrl;
+  try {
+    parsedUrl = new URL(rawUrl.trim());
+  } catch (error) {
+    alert("Please enter a valid HTTPS link.");
+    return;
+  }
+
+  if (parsedUrl.protocol !== "https:") {
+    alert("Only HTTPS links are allowed.");
+    return;
+  }
+
+  const markdown = "[" + label.trim().replace(/[\[\]]/g, "") + "](" + parsedUrl.href + ")";
+  textarea.setRangeText(markdown, start, end, "end");
+  textarea.focus();
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function renderLinkedText(target, value) {
+  target.replaceChildren();
+  const lines = String(value || "").split(/\r?\n/);
+
+  lines.forEach((line, index) => {
+    const pattern = /\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g;
+    let cursor = 0;
+    let match;
+
+    while ((match = pattern.exec(line))) {
+      target.appendChild(document.createTextNode(line.slice(cursor, match.index)));
+
+      const link = document.createElement("a");
+      link.textContent = match[1];
+      link.href = match[2];
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.style.cssText = "color:#2878dc;text-decoration:underline;font-weight:700";
+      target.appendChild(link);
+
+      cursor = pattern.lastIndex;
+    }
+
+    target.appendChild(document.createTextNode(line.slice(cursor)));
+    if (index < lines.length - 1) target.appendChild(document.createElement("br"));
+  });
+}
+
+document.querySelectorAll("[data-link-editor]").forEach(button => {
+  button.addEventListener("click", () => {
+    insertLinkAtSelection($(button.dataset.linkEditor));
+  });
+});
 
 function setNewsletterStatus(text, isError = false) {
   newsletterStatus.textContent = text;
@@ -1069,7 +1165,7 @@ function updateNewsletterPreview() {
   }
 
   $("newsletterPreviewSubject").textContent = subject;
-  $("newsletterPreviewBody").textContent = body;
+  renderLinkedText($("newsletterPreviewBody"), body);
 
   const previewButtons = $("newsletterPreviewButtons");
   previewButtons.replaceChildren();
