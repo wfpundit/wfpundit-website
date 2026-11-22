@@ -394,11 +394,15 @@ body.light .theme-toggle {
     <p class="editor-help">Highlight the words you want to link, then tap Insert Link. You can add unlimited links anywhere in the article.</p>
     <textarea id="content" rows="9"></textarea>
 
-    <label for="source">News Source</label>
-    <input id="source" type="text" maxlength="180" placeholder="e.g. Official club statement, BBC Sport">
-
-    <label for="sourceUrl">Source URL (optional)</label>
-    <input id="sourceUrl" type="url" maxlength="2048" placeholder="https://example.com/source">
+    <label for="source">News Sources (Maximum 4)</label>
+    <textarea id="source" rows="5" maxlength="12000" placeholder="BBC Sport — https://www.bbc.com/sport
+The Guardian — https://www.theguardian.com
+FIFA — https://www.fifa.com
+Official Club Website — https://example.com"></textarea>
+    <p class="editor-help">
+      Enter one source per line using this format: Source name — HTTPS link.
+      You can add up to four sources. Leave unused lines blank.
+    </p>
 
     <label for="category">Main Category</label>
     <select id="category" required>
@@ -671,6 +675,59 @@ function authHeaders() {
   return { "Authorization": "Bearer " + getToken() };
 }
 
+/* SOURCE LINK VALIDATION: MAXIMUM FOUR */
+
+function validateArticleSources(value) {
+  const lines = String(value || "")
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean);
+
+  if (lines.length > 4) {
+    throw new Error("You can add a maximum of four news sources.");
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const separator = lines[i].lastIndexOf(" — ");
+
+    if (separator < 1) {
+      throw new Error(
+        "Source " + (i + 1) +
+        " must use this format: Source name — https://link"
+      );
+    }
+
+    const name = lines[i].slice(0, separator).trim();
+    const rawUrl = lines[i].slice(separator + 3).trim();
+
+    if (!name || name.length > 180) {
+      throw new Error(
+        "Source " + (i + 1) +
+        " needs a name of 180 characters or fewer."
+      );
+    }
+
+    let parsedUrl;
+
+    try {
+      parsedUrl = new URL(rawUrl);
+    } catch {
+      throw new Error(
+        "Source " + (i + 1) + " has an invalid link."
+      );
+    }
+
+    if (parsedUrl.protocol !== "https:") {
+      throw new Error(
+        "Source " + (i + 1) +
+        " link must begin with https://."
+      );
+    }
+  }
+
+  return lines.join("\n");
+}
+
 function showMessage(text, isError = false) {
   message.textContent = text;
   message.style.color = isError ? "#ff6677" : "#35c98a";
@@ -694,6 +751,7 @@ $("imageUrl").addEventListener("input", () => {
 
 $("photo").addEventListener("change", () => {
   const file = $("photo").files[0];
+
   if (file) {
     setPreview(URL.createObjectURL(file));
     uploadSelectedPhoto();
@@ -707,6 +765,7 @@ $("uploadButton").addEventListener("click", () => {
     showMessage("Enter your admin token first.", true);
     return;
   }
+
   $("photo").click();
 });
 
@@ -717,6 +776,7 @@ async function uploadSelectedPhoto() {
   }
 
   const file = $("photo").files[0];
+
   if (!file) return;
 
   const button = $("uploadButton");
@@ -735,20 +795,26 @@ async function uploadSelectedPhoto() {
     });
 
     const result = await response.json();
+
     if (!response.ok || !result.success) {
       throw new Error(result.error || "Photo upload failed.");
     }
 
     const uploadedUrl = result.image_url || result.url;
+
     if (!uploadedUrl) {
-      throw new Error("Upload response did not contain an image URL.");
+      throw new Error(
+        "Upload response did not contain an image URL."
+      );
     }
 
     $("imageUrl").value = uploadedUrl;
     setPreview(uploadedUrl);
     showMessage("Photo uploaded successfully.");
+
   } catch (error) {
     showMessage(error.message, true);
+
   } finally {
     button.disabled = false;
     button.textContent = "CHOOSE & UPLOAD PHOTO";
@@ -764,7 +830,6 @@ function resetForm() {
   $("formHeading").textContent = "Create New Article";
   $("saveButton").textContent = "PUBLISH ARTICLE";
   $("source").value = "";
-  $("sourceUrl").value = "";
   $("cancelButton").classList.add("hidden");
   setPreview("");
   updateSubcategories();
@@ -788,12 +853,22 @@ form.addEventListener("submit", async event => {
   const id = $("articleId").value;
   const selectedCategory = subcategory.value || category.value;
 
+  let sourceText;
+
+  try {
+    sourceText = validateArticleSources($("source").value);
+  } catch (error) {
+    showMessage(error.message, true);
+    $("source").focus();
+    return;
+  }
+
   const article = {
     title: $("title").value.trim(),
     summary: $("summary").value,
     content: $("content").value,
-    source: $("source").value.trim(),
-    source_url: $("sourceUrl").value.trim(),
+    source: sourceText,
+    source_url: "",
     image_url: $("imageUrl").value.trim(),
     category: selectedCategory,
     author: $("author").value.trim() || "WF Pundit",
@@ -829,7 +904,9 @@ form.addEventListener("submit", async event => {
     }
 
     showMessage(
-      id ? "Article updated successfully." : "Article created successfully."
+      id
+        ? "Article updated successfully."
+        : "Article created successfully."
     );
 
     resetForm();
@@ -837,6 +914,7 @@ form.addEventListener("submit", async event => {
 
   } catch (error) {
     showMessage(error.message, true);
+
   } finally {
     button.disabled = false;
   }
@@ -938,8 +1016,11 @@ function editArticle(article) {
   $("title").value = article.title || "";
   $("summary").value = article.summary || "";
   $("content").value = article.content || "";
-  $("source").value = article.source || "";
-  $("sourceUrl").value = article.source_url || "";
+
+  $("source").value = article.source_url
+    ? (article.source || "") + " — " + article.source_url
+    : (article.source || "");
+
   $("author").value = article.author || "WF Pundit";
   $("status").value = article.status || "draft";
   $("imageUrl").value = article.image_url || "";
@@ -960,7 +1041,8 @@ function editArticle(article) {
 
   } else {
     const leagueCategory = subcategories["Women's Leagues"] || [];
-    const internationalCategory = subcategories["International Football"] || [];
+    const internationalCategory =
+      subcategories["International Football"] || [];
 
     if (leagueCategory.includes(article.category)) {
       category.value = "Women's Leagues";
@@ -991,7 +1073,8 @@ function editArticle(article) {
 
 async function deleteArticle(id, title) {
   if (!confirm(
-    'Are you sure you want to delete "' + title + '"? This cannot be undone.'
+    'Are you sure you want to delete "' +
+    title + '"? This cannot be undone.'
   )) {
     return;
   }
@@ -1032,13 +1115,23 @@ function insertLinkAtSelection(textarea) {
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const selected = textarea.value.slice(start, end);
-  const label = window.prompt("Text to display as the link:", selected || "");
+
+  const label = window.prompt(
+    "Text to display as the link:",
+    selected || ""
+  );
+
   if (label === null || !label.trim()) return;
 
-  const rawUrl = window.prompt("Paste the HTTPS link:", "https://");
+  const rawUrl = window.prompt(
+    "Paste the HTTPS link:",
+    "https://"
+  );
+
   if (rawUrl === null) return;
 
   let parsedUrl;
+
   try {
     parsedUrl = new URL(rawUrl.trim());
   } catch (error) {
@@ -1051,7 +1144,10 @@ function insertLinkAtSelection(textarea) {
     return;
   }
 
-  const markdown = "[" + label.trim().replace(/[\[\]]/g, "") + "](" + parsedUrl.href + ")";
+  const markdown =
+    "[" + label.trim().replace(/[\[\]]/g, "") +
+    "](" + parsedUrl.href + ")";
+
   textarea.setRangeText(markdown, start, end, "end");
   textarea.focus();
   textarea.dispatchEvent(new Event("input", { bubbles: true }));
@@ -1059,6 +1155,7 @@ function insertLinkAtSelection(textarea) {
 
 function renderLinkedText(target, value) {
   target.replaceChildren();
+
   const lines = String(value || "").split(/\r?\n/);
 
   lines.forEach((line, index) => {
@@ -1067,21 +1164,29 @@ function renderLinkedText(target, value) {
     let match;
 
     while ((match = pattern.exec(line))) {
-      target.appendChild(document.createTextNode(line.slice(cursor, match.index)));
+      target.appendChild(
+        document.createTextNode(line.slice(cursor, match.index))
+      );
 
       const link = document.createElement("a");
       link.textContent = match[1];
       link.href = match[2];
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-      link.style.cssText = "color:#2878dc;text-decoration:underline;font-weight:700";
-      target.appendChild(link);
+      link.style.cssText =
+        "color:#2878dc;text-decoration:underline;font-weight:700";
 
+      target.appendChild(link);
       cursor = pattern.lastIndex;
     }
 
-    target.appendChild(document.createTextNode(line.slice(cursor)));
-    if (index < lines.length - 1) target.appendChild(document.createElement("br"));
+    target.appendChild(
+      document.createTextNode(line.slice(cursor))
+    );
+
+    if (index < lines.length - 1) {
+      target.appendChild(document.createElement("br"));
+    }
   });
 }
 
@@ -1093,7 +1198,8 @@ document.querySelectorAll("[data-link-editor]").forEach(button => {
 
 function setNewsletterStatus(text, isError = false) {
   newsletterStatus.textContent = text;
-  newsletterStatus.style.color = isError ? "#ff6677" : "#35c98a";
+  newsletterStatus.style.color =
+    isError ? "#ff6677" : "#35c98a";
 }
 
 function collectNewsletterButtons() {
@@ -1114,7 +1220,8 @@ function collectNewsletterButtons() {
 
     if (text.length > 40) {
       throw new Error(
-        "Button " + i + " text must be 40 characters or fewer."
+        "Button " + i +
+        " text must be 40 characters or fewer."
       );
     }
 
@@ -1123,12 +1230,15 @@ function collectNewsletterButtons() {
     try {
       parsedUrl = new URL(url);
     } catch {
-      throw new Error("Enter a valid link for button " + i + ".");
+      throw new Error(
+        "Enter a valid link for button " + i + "."
+      );
     }
 
     if (parsedUrl.protocol !== "https:") {
       throw new Error(
-        "Button " + i + " link must begin with https://."
+        "Button " + i +
+        " link must begin with https://."
       );
     }
 
@@ -1150,6 +1260,7 @@ function updateNewsletterPreview() {
       "Enter both a subject and a message before previewing.",
       true
     );
+
     newsletterPreview.classList.add("hidden");
     return false;
   }
@@ -1165,7 +1276,11 @@ function updateNewsletterPreview() {
   }
 
   $("newsletterPreviewSubject").textContent = subject;
-  renderLinkedText($("newsletterPreviewBody"), body);
+
+  renderLinkedText(
+    $("newsletterPreviewBody"),
+    body
+  );
 
   const previewButtons = $("newsletterPreviewButtons");
   previewButtons.replaceChildren();
@@ -1192,7 +1307,8 @@ function updateNewsletterPreview() {
 }
 
 newsletterMessage.addEventListener("input", () => {
-  $("newsletterCharCount").textContent = newsletterMessage.value.length;
+  $("newsletterCharCount").textContent =
+    newsletterMessage.value.length;
 });
 
 $("newsletterPreviewButton").addEventListener(
@@ -1253,12 +1369,15 @@ newsletterSendButton.addEventListener("click", async () => {
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      throw new Error(result.error || "Newsletter could not be sent.");
+      throw new Error(
+        result.error || "Newsletter could not be sent."
+      );
     }
 
     setNewsletterStatus(
       "Newsletter submitted to Brevo successfully. Campaign ID: " +
-      result.campaignId + ". Brevo will now process delivery."
+      result.campaignId +
+      ". Brevo will now process delivery."
     );
 
     newsletterSubject.value = "";
@@ -1278,6 +1397,7 @@ newsletterSendButton.addEventListener("click", async () => {
       error.message || "Newsletter could not be sent.",
       true
     );
+
   } finally {
     newsletterSendButton.disabled = false;
   }
