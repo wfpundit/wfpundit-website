@@ -117,6 +117,22 @@ h1{
   text-underline-offset:3px;
 }
 .article-source a:hover{opacity:.8}
+.article-source-list{
+  display:inline-flex;
+  flex-wrap:wrap;
+  gap:7px 13px;
+  margin:0;
+  padding:0;
+  list-style:none;
+}
+.article-source-list li{
+  display:inline;
+}
+.article-source-list li:not(:last-child)::after{
+  content:"·";
+  margin-left:13px;
+  color:var(--muted);
+}
 .article-image{
   display:block;
   width:100%;
@@ -304,8 +320,6 @@ h1{
 body.light-mode .reaction-button,body.light-mode .reply-toggle{background:#fff;color:#245d9d;border-color:#b9cbe0}
 body.light-mode .reaction-button.active{background:#e3f1ff;border-color:#6aa4df;color:#174d83}
 body.light-mode .reply-form textarea{background:#fff;color:#1c2939;border-color:#cbd5e1}
-@media(max-width:480px){.comment-replies{margin-left:8px;padding-left:9px}.reaction-button,.reply-toggle{padding:6px 8px;font-size:10px}}
-
 [hidden]{display:none!important}
 body.light-mode{
   --bg:#f1f4f8;
@@ -350,6 +364,12 @@ body.light-mode .article-source a{color:#245d9d}
   .summary{font-size:15px}
   .article-content{font-size:15px}
 }
+@media(max-width:480px){
+  .comment-replies{margin-left:8px;padding-left:9px}
+  .reaction-button,.reply-toggle{padding:6px 8px;font-size:10px}
+  .article-source-list{gap:7px 9px}
+  .article-source-list li:not(:last-child)::after{margin-left:9px}
+}
 </style>
 </head>
 
@@ -377,7 +397,7 @@ body.light-mode .article-source a{color:#245d9d}
           <span id="articleDate"></span>
         </div>
 
-        <p class="article-source" id="articleSource" hidden></p>
+        <div class="article-source" id="articleSource" hidden></div>
 
         <img id="articleImage" class="article-image" alt="" hidden>
         <div class="article-content" id="articleBody"></div>
@@ -587,8 +607,7 @@ function getSafeHttpsUrl(value) {
   }
 }
 
-// Render unlimited Markdown-style links safely.
-// Example: [Read the full interview](https://example.com)
+// Render Markdown-style links safely.
 // All ordinary text is inserted as text nodes, never as raw HTML.
 function renderArticleText(target, value) {
   target.replaceChildren();
@@ -629,30 +648,95 @@ function renderArticleText(target, value) {
   }
 }
 
-// Display source attribution without trusting article data as HTML.
+// Parse the single source field into a maximum of four source entries.
+// Expected format per line: Source name — HTTPS URL
+// Older articles using source + source_url remain supported.
+function getArticleSources(article) {
+  const rawSource = String(article.source || "").trim();
+  const legacyUrl = String(article.source_url || "").trim();
+
+  if (!rawSource) return [];
+
+  const lines = rawSource
+    .split(/\r?\n/)
+    .map(line => line.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+
+  const sources = [];
+
+  lines.forEach(line => {
+    const separatorIndex = line.indexOf(" — ");
+
+    if (separatorIndex !== -1) {
+      const name = line.slice(0, separatorIndex).trim();
+      const urlText = line.slice(separatorIndex + 3).trim();
+
+      if (!name || !urlText) return;
+
+      const safeUrl = getSafeHttpsUrl(urlText);
+
+      if (!safeUrl) return;
+
+      sources.push({ name, url: safeUrl });
+      return;
+    }
+
+    // Legacy format: one source name and a separate source_url field.
+    if (lines.length === 1 && legacyUrl) {
+      const safeUrl = getSafeHttpsUrl(legacyUrl);
+
+      sources.push({
+        name: line,
+        url: safeUrl
+      });
+      return;
+    }
+
+    // Keep older source names visible even if they do not have a link.
+    sources.push({
+      name: line,
+      url: null
+    });
+  });
+
+  return sources.slice(0, 4);
+}
+
+// Display one to four sources safely as clickable links.
 function renderArticleSource(article) {
   articleSource.replaceChildren();
   articleSource.hidden = true;
 
-  const sourceName = String(article.source || "").trim();
+  const sources = getArticleSources(article);
 
-  if (!sourceName) return;
+  if (!sources.length) return;
 
-  articleSource.appendChild(document.createTextNode("Source: "));
+  const label = document.createElement("strong");
+  label.textContent = sources.length > 1 ? "Sources: " : "Source: ";
+  articleSource.appendChild(label);
 
-  const safeUrl = getSafeHttpsUrl(article.source_url);
+  const list = document.createElement("ul");
+  list.className = "article-source-list";
 
-  if (safeUrl) {
-    const link = document.createElement("a");
-    link.href = safeUrl;
-    link.textContent = sourceName;
-    link.target = "_blank";
-    link.rel = "noopener noreferrer";
-    articleSource.appendChild(link);
-  } else {
-    articleSource.appendChild(document.createTextNode(sourceName));
-  }
+  sources.forEach(source => {
+    const item = document.createElement("li");
 
+    if (source.url) {
+      const link = document.createElement("a");
+      link.href = source.url;
+      link.textContent = source.name;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      item.appendChild(link);
+    } else {
+      item.textContent = source.name;
+    }
+
+    list.appendChild(item);
+  });
+
+  articleSource.appendChild(list);
   articleSource.hidden = false;
 }
 
