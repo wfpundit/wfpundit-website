@@ -136,7 +136,21 @@ export const OFFICIAL_CLUBS = [
   { id: "bayern-munich-women", name: "FC Bayern München", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
   { id: "nurnberg-women", name: "1. FC Nürnberg", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
   { id: "vfb-stuttgart-women", name: "VfB Stuttgart", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
-  { id: "wolfsburg-women", name: "VfL Wolfsburg", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" }
+  { id: "wolfsburg-women", name: "VfL Wolfsburg", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },
+
+  // Arkema Première Ligue (France, 2026-27 official FFF club ticketing directory)
+  { id: "fc-fleury-91-women", name: "FC Fleury 91", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "fc-nantes-women", name: "FC Nantes", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "le-havre-ac-women", name: "Le Havre AC", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "montpellier-fc-women", name: "Montpellier FC", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "ol-lyonnes", name: "OL Lyonnes", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "olympique-marseille-women", name: "Olympique de Marseille", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "paris-fc-women", name: "Paris FC", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "paris-saint-germain-women", name: "Paris Saint-Germain", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "rc-lens-women", name: "RC Lens", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "rc-strasbourg-alsace-women", name: "RC Strasbourg Alsace", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "toulouse-fc-women", name: "Toulouse FC", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "us-saint-malo-women", name: "US Saint-Malo", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" }
 ];
 
 // No club RSS/Atom URLs are enabled until each endpoint is confirmed as an official feed.
@@ -162,4 +176,4 @@ export const ARTICLE_KEYWORDS = [
   "manager", "coach", "match report", "national team", "qualifier", "tournament"
 ];
 
-export const SOURCE_REGISTRY_VERSION = 4;
+export const SOURCE_REGISTRY_VERSION = 5;
