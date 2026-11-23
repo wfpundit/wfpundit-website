@@ -110,7 +110,7 @@ export const OFFICIAL_CLUBS = [
   { id: "costa-adeje-tenerife", name: "Costa Adeje Tenerife", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },
   { id: "deportivo-abanca", name: "Deportivo Abanca", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },
   { id: "deportivo-alaves-women", name: "Deportivo Alavés", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },
-  { id: "dux-logrono", name: "DUX Logroño", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },
+  { id: "logrono-united", name: "Logroño United", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },
   { id: "fc-badalona-women", name: "FC Badalona Women", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },
   { id: "barcelona-femeni", name: "FC Barcelona", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },
   { id: "granada-cf-women", name: "Granada CF Fundación 1931", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },
@@ -147,7 +147,7 @@ export const OFFICIAL_CLUBS = [
   { id: "olympique-marseille-women", name: "Olympique de Marseille", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
   { id: "paris-fc-women", name: "Paris FC", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
   { id: "paris-saint-germain-women", name: "Paris Saint-Germain", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
-  { id: "rc-lens-women", name: "RC Lens", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
+  { id: "amiens-sc-women", name: "Amiens SC", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
   { id: "rc-strasbourg-alsace-women", name: "RC Strasbourg Alsace", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
   { id: "toulouse-fc-women", name: "Toulouse FC", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" },
   { id: "us-saint-malo-women", name: "US Saint-Malo", league: "Arkema Première Ligue", country: "France", leagueDirectory: "https://billetterie.fff.fr/fr/arkema_premiere_ligue" }
@@ -176,4 +176,4 @@ export const ARTICLE_KEYWORDS = [
   "manager", "coach", "match report", "national team", "qualifier", "tournament"
 ];
 
-export const SOURCE_REGISTRY_VERSION = 5;
+export const SOURCE_REGISTRY_VERSION = 6;
