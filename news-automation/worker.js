@@ -149,12 +149,12 @@ function titleSimilarity(a, b) {
 async function markPossibleDuplicates(env, item, editorial) {
   if (editorial.status === "excluded") return editorial;
   const recent = await env.DB.prepare(`
-    SELECT id, title, source_name FROM wf_news_candidates
+    SELECT id, title, source_name, url FROM wf_news_candidates
     WHERE discovered_at >= datetime('now', '-48 hours')
     ORDER BY discovered_at DESC LIMIT ?
   `).bind(MAX_DUPLICATE_COMPARISON_ROWS).all();
   const matches = (recent.results || [])
-    .filter(row => row.title !== item.title && titleSimilarity(row.title, item.title) >= 0.72)
+    .filter(row => row.url !== item.link && titleSimilarity(row.title, item.title) >= 0.72)
     .slice(0, 3);
   if (matches.length) {
     editorial.flags.push("possible_related_story");
@@ -168,7 +168,7 @@ async function markPossibleDuplicates(env, item, editorial) {
 
 async function backfillPendingEditorial(env) {
   const pending = await env.DB.prepare(`
-    SELECT id, title, description, published_at
+    SELECT id, title, description, published_at, url
     FROM wf_news_candidates
     WHERE editorial_status = 'pending_triage'
     ORDER BY discovered_at DESC
@@ -179,7 +179,8 @@ async function backfillPendingEditorial(env) {
     const item = {
       title: row.title || "",
       description: row.description || "",
-      publishedAt: row.published_at || null
+      publishedAt: row.published_at || null,
+      link: row.url
     };
     let editorial = editorialTriage(item);
     editorial = await markPossibleDuplicates(env, item, editorial);
