@@ -33,15 +33,14 @@ function decodeXML(value = "") {
 
 function tagValue(xml, tag) {
   const match = xml.match(new RegExp(
-    "<" + tag + "(?:\\s[^>]*)?>([\\s\\S]*?)<\\/" +
-    tag.replace(/:/g, "\\\\:") + ">",
+    "<" + tag + "(?:\\s[^>]*)?>([\\s\\S]*?)</" + tag + ">",
     "i"
   ));
   return match ? decodeXML(match[1].trim()) : "";
 }
 
 function attributeValue(xml, attribute) {
-  const match = xml.match(new RegExp("\\\\b" + attribute + "\\s*=\\s*[\\"']([^\\"']+)[\\"']", "i"));
+  const match = xml.match(new RegExp("\\b" + attribute + "\\s*=\\s*[\"']([^\"']+)[\"']", "i"));
   return match ? decodeXML(match[1].trim()) : "";
 }
 
