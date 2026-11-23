@@ -19,7 +19,7 @@ function json(data, status = 200) {
 
 function authorised(request, env) {
   return Boolean(env.ADMIN_TOKEN &&
-    request.headers.get("Authorization") === \`Bearer \${env.ADMIN_TOKEN}\`);
+    request.headers.get("Authorization") === `Bearer ${env.ADMIN_TOKEN}`);
 }
 
 function decodeXML(value = "") {
@@ -33,7 +33,7 @@ function decodeXML(value = "") {
 
 function tagValue(xml, tag) {
   const match = xml.match(new RegExp(
-    "<" + tag.replace(/:/g, "\\\\:") + "(?:\\\\s[^>]*)?>([\\\\s\\\\S]*?)<\\\\/" +
+    "<" + tag + "(?:\\s[^>]*)?>([\\s\\S]*?)<\\/" +
     tag.replace(/:/g, "\\\\:") + ">",
     "i"
   ));
@@ -41,7 +41,7 @@ function tagValue(xml, tag) {
 }
 
 function attributeValue(xml, attribute) {
-  const match = xml.match(new RegExp("\\\\b" + attribute + "\\\\s*=\\\\s*[\\"']([^\\"']+)[\\"']", "i"));
+  const match = xml.match(new RegExp("\\\\b" + attribute + "\\s*=\\s*[\\"']([^\\"']+)[\\"']", "i"));
   return match ? decodeXML(match[1].trim()) : "";
 }
 
@@ -148,11 +148,11 @@ function titleSimilarity(a, b) {
 
 async function markPossibleDuplicates(env, item, editorial) {
   if (editorial.status === "excluded") return editorial;
-  const recent = await env.DB.prepare(\`
+  const recent = await env.DB.prepare(`
     SELECT id, title, source_name FROM wf_news_candidates
     WHERE discovered_at >= datetime('now', '-48 hours')
     ORDER BY discovered_at DESC LIMIT ?
-  \`).bind(MAX_DUPLICATE_COMPARISON_ROWS).all();
+  `).bind(MAX_DUPLICATE_COMPARISON_ROWS).all();
   const matches = (recent.results || [])
     .filter(row => row.title !== item.title && titleSimilarity(row.title, item.title) >= 0.72)
     .slice(0, 3);
@@ -168,7 +168,7 @@ async function markPossibleDuplicates(env, item, editorial) {
 
 async function ensureDatabase(env) {
   if (!env.DB) throw new Error("The D1 database binding DB is missing.");
-  await env.DB.prepare(\`
+  await env.DB.prepare(`
     CREATE TABLE IF NOT EXISTS wf_news_candidates (
       id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL,
       description TEXT DEFAULT '', url TEXT NOT NULL UNIQUE,
@@ -176,7 +176,7 @@ async function ensureDatabase(env) {
       published_at TEXT, discovered_at TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'new', created_at TEXT NOT NULL
     )
-  \`).run();
+  `).run();
 
   const columns = await env.DB.prepare("PRAGMA table_info(wf_news_candidates)").all();
   const names = new Set((columns.results || []).map(column => column.name));
@@ -200,22 +200,22 @@ async function saveCandidate(env, item) {
   const existing = await env.DB.prepare("SELECT id FROM wf_news_candidates WHERE url = ?").bind(item.link).first();
 
   if (existing) {
-    await env.DB.prepare(\`
+    await env.DB.prepare(`
       UPDATE wf_news_candidates
       SET title = ?, description = ?, source_name = ?, source_region = ?,
           published_at = ?, editorial_status = ?, editorial_flags = ?
       WHERE id = ?
-    \`).bind(item.title, item.description, item.sourceName, item.sourceRegion,
+    `).bind(item.title, item.description, item.sourceName, item.sourceRegion,
       item.publishedAt, editorial.status, flags, existing.id).run();
     return { inserted: false, editorialStatus: editorial.status };
   }
 
-  const result = await env.DB.prepare(\`
+  const result = await env.DB.prepare(`
     INSERT INTO wf_news_candidates (
       title, description, url, source_name, source_region, published_at,
       discovered_at, status, created_at, editorial_status, editorial_flags
     ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?)
-  \`).bind(item.title, item.description, item.link, item.sourceName, item.sourceRegion,
+  `).bind(item.title, item.description, item.link, item.sourceName, item.sourceRegion,
     item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags).run();
 
   return { inserted: result.meta.changes > 0, editorialStatus: editorial.status };
@@ -290,10 +290,10 @@ async function getCandidates(env, request) {
   if (editorialStatus !== "all") { clauses.push("editorial_status = ?"); values.push(editorialStatus); }
 
   const where = clauses.length ? "WHERE " + clauses.join(" AND ") : "";
-  const result = await env.DB.prepare(\`
-    SELECT * FROM wf_news_candidates \${where}
+  const result = await env.DB.prepare(`
+    SELECT * FROM wf_news_candidates ${where}
     ORDER BY discovered_at DESC LIMIT ?
-  \`).bind(...values, limit).all();
+  `).bind(...values, limit).all();
 
   return json({
     success: true, count: result.results.length,
