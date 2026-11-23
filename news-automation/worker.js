@@ -140,7 +140,7 @@ function normaliseTitle(title = "") {
 function titleSimilarity(a, b) {
   // Keep numeric tokens such as "10" and "11": they distinguish matchweeks
   // and episode numbers that would otherwise be discarded as short words.
-  const keepToken = word => word.length > 2 || /^\\d+$/.test(word);
+  const keepToken = word => word.length > 2 || /^\d+$/.test(word);
   const left = new Set(normaliseTitle(a).split(" ").filter(keepToken));
   const right = new Set(normaliseTitle(b).split(" ").filter(keepToken));
   if (!left.size || !right.size) return 0;
