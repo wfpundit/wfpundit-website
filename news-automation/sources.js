@@ -1,10 +1,8 @@
 
 /**
  * WF Pundit — source registry
- *
- * RSS endpoints only. Do not scrape pages that do not publish a feed.
- * Preserve each publisher's name and original article URL.
- * Feed items are discovery leads, not permission to republish source material.
+ * RSS feeds only. Preserve publisher attribution and original URLs.
+ * Discovery feeds do not grant permission to copy articles.
  */
 
 export const RSS_FEEDS = [
@@ -23,13 +21,25 @@ export const RSS_FEEDS = [
     language: "en",
     url: "https://www.theguardian.com/football/womensfootball/rss",
     enabled: true
+  },
+  {
+    id: "equalizer-soccer",
+    name: "Equalizer Soccer",
+    region: "North America",
+    language: "en",
+    url: "https://equalizersoccer.com/feed/",
+    enabled: true
+  },
+  {
+    id: "shekicks",
+    name: "SheKicks Magazine",
+    region: "United Kingdom and International",
+    language: "en",
+    url: "https://shekicks.net/feed/",
+    enabled: true
   }
 ];
 
-/**
- * Topics for future regional search-feed adapters.
- * These are topics, not verified RSS endpoints.
- */
 export const DISCOVERY_TOPICS = [
   {
     id: "global",
@@ -39,7 +49,7 @@ export const DISCOVERY_TOPICS = [
   {
     id: "africa",
     label: "African women's football",
-    terms: ["women's football Africa", "CAF women's football", "WAFCON"]
+    terms: ["CAF women's football", "WAFCON", "African women's football"]
   },
   {
     id: "england",
@@ -49,22 +59,27 @@ export const DISCOVERY_TOPICS = [
   {
     id: "europe",
     label: "European club football",
-    terms: ["UEFA Women's Champions League", "women's football Europe", "women's transfer news"]
+    terms: ["UWCL", "Liga F", "Frauen Bundesliga", "Serie A Women"]
   },
   {
     id: "north-america",
     label: "North American football",
-    terms: ["NWSL", "Liga MX Femenil", "Canada women's soccer"]
+    terms: ["NWSL", "USWNT", "Liga MX Femenil", "Canada women's soccer"]
   },
   {
     id: "south-america",
     label: "South American football",
-    terms: ["Copa Libertadores Femenina", "Brazil women's football", "Argentina women's football"]
+    terms: ["Copa Libertadores Femenina", "Brazil women's football"]
   },
   {
     id: "asia",
     label: "Asian women's football",
-    terms: ["AFC Women's Champions League", "Japan women's football", "China women's football", "Australia A-League Women"]
+    terms: ["AFC Women's Champions League", "Japan women's football"]
+  },
+  {
+    id: "oceania",
+    label: "Australian and New Zealand football",
+    terms: ["A-League Women", "Matildas", "Football Ferns"]
   }
 ];
 
@@ -81,15 +96,21 @@ export const ARTICLE_KEYWORDS = [
   "Liga MX Femenil",
   "Copa Libertadores Femenina",
   "transfer",
+  "transfer rumour",
+  "transfer rumor",
+  "rumoured",
+  "rumored",
+  "linked with",
+  "in talks",
+  "loan move",
+  "contract extension",
   "injury",
   "manager",
   "coach",
-  "contract",
   "match report",
-  "international",
   "national team",
   "qualifier",
   "tournament"
 ];
 
-export const SOURCE_REGISTRY_VERSION = 1;
+export const SOURCE_REGISTRY_VERSION = 2;
