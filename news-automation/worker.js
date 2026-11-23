@@ -2,7 +2,8 @@ import {
   RSS_FEEDS,
   ARTICLE_KEYWORDS,
   SOURCE_REGISTRY_VERSION,
-  OFFICIAL_CLUBS
+  OFFICIAL_CLUBS,
+  OFFICIAL_CLUB_FEEDS
 } from "./sources.js";
 
 const WORKER_NAME = "WF Pundit News Automation";
@@ -165,6 +166,35 @@ async function markPossibleDuplicates(env, item, editorial) {
   return editorial;
 }
 
+async function backfillPendingEditorial(env) {
+  const pending = await env.DB.prepare(`
+    SELECT id, title, description, published_at
+    FROM wf_news_candidates
+    WHERE editorial_status = 'pending_triage'
+    ORDER BY discovered_at DESC
+    LIMIT 1000
+  `).all();
+
+  for (const row of pending.results || []) {
+    const item = {
+      title: row.title || "",
+      description: row.description || "",
+      publishedAt: row.published_at || null
+    };
+    let editorial = editorialTriage(item);
+    editorial = await markPossibleDuplicates(env, item, editorial);
+    const flags = JSON.stringify({
+      flags: editorial.flags,
+      relatedCandidates: editorial.relatedCandidates || []
+    });
+    await env.DB.prepare(`
+      UPDATE wf_news_candidates
+      SET editorial_status = ?, editorial_flags = ?
+      WHERE id = ?
+    `).bind(editorial.status, flags, row.id).run();
+  }
+}
+
 async function ensureDatabase(env) {
   if (!env.DB) throw new Error("The D1 database binding DB is missing.");
   await env.DB.prepare(`
@@ -187,6 +217,7 @@ async function ensureDatabase(env) {
   }
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_status ON wf_news_candidates(status)").run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_editorial_status ON wf_news_candidates(editorial_status)").run();
+  await backfillPendingEditorial(env);
 }
 
 async function saveCandidate(env, item) {
@@ -322,7 +353,7 @@ export default {
         stage: "RSS and Atom collection with editorial triage"
       });
     }
-    if (path === "/sources") return json({ success: true, feeds: RSS_FEEDS });
+    if (path === "/sources") return json({ success: true, feeds: RSS_FEEDS, officialClubFeeds: OFFICIAL_CLUB_FEEDS });
     if (path === "/clubs") return json({ success: true, count: OFFICIAL_CLUBS.length, clubs: OFFICIAL_CLUBS });
 
     if (!authorised(request, env)) return json({ error: "Unauthorised" }, 401);
