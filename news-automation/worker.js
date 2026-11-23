@@ -163,8 +163,23 @@ async function markPossibleDuplicates(env, item, editorial) {
       const existingTitle = normaliseTitle(row.title);
       // Same-feed items with an identical recurring programme title are
       // not treated as cross-article duplicates (e.g. weekly podcast feeds).
-      if (item.sourceName && row.source_name === item.sourceName &&
-          existingTitle === currentTitle) return false;
+      if (item.sourceName && row.source_name === item.sourceName) {
+        if (existingTitle === currentTitle) return false;
+
+        // Separate numbered editions of the same recurring series (for
+        // example, WSL matchweek 10 vs matchweek 11) are not duplicates.
+        const editionPattern = /\\bmatchweek\\s+(\\d+)\\b/i;
+        const currentEdition = item.title.match(editionPattern);
+        const existingEdition = row.title.match(editionPattern);
+        if (currentEdition && existingEdition &&
+            currentEdition[1] !== existingEdition[1]) {
+          const withoutEditionNumber = title =>
+            normaliseTitle(title.replace(/\\bmatchweek\\s+\\d+\\b/ig, " matchweek "));
+          if (withoutEditionNumber(row.title) === withoutEditionNumber(item.title)) {
+            return false;
+          }
+        }
+      }
       return titleSimilarity(row.title, item.title) >= 0.72;
     })
     .slice(0, 3);
