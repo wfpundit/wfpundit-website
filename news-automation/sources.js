@@ -39,8 +39,8 @@ export const RSS_FEEDS = [
   }
 ];
 
-// Current club directory snapshot: Barclays WSL / WSL2 and NWSL.
-// Recheck league membership and canonical URLs periodically.
+// Current club directory snapshot: WSL / WSL2, NWSL, Serie A Women, Liga F and Frauen-Bundesliga.
+// League membership is sourced from the official competition/federation directories and should be refreshed each season.
 export const OFFICIAL_CLUBS = [
   // Barclays Women's Super League
   { id: "arsenal-women", name: "Arsenal Women", league: "Barclays WSL", country: "England", officialWebsite: "https://www.arsenal.com/", leagueDirectory: "https://www.wslfootball.com/clubs/index" },
@@ -88,7 +88,55 @@ export const OFFICIAL_CLUBS = [
   { id: "san-diego-wave", name: "San Diego Wave FC", league: "NWSL", country: "United States", officialWebsite: "https://sandiegowavefc.com/", leagueDirectory: "https://www.nwslsoccer.com/teams" },
   { id: "seattle-reign", name: "Seattle Reign FC", league: "NWSL", country: "United States", officialWebsite: "https://www.reignfc.com/", leagueDirectory: "https://www.nwslsoccer.com/teams" },
   { id: "utah-royals", name: "Utah Royals FC", league: "NWSL", country: "United States", officialWebsite: "https://www.rsl.com/", leagueDirectory: "https://www.nwslsoccer.com/teams" },
-  { id: "washington-spirit", name: "Washington Spirit", league: "NWSL", country: "United States", officialWebsite: "https://washingtonspirit.com/", leagueDirectory: "https://www.nwslsoccer.com/teams" }
+  { id: "washington-spirit", name: "Washington Spirit", league: "NWSL", country: "United States", officialWebsite: "https://washingtonspirit.com/", leagueDirectory: "https://www.nwslsoccer.com/teams" },
+
+  // Serie A Women (Italy, 2026-27 official FIGC club list)
+  { id: "como-1907-women", name: "Como 1907", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "como-women", name: "Como Women", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "fiorentina-women", name: "Fiorentina", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "inter-women", name: "Inter", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "juventus-women", name: "Juventus", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "lazio-women", name: "Lazio", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "milan-women", name: "Milan", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "napoli-women", name: "Napoli Women", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "parma-women", name: "Parma", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "roma-women", name: "Roma", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "sassuolo-women", name: "Sassuolo", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+  { id: "ternana-women", name: "Ternana Women", league: "Serie A Women", country: "Italy", leagueDirectory: "https://www.figc.it/it/serie-a-women/club/club-serie-a" },,
+
+  // Liga F (Spain, 2026-27 official LALIGA club list)
+  { id: "athletic-club-women", name: "Athletic Club", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "atletico-madrid-women", name: "Atlético de Madrid", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "costa-adeje-tenerife", name: "Costa Adeje Tenerife", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "deportivo-abanca", name: "Deportivo Abanca", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "deportivo-alaves-women", name: "Deportivo Alavés", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "dux-logrono", name: "DUX Logroño", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "fc-badalona-women", name: "FC Badalona Women", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "barcelona-femeni", name: "FC Barcelona", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "granada-cf-women", name: "Granada CF Fundación 1931", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "madrid-cff", name: "Madrid CFF", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "espanyol-women", name: "RCD Espanyol de Barcelona", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "real-madrid-femeni", name: "Real Madrid CF", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "real-sociedad-women", name: "Real Sociedad", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "sd-eibar-women", name: "SD Eibar", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "sevilla-fc-women", name: "Sevilla FC", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+  { id: "valencia-cf-femenino", name: "VCF Femenino", league: "Liga F", country: "Spain", leagueDirectory: "https://www.laliga.com/futbol-femenino/clubes" },,
+
+  // Google Pixel Frauen-Bundesliga (Germany, 2026-27 official DFB club list)
+  { id: "union-berlin-women", name: "1. FC Union Berlin", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "werder-bremen-women", name: "SV Werder Bremen", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "eintracht-frankfurt-women", name: "Eintracht Frankfurt", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "sc-freiburg-women", name: "SC Freiburg", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "hamburger-sv-women", name: "Hamburger SV", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "hoffenheim-women", name: "TSG 1899 Hoffenheim", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "fc-koln-women", name: "1. FC Köln", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "rb-leipzig-women", name: "RB Leipzig", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "bayer-leverkusen-women", name: "Bayer 04 Leverkusen", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "mainz-05-women", name: "1. FSV Mainz 05", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "bayern-munich-women", name: "FC Bayern München", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "nurnberg-women", name: "1. FC Nürnberg", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "vfb-stuttgart-women", name: "VfB Stuttgart", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" },,
+  { id: "wolfsburg-women", name: "VfL Wolfsburg", league: "Google Pixel Frauen-Bundesliga", country: "Germany", leagueDirectory: "https://www.dfb.de/news/teilnehmerfeld-der-google-pixel-frauen-bundesliga-steht-fest-alle-sportlich-qualifizierten-klubs-erhalten-zulassung" }
 ];
 
 // No club RSS/Atom URLs are enabled until each endpoint is confirmed as an official feed.
@@ -114,4 +162,4 @@ export const ARTICLE_KEYWORDS = [
   "manager", "coach", "match report", "national team", "qualifier", "tournament"
 ];
 
-export const SOURCE_REGISTRY_VERSION = 3;
+export const SOURCE_REGISTRY_VERSION = 4;
