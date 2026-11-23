@@ -168,13 +168,13 @@ async function markPossibleDuplicates(env, item, editorial) {
 
         // Separate numbered editions of the same recurring series (for
         // example, WSL matchweek 10 vs matchweek 11) are not duplicates.
-        const editionPattern = /\\bmatchweek\\s+(\\d+)\\b/i;
+        const editionPattern = /\bmatchweek\s+(\d+)\b/i;
         const currentEdition = item.title.match(editionPattern);
         const existingEdition = row.title.match(editionPattern);
         if (currentEdition && existingEdition &&
             currentEdition[1] !== existingEdition[1]) {
           const withoutEditionNumber = title =>
-            normaliseTitle(title.replace(/\\bmatchweek\\s+\\d+\\b/ig, " matchweek "));
+            normaliseTitle(title.replace(/\bmatchweek\s+\d+\b/ig, " matchweek "));
           if (withoutEditionNumber(row.title) === withoutEditionNumber(item.title)) {
             return false;
           }
