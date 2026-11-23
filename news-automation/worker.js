@@ -138,8 +138,11 @@ function normaliseTitle(title = "") {
 }
 
 function titleSimilarity(a, b) {
-  const left = new Set(normaliseTitle(a).split(" ").filter(word => word.length > 2));
-  const right = new Set(normaliseTitle(b).split(" ").filter(word => word.length > 2));
+  // Keep numeric tokens such as "10" and "11": they distinguish matchweeks
+  // and episode numbers that would otherwise be discarded as short words.
+  const keepToken = word => word.length > 2 || /^\\d+$/.test(word);
+  const left = new Set(normaliseTitle(a).split(" ").filter(keepToken));
+  const right = new Set(normaliseTitle(b).split(" ").filter(keepToken));
   if (!left.size || !right.size) return 0;
   let overlap = 0;
   for (const word of left) if (right.has(word)) overlap++;
@@ -153,8 +156,17 @@ async function markPossibleDuplicates(env, item, editorial) {
     WHERE discovered_at >= datetime('now', '-48 hours')
     ORDER BY discovered_at DESC LIMIT ?
   `).bind(MAX_DUPLICATE_COMPARISON_ROWS).all();
+  const currentTitle = normaliseTitle(item.title);
   const matches = (recent.results || [])
-    .filter(row => row.url !== item.link && titleSimilarity(row.title, item.title) >= 0.72)
+    .filter(row => {
+      if (row.url === item.link) return false;
+      const existingTitle = normaliseTitle(row.title);
+      // Same-feed items with an identical recurring programme title are
+      // not treated as cross-article duplicates (e.g. weekly podcast feeds).
+      if (item.sourceName && row.source_name === item.sourceName &&
+          existingTitle === currentTitle) return false;
+      return titleSimilarity(row.title, item.title) >= 0.72;
+    })
     .slice(0, 3);
   if (matches.length) {
     editorial.flags.push("possible_related_story");
@@ -180,6 +192,7 @@ async function backfillPendingEditorial(env) {
       title: row.title || "",
       description: row.description || "",
       publishedAt: row.published_at || null,
+      sourceName: row.source_name || "",
       link: row.url
     };
     let editorial = editorialTriage(item);
