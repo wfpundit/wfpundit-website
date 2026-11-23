@@ -121,9 +121,21 @@ function editorialTriage(item) {
 
   if (item.publishedAt) {
     const time = Date.parse(item.publishedAt);
-    if (!Number.isNaN(time) && time > Date.now() + 5 * 60 * 1000) flags.push("future_publication_date");
-    if (Number.isNaN(time)) flags.push("unparsed_publication_date");
+    if (Number.isNaN(time)) {
+      flags.push("unparsed_publication_date");
+    } else if (time > Date.now() + 5 * 60 * 1000) {
+      flags.push("future_publication_date");
+    } else if (Date.now() - time > 48 * 60 * 60 * 1000) {
+      flags.push("older_than_48_hours");
+    }
   }
+
+  // Keep older stories in the database for reference, but remove them
+  // from the current editorial-review queue.
+  if (flags.includes("older_than_48_hours")) {
+    return { status: "excluded", flags };
+  }
+
   return {
     status: flags.length ? "needs_editorial_check" : "ready_for_editorial_review",
     flags
