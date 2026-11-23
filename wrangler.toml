@@ -7,8 +7,8 @@ crons = ["*/15 * * * *"]
 
 [[d1_databases]]
 binding = "DB"
-database_name = "wfpundit-db"
-database_id = "75fa8c35-6422-4e8b-928b-59d7ddc8206b"
+database_name = "wfpundit-news-test-db"
+database_id = "90bee875-0b6a-4cd4-b824-214f8c1eb6c9"
 [observability]
 enabled = true
 head_sampling_rate = 1
