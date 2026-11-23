@@ -9,3 +9,21 @@ crons = ["*/15 * * * *"]
 binding = "DB"
 database_name = "wfpundit-db"
 database_id = "75fa8c35-6422-4e8b-928b-59d7ddc8206b"
+[observability]
+enabled = true
+head_sampling_rate = 1
+redact_query_string = false
+
+[observability.logs]
+enabled = true
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
+
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
+persist = true
+
+[observability.issues]
+enabled = false
