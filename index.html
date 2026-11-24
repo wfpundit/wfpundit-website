@@ -117,9 +117,11 @@ animation:toplineSlide 25s linear infinite
 .topline-group{
 display:inline-flex;
 align-items:center;
-flex:none;
+justify-content:space-around;
+flex:0 0 100vw;
+box-sizing:border-box;
 gap:10px;
-padding-right:38px;
+padding:0 24px;
 white-space:nowrap
 }
 .topline-live{
@@ -1624,7 +1626,12 @@ body.light-mode .foot .brand{color:#1c2939}/* DESKTOP-SITE HEADER ON TABLETS AND
 .wrap{width:calc(100% - 24px)}
 .topline{height:27px}
 .topline .wrap{width:100%;padding:0}
-.topline-group{gap:8px;padding-right:30px}
+.topline-group{
+  flex:none;
+  justify-content:flex-start;
+  gap:8px;
+  padding:0 30px 0 0
+}
 .topline-live,.topline-location,.topline-message{font-size:8px}
 .topline-dot{width:5px;height:5px}
 .nav{min-height:66px;justify-content:flex-start;gap:9px}
