@@ -375,6 +375,21 @@ body.light .theme-toggle {
   <p class="muted">Your token is used for authenticated admin requests.</p>
 </section>
 
+<section class="panel" id="collectedNewsPanel">
+  <h2>Collected News</h2>
+  <p class="muted">
+    Review recent stories gathered by the test news collector. Choosing a story
+    fills the article editor as a draft; nothing is published automatically.
+  </p>
+  <div class="actions">
+    <button type="button" id="loadCollectedNewsButton">Load Collected News</button>
+  </div>
+  <p id="collectedNewsStatus" class="muted" role="status" aria-live="polite">
+    Enter your admin token, then load collected news.
+  </p>
+  <div id="collectedNewsList"></div>
+</section>
+
 <section class="panel">
   <h2 id="formHeading">Create New Article</h2>
 
@@ -570,6 +585,100 @@ const category = $("category");
 const subcategory = $("subcategory");
 const form = $("articleForm");
 const message = $("message");
+
+/* COLLECTED NEWS: LOAD TEST CANDIDATES INTO THE EXISTING EDITOR */
+
+$("loadCollectedNewsButton").addEventListener("click", loadCollectedNews);
+
+async function loadCollectedNews() {
+  const status = $("collectedNewsStatus");
+  const list = $("collectedNewsList");
+
+  if (!getToken()) {
+    status.textContent = "Enter your admin token first.";
+    return;
+  }
+
+  status.textContent = "Loading recent collected stories...";
+  list.replaceChildren();
+
+  try {
+    const response = await fetch("/api/admin/collected-news", {
+      method: "GET",
+      headers: authHeaders(),
+      cache: "no-store"
+    });
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to load collected news.");
+    }
+
+    if (!result.candidates || !result.candidates.length) {
+      status.textContent = "No new stories are currently ready for editorial review.";
+      return;
+    }
+
+    status.textContent = result.count + " stories ready for editorial review.";
+
+    result.candidates.forEach(candidate => {
+      const card = document.createElement("article");
+      card.className = "article";
+
+      const title = document.createElement("h3");
+      title.textContent = candidate.title || "Untitled story";
+
+      const meta = document.createElement("div");
+      meta.className = "article-meta";
+      const dateValue = candidate.published_at || candidate.discovered_at;
+      const dateText = dateValue && !Number.isNaN(Date.parse(dateValue))
+        ? new Date(dateValue).toLocaleString()
+        : "Date not supplied";
+      meta.textContent = [candidate.source_name, candidate.source_region, dateText]
+        .filter(Boolean).join(" · ");
+
+      const description = document.createElement("p");
+      description.className = "muted";
+      description.textContent = candidate.description || "No summary supplied by the source.";
+
+      const sourceLink = document.createElement("a");
+      sourceLink.href = candidate.url;
+      sourceLink.target = "_blank";
+      sourceLink.rel = "noopener noreferrer";
+      sourceLink.textContent = "Open original story";
+      sourceLink.className = "muted";
+
+      const useButton = document.createElement("button");
+      useButton.type = "button";
+      useButton.className = "small";
+      useButton.textContent = "Use in Article Editor";
+      useButton.addEventListener("click", () => {
+        $("articleId").value = "";
+        $("title").value = candidate.title || "";
+        $("summary").value = candidate.description || "";
+        $("content").value = "";
+        $("source").value = candidate.source_name + " — " + candidate.url;
+        $("status").value = "draft";
+        $("author").value = $("author").value.trim() || "WF Pundit";
+        $("formHeading").textContent = "Review Collected Story";
+        $("saveButton").textContent = "SAVE AS DRAFT";
+        $("cancelButton").classList.remove("hidden");
+        $("content").focus();
+        $("collectedNewsStatus").textContent =
+          "Story added to the editor as a draft. Review and write the article before saving.";
+        $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+      actions.append(sourceLink, useButton);
+      card.append(title, meta, description, actions);
+      list.appendChild(card);
+    });
+  } catch (error) {
+    status.textContent = error.message;
+  }
+}
 
 /* DARK / LIGHT THEME */
 
