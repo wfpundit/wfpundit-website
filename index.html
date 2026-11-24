@@ -2067,54 +2067,87 @@ body.light-mode .matchday-friendly-note{background:linear-gradient(90deg,#edf5fd
 </style>
 
 <style>
-/* ARTICLE CARDS: EQUAL HEIGHTS WITH COMPLETE TEXT */
+/* HOMEPAGE ARTICLE CARDS: COMPACT, EQUAL SIZE, FULL PHOTO VISIBLE */
 #latest .news-grid{
   align-items:stretch;
-  overflow-y:visible;
+  overflow-y:hidden;
 }
 #latest .news-card{
   display:flex;
   flex-direction:column;
-  align-self:stretch;
-  height:auto;
-  min-height:0;
+  height:390px;
+  min-height:390px;
+  max-height:390px;
 }
 #latest .news-card .thumb{
-  flex:0 0 190px;
-  min-height:190px;
+  flex:0 0 180px;
+  height:180px;
+  min-height:180px;
+  background-color:#101b2b;
+  background-position:center center;
+  background-size:contain !important;
+  background-repeat:no-repeat;
 }
 #latest .news-card .news-body{
   display:flex;
   flex:1 1 auto;
   flex-direction:column;
+  min-height:0;
   min-width:0;
-  overflow:visible;
+  overflow:hidden;
+  padding:13px 15px 14px;
 }
-#latest .news-card .news-body .meta,
-#latest .news-card .news-body h3,
-#latest .news-card .news-body p,
-#latest .news-card .news-body .date{
+#latest .news-card .news-body .meta{
+  flex:0 0 auto;
   max-width:100%;
-  overflow-wrap:anywhere;
-  word-break:normal;
-  white-space:normal;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
-#latest .news-card .news-body h3,
+#latest .news-card .news-body h3{
+  display:-webkit-box;
+  flex:0 0 auto;
+  max-width:100%;
+  margin:7px 0 8px;
+  overflow:hidden;
+  overflow-wrap:anywhere;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:2;
+  line-clamp:2;
+}
 #latest .news-card .news-body p{
-  display:block;
-  overflow:visible;
-  -webkit-line-clamp:unset;
-  line-clamp:unset;
-  -webkit-box-orient:initial;
+  display:-webkit-box;
+  flex:0 0 auto;
+  max-width:100%;
+  margin:0 0 8px;
+  overflow:hidden;
+  overflow-wrap:anywhere;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:3;
+  line-clamp:3;
 }
 #latest .news-card .news-body .date{
   margin-top:auto;
-  padding-top:14px;
+  padding-top:7px;
+  flex:0 0 auto;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
 }
 @media(max-width:720px){
+  #latest .news-card{
+    height:365px;
+    min-height:365px;
+    max-height:365px;
+  }
   #latest .news-card .thumb{
-    flex-basis:160px;
-    min-height:160px;
+    flex-basis:165px;
+    height:165px;
+    min-height:165px;
+  }
+  #latest .news-card .news-body{
+    padding:12px 13px 13px;
   }
 }
 </style>
