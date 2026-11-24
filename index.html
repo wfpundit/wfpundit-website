@@ -108,11 +108,11 @@ align-items:center
 .topline-track{
 display:flex;
 align-items:center;
-width:max-content;
-min-width:max-content;
+justify-content:center;
+width:100%;
+min-width:0;
 white-space:nowrap;
-will-change:transform;
-animation:toplineSlide 25s linear infinite
+will-change:transform
 }
 .topline-group{
 display:inline-flex;
@@ -1614,6 +1614,13 @@ body.light-mode .foot .brand{color:#1c2939}/* DESKTOP-SITE HEADER ON TABLETS AND
 
 /* NORMAL MOBILE NAVIGATION */
 @media(max-width:720px){
+.topline-track{
+  width:max-content;
+  min-width:max-content;
+  justify-content:flex-start;
+  animation:toplineSlide 25s linear infinite
+}
+
 .wrap{width:calc(100% - 24px)}
 .topline{height:27px}
 .topline .wrap{width:100%;padding:0}
@@ -2154,21 +2161,22 @@ body.light-mode .matchday-friendly-note{background:linear-gradient(90deg,#edf5fd
 <!-- SLIM TOP LIVE TICKER -->
 <div class="topline" aria-label="WF Pundit live status and location">
 <div class="wrap">
-<div class="topline-track"><div class="topline-group"><span class="topline-live">
-<span class="topline-dot"></span>
-LIVE
-</span>
-<span class="topline-separator">•</span>
-<span class="topline-location">UNITED KINGDOM</span>
-<span class="topline-separator">•</span>
-<span class="topline-message">THE HOME OF WOMEN'S FOOTBALL</span>
-</div>
-<div class="topline-group" aria-hidden="true">
+<div class="topline-track">
+<div class="topline-group">
+<span class="topline-message">WOMEN'S FOOTBALL</span>
 <span class="topline-live"><span class="topline-dot"></span>LIVE</span>
 <span class="topline-separator">•</span>
 <span class="topline-location">UNITED KINGDOM</span>
 <span class="topline-separator">•</span>
-<span class="topline-message">LATEST NEWS · TRANSFERS · MATCHDAY</span>
+<span class="topline-message">LATEST NEWS · TRANSFERS</span>
+</div>
+<div class="topline-group" aria-hidden="true">
+<span class="topline-message">WOMEN'S FOOTBALL</span>
+<span class="topline-live"><span class="topline-dot"></span>LIVE</span>
+<span class="topline-separator">•</span>
+<span class="topline-location">UNITED KINGDOM</span>
+<span class="topline-separator">•</span>
+<span class="topline-message">LATEST NEWS · TRANSFERS</span>
 </div>
 </div>
 </div>
