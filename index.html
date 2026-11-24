@@ -2067,7 +2067,7 @@ body.light-mode .matchday-friendly-note{background:linear-gradient(90deg,#edf5fd
 </style>
 
 <style>
-/* HOMEPAGE ARTICLE CARDS: COMPACT, EQUAL SIZE, FULL PHOTO VISIBLE */
+/* HOMEPAGE ARTICLE CARDS: COMPACT, EQUAL HEIGHTS, ENTIRE PHOTO */
 #latest .news-grid{
   align-items:stretch;
   overflow-y:hidden;
@@ -2075,18 +2075,26 @@ body.light-mode .matchday-friendly-note{background:linear-gradient(90deg,#edf5fd
 #latest .news-card{
   display:flex;
   flex-direction:column;
-  height:390px;
-  min-height:390px;
-  max-height:390px;
+  height:350px;
+  min-height:350px;
+  max-height:350px;
 }
 #latest .news-card .thumb{
-  flex:0 0 180px;
-  height:180px;
-  min-height:180px;
-  background-color:#101b2b;
-  background-position:center center;
-  background-size:contain !important;
-  background-repeat:no-repeat;
+  display:flex;
+  flex:0 0 165px;
+  align-items:center;
+  justify-content:center;
+  height:165px;
+  min-height:165px;
+  overflow:hidden;
+  background:#101b2b;
+}
+#latest .news-card .thumb img{
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  object-position:center;
 }
 #latest .news-card .news-body{
   display:flex;
@@ -2095,7 +2103,7 @@ body.light-mode .matchday-friendly-note{background:linear-gradient(90deg,#edf5fd
   min-height:0;
   min-width:0;
   overflow:hidden;
-  padding:13px 15px 14px;
+  padding:12px 14px 13px;
 }
 #latest .news-card .news-body .meta{
   flex:0 0 auto;
@@ -2108,7 +2116,7 @@ body.light-mode .matchday-friendly-note{background:linear-gradient(90deg,#edf5fd
   display:-webkit-box;
   flex:0 0 auto;
   max-width:100%;
-  margin:7px 0 8px;
+  margin:6px 0 7px;
   overflow:hidden;
   overflow-wrap:anywhere;
   -webkit-box-orient:vertical;
@@ -2119,16 +2127,16 @@ body.light-mode .matchday-friendly-note{background:linear-gradient(90deg,#edf5fd
   display:-webkit-box;
   flex:0 0 auto;
   max-width:100%;
-  margin:0 0 8px;
+  margin:0 0 6px;
   overflow:hidden;
   overflow-wrap:anywhere;
   -webkit-box-orient:vertical;
-  -webkit-line-clamp:3;
-  line-clamp:3;
+  -webkit-line-clamp:2;
+  line-clamp:2;
 }
 #latest .news-card .news-body .date{
   margin-top:auto;
-  padding-top:7px;
+  padding-top:5px;
   flex:0 0 auto;
   max-width:100%;
   overflow:hidden;
@@ -2137,17 +2145,17 @@ body.light-mode .matchday-friendly-note{background:linear-gradient(90deg,#edf5fd
 }
 @media(max-width:720px){
   #latest .news-card{
-    height:365px;
-    min-height:365px;
-    max-height:365px;
+    height:330px;
+    min-height:330px;
+    max-height:330px;
   }
   #latest .news-card .thumb{
-    flex-basis:165px;
-    height:165px;
-    min-height:165px;
+    flex-basis:150px;
+    height:150px;
+    min-height:150px;
   }
   #latest .news-card .news-body{
-    padding:12px 13px 13px;
+    padding:11px 12px 12px;
   }
 }
 </style>
@@ -3348,7 +3356,12 @@ const thumb=document.createElement('div');
 thumb.className='thumb';
 
 if(article.image_url&&/^https:\/\//i.test(article.image_url)){
-thumb.style.backgroundImage='url("'+article.image_url.replace(/["\\]/g,'')+'")';
+const photo=document.createElement('img');
+photo.src=article.image_url;
+photo.alt=article.title||'WF Pundit article photo';
+photo.loading='lazy';
+photo.decoding='async';
+thumb.append(photo);
 }
 
 const body=document.createElement('div');
