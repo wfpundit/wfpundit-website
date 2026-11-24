@@ -1660,6 +1660,97 @@ body.light-mode .foot .brand{color:#1c2939}/* DESKTOP-SITE HEADER ON TABLETS AND
   }
 }
 
+/* WIDE DESKTOP HEADER: KEEP NAVIGATION ON ROW ONE AND CONTROLS FULLY VISIBLE ON ROW TWO */
+@media(min-width:1001px){
+  .nav{
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    grid-template-rows:auto auto;
+    align-items:center;
+    column-gap:clamp(18px,2.4vw,34px);
+    row-gap:9px;
+    min-height:0;
+    padding:13px 0 14px;
+  }
+
+  .nav>.menu{display:none}
+
+  .nav>.brand{
+    grid-column:1;
+    grid-row:1;
+    align-self:center;
+  }
+
+  .nav>nav{
+    grid-column:2;
+    grid-row:1;
+    justify-self:end;
+    min-width:0;
+    gap:clamp(10px,1.35vw,20px);
+    white-space:nowrap;
+  }
+
+  .nav>.navright{
+    grid-column:1 / -1;
+    grid-row:2;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+    gap:10px;
+    width:100%;
+    min-width:0;
+    margin:0;
+  }
+
+  .navright>.search{
+    width:clamp(130px,14vw,175px);
+    flex:0 1 175px;
+  }
+
+  .navright>.account-actions,
+  .navright>.language-box,
+  .navright>.theme-toggle{
+    flex:0 0 auto;
+  }
+
+  .navright>.language-box{
+    gap:7px;
+    white-space:nowrap;
+  }
+
+  .navright>.language-box label{
+    display:inline;
+  }
+
+  .navright>.language-box .language-select{
+    max-width:130px;
+    min-width:112px;
+  }
+
+  .navright>.theme-toggle{
+    flex-shrink:0;
+    min-height:44px;
+    padding:6px 14px 6px 7px;
+    gap:10px;
+  }
+
+  .navright>.theme-toggle .theme-track{
+    flex:0 0 48px;
+    width:48px;
+    height:27px;
+  }
+
+  .navright>.theme-toggle .theme-thumb{
+    width:19px;
+    height:19px;
+  }
+
+  .navright>.theme-toggle[aria-pressed=true] .theme-thumb{
+    transform:translateX(21px);
+  }
+}
+
 /* NORMAL MOBILE NAVIGATION */
 @media(max-width:720px){
 .topline-track{animation-name:toplineSlideMobile}
