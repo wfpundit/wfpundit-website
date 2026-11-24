@@ -36,6 +36,14 @@ export const RSS_FEEDS = [
     language: "en",
     url: "https://shekicks.net/feed/",
     enabled: true
+  },
+  {
+    id: "wsl-full-time",
+    name: "WSL Full-Time",
+    region: "United Kingdom",
+    language: "en",
+    url: "https://fawslfulltime.co.uk/feed/",
+    enabled: true
   }
 ];
 
@@ -176,4 +184,4 @@ export const ARTICLE_KEYWORDS = [
   "manager", "coach", "match report", "national team", "qualifier", "tournament"
 ];
 
-export const SOURCE_REGISTRY_VERSION = 6;
+export const SOURCE_REGISTRY_VERSION = 7;
