@@ -2062,7 +2062,6 @@ LIVE
 <div class="account-actions" data-session-state="checking" aria-label="Reader account">
 <a class="account-link login" href="/account.html">LOG IN</a>
 <a class="account-link signup" href="/account.html?mode=register">SIGN UP</a>
-<a class="account-link signup" id="adminManagementLink" href="/admin.html" hidden>MANAGE SITE</a>
 </div>
 
 <div class="language-box">
@@ -3296,36 +3295,6 @@ setTimeout(finishLoading,350);
 
 setTimeout(finishLoading,3000);
 </script>
-<script src="/homepage-account.js" defer>
-/* SHOW ADMIN MANAGEMENT ONLY TO THE VERIFIED SITE ADMIN */
-async function loadAdminManagementLink() {
-  const link = document.getElementById("adminManagementLink");
-  if (!link) return;
-
-  link.hidden = true;
-
-  try {
-    const response = await fetch("/api/me", {
-      method: "GET",
-      credentials: "same-origin",
-      cache: "no-store"
-    });
-    const result = await response.json();
-
-    link.hidden = !(
-      response.ok &&
-      result.success &&
-      result.loggedIn &&
-      result.user &&
-      result.user.isAdmin === true
-    );
-  } catch (error) {
-    link.hidden = true;
-  }
-}
-
-loadAdminManagementLink();
-
-</script>
+<script src="/homepage-account.js" defer></script>
 </body>
 </html>
