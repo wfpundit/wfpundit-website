@@ -946,6 +946,10 @@ async function loadCollectedNews() {
 
           const article = result.article;
           generatedImagePrompt = article.image_prompt || "";
+          photoButton.disabled = !generatedImagePrompt;
+          photoButton.title = generatedImagePrompt
+            ? "Generate a matching editorial image"
+            : "No image prompt was returned";
           $("articleId").value = "";
           $("title").value = article.title || candidate.title || "";
           $("summary").value = article.summary || candidate.description || "";
