@@ -1,4 +1,4 @@
-import { currentUser, json } from "./_auth.js";
+import { currentUser, isSiteAdmin, json } from "./_auth.js";
 
 export async function onRequestGet({ request, env }) {
   try {
@@ -12,6 +12,8 @@ export async function onRequestGet({ request, env }) {
       });
     }
 
+    const isAdmin = await isSiteAdmin(request, env);
+
     return json({
       success: true,
       loggedIn: true,
@@ -19,7 +21,8 @@ export async function onRequestGet({ request, env }) {
         id: user.id,
         email: user.email,
         displayName: user.display_name,
-        emailVerified: Boolean(user.email_verified_at)
+        emailVerified: Boolean(user.email_verified_at),
+        isAdmin
       }
     });
   } catch (error) {
