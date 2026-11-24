@@ -256,6 +256,13 @@ white-space:nowrap
   border-color:#e77b86;
   transform:translateY(-1px);
 }
+.homepage-mobile-logout{
+  display:none;
+  color:#ffd6d6;
+  background:rgba(164,42,55,.14);
+  border-color:rgba(225,105,117,.65);
+}
+.homepage-mobile-logout:disabled{opacity:.65;cursor:wait}
 .homepage-account-logout:disabled{
   opacity:.65;
   cursor:wait;
@@ -1710,6 +1717,18 @@ min-height:42px;
 font-size:10px;
 justify-content:center
 }
+.nav nav .homepage-mobile-logout{
+display:inline-flex;
+margin-top:5px;
+color:#ffd6d6;
+background:rgba(164,42,55,.14);
+border-color:rgba(225,105,117,.65)
+}
+body.light-mode .nav nav .homepage-mobile-logout{
+color:#a52b38;
+background:#fff5f5;
+border-color:#d99aa1
+}
 
 body.light-mode .nav nav{background:#fff}
 .search{width:90px;padding:8px 6px;font-size:10px}
@@ -2274,6 +2293,9 @@ LIVE
 <a href="#competitions">Competitions</a>
 <a href="#matchday">Matchday</a>
 <a href="#about">About</a>
+<button class="account-link homepage-mobile-logout" type="button" hidden>
+  LOG OUT
+</button>
 
 </nav>
 
