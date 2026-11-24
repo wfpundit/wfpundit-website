@@ -59,14 +59,15 @@ export async function onRequestPost({ request, env }) {
 
   try {
     const user = await env.DB.prepare(
-      `SELECT id, email, display_name, google_sub
+      `SELECT id, email, display_name
        FROM reader_accounts
        WHERE lower(email) = ?
        LIMIT 1`
     ).bind(email).first();
 
-    // Google-only accounts cannot use password reset.
-    if (!user || user.google_sub) {
+    // Password setup and reset are available to both Google and email accounts.
+    // The reset link is delivered to the account's registered email address.
+    if (!user) {
       return json({
         success: true,
         message: genericMessage
@@ -141,7 +142,7 @@ export async function onRequestPost({ request, env }) {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          from: "WF Pundit <onboarding@resend.dev>",
+          from: env.RESEND_FROM_EMAIL || "WF Pundit <onboarding@resend.dev>",
           to: [user.email],
           subject: "Reset your WF Pundit password",
 

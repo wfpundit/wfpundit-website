@@ -52,16 +52,15 @@ export async function onRequestPost({ request, env }) {
     const now = new Date().toISOString();
 
     const reset = await env.DB.prepare(`
-      SELECT r.id, r.user_id, u.google_sub
+      SELECT r.id, r.user_id
       FROM reader_password_resets r
-      JOIN reader_accounts u ON u.id = r.user_id
       WHERE r.token_hash = ?
       AND r.used_at IS NULL
       AND r.expires_at > ?
       LIMIT 1
     `).bind(tokenHash, now).first();
 
-    if (!reset || reset.google_sub) {
+    if (!reset) {
       return json({
         success: false,
         error: "This reset link is invalid or has expired. Request a new one."
@@ -91,7 +90,6 @@ export async function onRequestPost({ request, env }) {
       UPDATE reader_accounts
       SET password_hash = ?
       WHERE id = ?
-      AND google_sub IS NULL
     `).bind(passwordHash, reset.user_id).run();
 
     if (!updated.meta || updated.meta.changes !== 1) {
@@ -117,7 +115,7 @@ export async function onRequestPost({ request, env }) {
 
     return json({
       success: true,
-      message: "Your password has been reset. Please log in with your new password."
+      message: "Your password has been set or reset. You can now sign in with your email and password. Google sign-in will continue to work."
     });
 
   } catch (error) {
