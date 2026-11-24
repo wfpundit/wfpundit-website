@@ -1558,106 +1558,49 @@ body.light-mode .filter.active{background:var(--blue);color:#fff}
 body.light-mode .breaking{background:#fff}
 body.light-mode .breaking span{color:#34445c}
 
-body.light-mode .foot .brand{color:#1c2939}/* DESKTOP-SITE HEADER ON TABLETS AND PHONE DESKTOP MODE */
+body.light-mode .foot .brand{color:#1c2939}/* DESKTOP-SITE HEADER: KEEP THE THEME CONTROL ON A DEDICATED, UNCROPPED ROW */
 @media(min-width:721px) and (max-width:1000px){
   .nav{
     position:relative;
-    min-height:70px;
-    justify-content:flex-start;
-    gap:9px
-  }
-
-  .menu{display:none}
-
-  .nav nav{
-    display:flex;
-    position:static;
-    flex-direction:row;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr);
+    grid-template-rows:auto auto;
     align-items:center;
-    justify-content:flex-start;
-    gap:clamp(6px,1vw,11px);
-    flex:0 1 auto;
-    white-space:nowrap;
-    padding:0;
-    background:transparent
+    column-gap:12px;
+    row-gap:9px;
+    min-height:0;
+    padding:12px 0;
   }
-
-  .nav nav a{font-size:10px}
-
-  .navright{
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    gap:6px;
-    margin-left:auto;
-    min-width:0;
-    flex:0 0 auto
+  .nav>.menu{display:none}
+  .nav>.brand{grid-column:1;grid-row:1;min-width:0}
+  .nav>nav{
+    grid-column:2;grid-row:1;display:flex;position:static;
+    flex-direction:row;flex-wrap:wrap;align-items:center;justify-content:flex-end;
+    gap:7px 10px;min-width:0;padding:0;white-space:normal;background:transparent;
   }
-
+  .nav>nav a{font-size:9px}
+  .nav>.navright{
+    grid-column:1 / -1;grid-row:2;display:flex;align-items:center;
+    justify-content:flex-end;flex-wrap:wrap;gap:8px;width:100%;
+    min-width:0;margin:0;overflow:visible;
+  }
   .navright>.search{display:none}
-
-  .account-actions{
-    display:flex;
-    flex:0 0 auto;
-    gap:5px
-  }
-
-  .account-link{
-    min-height:34px;
-    padding:0 8px;
-    font-size:9px
-  }
-
-  .language-box,.theme-toggle{
-    display:inline-flex;
-    flex:0 0 auto
-  }
-
+  .account-actions{display:flex;flex:0 0 auto;gap:5px}
+  .account-link{min-height:34px;padding:0 8px;font-size:9px}
+  .language-box{display:inline-flex;flex:0 0 auto;white-space:nowrap}
   .language-box label{display:none}
-
-  .language-select{
-    width:auto;
-    max-width:94px;
-    min-width:74px;
-    padding:7px 4px;
-    font-size:9px
+  .language-select{width:auto;max-width:94px;min-width:74px;padding:7px 4px;font-size:9px}
+  .navright>.theme-toggle{
+    display:inline-flex;flex:0 0 auto;flex-shrink:0;box-sizing:border-box;
+    width:max-content;max-width:100%;min-height:40px;padding:5px 10px 5px 7px;
+    gap:8px;overflow:visible;white-space:nowrap;position:relative;z-index:1;
+    border-color:#7ea9da;box-shadow:0 2px 9px rgba(0,0,0,.18);
   }
-
-  .theme-toggle{
-    min-height:36px;
-    padding:4px 8px;
-    gap:7px;
-    border-color:#7ea9da;
-    box-shadow:0 2px 9px rgba(0,0,0,.18)
-  }
-
-  .theme-track{
-    flex:0 0 36px;
-    width:36px;
-    height:22px;
-    box-sizing:border-box
-  }
-
-  .theme-thumb{
-    width:14px;
-    height:14px
-  }
-
-  .theme-toggle[aria-pressed=true] .theme-thumb{
-    transform:translateX(13px)
-  }
-
-  .theme-label{
-    display:inline;
-    min-width:52px;
-    font-size:9px;
-    font-weight:900
-  }
-
-  body.light-mode .theme-toggle{
-    border-color:#8da9c8;
-    box-shadow:0 2px 9px rgba(38,60,88,.12)
-  }
+  .navright>.theme-toggle .theme-track{flex:0 0 38px;width:38px;height:23px;box-sizing:border-box}
+  .navright>.theme-toggle .theme-thumb{width:15px;height:15px}
+  .navright>.theme-toggle[aria-pressed=true] .theme-thumb{transform:translateX(14px)}
+  .navright>.theme-toggle .theme-label{display:inline;min-width:54px;font-size:9px;font-weight:900}
+  body.light-mode .navright>.theme-toggle{border-color:#8da9c8;box-shadow:0 2px 9px rgba(38,60,88,.12)}
 }
 
 /* WIDE DESKTOP HEADER: KEEP NAVIGATION ON ROW ONE AND CONTROLS FULLY VISIBLE ON ROW TWO */
@@ -1711,7 +1654,19 @@ body.light-mode .foot .brand{color:#1c2939}/* DESKTOP-SITE HEADER ON TABLETS AND
   .navright>.account-actions,
   .navright>.language-box,
   .navright>.theme-toggle{
+    display:inline-flex;
     flex:0 0 auto;
+    flex-shrink:0;
+    box-sizing:border-box;
+    width:max-content;
+    max-width:100%;
+    min-height:44px;
+    padding:6px 14px 6px 7px;
+    gap:10px;
+    overflow:visible;
+    white-space:nowrap;
+    position:relative;
+    z-index:1;
   }
 
   .navright>.language-box{
