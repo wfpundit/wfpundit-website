@@ -363,17 +363,21 @@ body.light .theme-toggle {
   </button>
 </header>
 
-<section class="panel">
-  <h2>Admin Access</h2>
-  <label for="adminToken">Admin Token</label>
-  <input id="adminToken" type="password" placeholder="Enter your admin token">
-
+<section class="panel" id="adminAccessPanel">
+  <h2>Administrator Access</h2>
+  <p id="adminAccessStatus" class="muted" role="status" aria-live="polite">
+    Checking your WF Pundit account...
+  </p>
   <div class="actions">
-    <button type="button" id="loadButton">Load Articles</button>
+    <button type="button" id="loadButton" disabled>Load Articles</button>
+    <a id="adminSignInLink" href="/account.html?returnTo=%2Fadmin.html" hidden>
+      Sign in with your WF Pundit account
+    </a>
+    <a href="/" class="muted">Return to WF Pundit</a>
   </div>
-
-  <p class="muted">Your token is used for authenticated admin requests.</p>
 </section>
+
+<div id="adminTools" hidden>
 
 <section class="panel" id="collectedNewsPanel">
   <h2>Collected News</h2>
@@ -385,7 +389,7 @@ body.light .theme-toggle {
     <button type="button" id="loadCollectedNewsButton">Load Collected News</button>
   </div>
   <p id="collectedNewsStatus" class="muted" role="status" aria-live="polite">
-    Enter your admin token, then load collected news.
+    Your administrator session is verified. Load stories when you're ready.
   </p>
   <div id="collectedNewsList"></div>
 </section>
@@ -578,6 +582,8 @@ Official Club Website — https://example.com"></textarea>
 
 </div>
 
+</div>
+
 <script>
 const $ = id => document.getElementById(id);
 
@@ -594,18 +600,13 @@ async function loadCollectedNews() {
   const status = $("collectedNewsStatus");
   const list = $("collectedNewsList");
 
-  if (!getToken()) {
-    status.textContent = "Enter your admin token first.";
-    return;
-  }
-
   status.textContent = "Loading recent collected stories...";
   list.replaceChildren();
 
   try {
     const response = await fetch("/api/admin/collected-news", {
       method: "GET",
-      headers: authHeaders(),
+      credentials: "same-origin",
       cache: "no-store"
     });
     const result = await response.json();
@@ -776,12 +777,54 @@ function updateSubcategories(selected = "") {
 
 category.addEventListener("change", () => updateSubcategories());
 
-function getToken() {
-  return $("adminToken").value.trim();
-}
+let adminSessionReady = false;
 
-function authHeaders() {
-  return { "Authorization": "Bearer " + getToken() };
+async function checkAdminSession() {
+  const status = $("adminAccessStatus");
+  const toolsPanel = $("adminTools");
+  const signInLink = $("adminSignInLink");
+  const loadButton = $("loadButton");
+
+  status.textContent = "Checking your WF Pundit account...";
+  toolsPanel.hidden = true;
+  signInLink.hidden = true;
+  loadButton.disabled = true;
+
+  try {
+    const response = await fetch("/api/me", {
+      method: "GET",
+      credentials: "same-origin",
+      cache: "no-store"
+    });
+    const result = await response.json();
+
+    if (!response.ok || !result.success) {
+      throw new Error(result.error || "Unable to verify your account.");
+    }
+
+    if (!result.loggedIn) {
+      status.textContent = "Please sign in to your WF Pundit account to continue.";
+      signInLink.hidden = false;
+      return;
+    }
+
+    if (!result.user || !result.user.isAdmin) {
+      status.textContent =
+        "You're signed in, but this account does not have WF Pundit administrator access.";
+      return;
+    }
+
+    adminSessionReady = true;
+    toolsPanel.hidden = false;
+    loadButton.disabled = false;
+    status.textContent =
+      "Administrator access verified for " + result.user.email + ".";
+    $("collectedNewsStatus").textContent =
+      "Your administrator session is verified. Load stories when you're ready.";
+  } catch (error) {
+    status.textContent = error.message || "Unable to verify administrator access.";
+    signInLink.hidden = false;
+  }
 }
 
 /* SOURCE LINK VALIDATION: MAXIMUM FOUR */
@@ -870,17 +913,12 @@ $("photo").addEventListener("change", () => {
 /* PHOTO UPLOAD */
 
 $("uploadButton").addEventListener("click", () => {
-  if (!getToken()) {
-    showMessage("Enter your admin token first.", true);
-    return;
-  }
-
   $("photo").click();
 });
 
 async function uploadSelectedPhoto() {
-  if (!getToken()) {
-    showMessage("Enter your admin token first.", true);
+  if (!adminSessionReady) {
+    showMessage("Administrator access is required.", true);
     return;
   }
 
@@ -899,7 +937,7 @@ async function uploadSelectedPhoto() {
 
     const response = await fetch("/api/upload-image", {
       method: "POST",
-      headers: authHeaders(),
+      credentials: "same-origin",
       body: data
     });
 
@@ -954,8 +992,8 @@ $("cancelButton").addEventListener("click", () => {
 form.addEventListener("submit", async event => {
   event.preventDefault();
 
-  if (!getToken()) {
-    showMessage("Enter your admin token first.", true);
+  if (!adminSessionReady) {
+    showMessage("Administrator access is required.", true);
     return;
   }
 
@@ -997,10 +1035,8 @@ form.addEventListener("submit", async event => {
   try {
     const response = await fetch("/api/admin/articles", {
       method: id ? "PUT" : "POST",
-      headers: {
-        ...authHeaders(),
-        "Content-Type": "application/json"
-      },
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(
         id ? { ...article, id: Number(id) } : article
       )
@@ -1032,8 +1068,8 @@ form.addEventListener("submit", async event => {
 /* LOAD ARTICLES */
 
 async function loadArticles() {
-  if (!getToken()) {
-    showMessage("Enter your admin token first.", true);
+  if (!adminSessionReady) {
+    showMessage("Administrator access is required.", true);
     return;
   }
 
@@ -1042,7 +1078,7 @@ async function loadArticles() {
   try {
     const response = await fetch("/api/admin/articles", {
       method: "GET",
-      headers: authHeaders()
+      credentials: "same-origin"
     });
 
     const result = await response.json();
@@ -1191,10 +1227,8 @@ async function deleteArticle(id, title) {
   try {
     const response = await fetch("/api/admin/articles", {
       method: "DELETE",
-      headers: {
-        ...authHeaders(),
-        "Content-Type": "application/json"
-      },
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id })
     });
 
@@ -1426,12 +1460,6 @@ $("newsletterPreviewButton").addEventListener(
 );
 
 newsletterSendButton.addEventListener("click", async () => {
-  if (!getToken()) {
-    setNewsletterStatus("Enter your admin token first.", true);
-    $("adminToken").focus();
-    return;
-  }
-
   if (!updateNewsletterPreview()) return;
 
   const subject = newsletterSubject.value.trim();
@@ -1464,10 +1492,8 @@ newsletterSendButton.addEventListener("click", async () => {
   try {
     const response = await fetch("/api/admin/newsletter-send", {
       method: "POST",
-      headers: {
-        ...authHeaders(),
-        "Content-Type": "application/json"
-      },
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         subject,
         message: body,
@@ -1517,6 +1543,7 @@ newsletterSendButton.addEventListener("click", async () => {
 $("loadButton").addEventListener("click", loadArticles);
 
 updateSubcategories();
+checkAdminSession();
 </script>
 
 </body>
