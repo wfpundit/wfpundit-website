@@ -1,5 +1,6 @@
 
 import { createSession, hashPassword, json, readJson, validOrigin } from "./_auth.js";
+import { sendWelcomeEmail } from "./_welcome-email.js";
 
 export async function onRequestPost({ request, env }) {
   if (!validOrigin(request)) {
@@ -49,6 +50,12 @@ export async function onRequestPost({ request, env }) {
     `).bind(email, passwordHash, displayName).run();
 
     const session = await createSession(result.meta.last_row_id, env);
+
+    try {
+      await sendWelcomeEmail(env, email, displayName);
+    } catch (emailError) {
+      console.error("WF Pundit registration welcome email error:", emailError);
+    }
 
     return json({
       success: true,
