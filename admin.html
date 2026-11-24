@@ -1003,7 +1003,6 @@ async function loadCollectedNews() {
             throw new Error(result.error || "AI photo generation failed.");
           }
           generatedImageDataUrl = "data:" + (result.mime_type || "image/png") + ";base64," + result.image_data;
-          $("imageUrl").value = generatedImageDataUrl;
           setPreview(generatedImageDataUrl);
           $("collectedNewsStatus").textContent =
             "AI photo generated and attached to the editor preview. It will be uploaded when you save the article.";
@@ -1382,8 +1381,8 @@ form.addEventListener("submit", async event => {
   showMessage(id ? "Updating article..." : "Creating article...");
 
   try {
-    if (article.image_url.startsWith("data:image/")) {
-      const imageBlob = await fetch(article.image_url).then(response => response.blob());
+    if (generatedImageDataUrl) {
+      const imageBlob = await fetch(generatedImageDataUrl).then(response => response.blob());
       const imageForm = new FormData();
       imageForm.append("photo", imageBlob, "wf-pundit-ai-editorial.png");
       const uploadResponse = await fetch("/api/upload-image", {
