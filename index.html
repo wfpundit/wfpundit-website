@@ -245,6 +245,32 @@ white-space:nowrap
 
 .homepage-admin-link[hidden]{display:none!important}
 
+.homepage-account-logout{
+  color:#ffd6d6;
+  background:rgba(164,42,55,.14);
+  border-color:rgba(225,105,117,.65);
+  transition:background .2s,border-color .2s,transform .2s;
+}
+.homepage-account-logout:hover{
+  background:rgba(164,42,55,.28);
+  border-color:#e77b86;
+  transform:translateY(-1px);
+}
+.homepage-account-logout:disabled{
+  opacity:.65;
+  cursor:wait;
+  transform:none;
+}
+body.light-mode .homepage-account-logout{
+  color:#a52b38;
+  background:#fff5f5;
+  border-color:#d99aa1;
+}
+body.light-mode .homepage-account-logout:hover{
+  background:#ffe9eb;
+  border-color:#c85c68;
+}
+
 .account-link.signup{
 color:#fff;
 background:#3978c8;
