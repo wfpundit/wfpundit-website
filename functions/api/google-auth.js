@@ -1,5 +1,6 @@
 
 import { json, validOrigin, readJson, hashPassword, createSession } from "./_auth.js";
+import { sendWelcomeEmail } from "./_welcome-email.js";
 
 const GOOGLE_CERTS_URL = "https://www.googleapis.com/oauth2/v3/certs";
 
@@ -145,6 +146,7 @@ if (!origin || origin !== new URL(request.url).origin) {
   }
 
   try {
+    let newlyRegistered = false;
     let user = await env.DB.prepare(
       "SELECT id, email, display_name FROM reader_accounts WHERE google_sub = ? LIMIT 1"
     ).bind(identity.googleSub).first();
@@ -184,6 +186,7 @@ if (!origin || origin !== new URL(request.url).origin) {
         identity.googleSub
       ).run();
 
+      newlyRegistered = true;
       user = {
         id: result.meta.last_row_id,
         email: identity.email,
@@ -192,6 +195,14 @@ if (!origin || origin !== new URL(request.url).origin) {
     }
 
     const session = await createSession(user.id, env);
+
+    if (newlyRegistered) {
+      try {
+        await sendWelcomeEmail(env, user.email, user.display_name);
+      } catch (emailError) {
+        console.error("WF Pundit Google registration welcome email error:", emailError);
+      }
+    }
 
     return json({
       success: true,
