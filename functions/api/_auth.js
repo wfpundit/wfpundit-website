@@ -150,3 +150,45 @@ export async function deleteCurrentSession(request, env) {
       .bind(await sha256(token)).run();
   }
 }
+
+/*
+ * Site administrator access.
+ * The configured email is matched only against a verified, server-side
+ * reader session. The legacy ADMIN_TOKEN remains supported for existing
+ * integrations, but is never sent to the browser by this helper.
+ */
+export async function isSiteAdmin(request, env) {
+  const configuredEmail = String(env.SITE_ADMIN_EMAIL || "")
+    .trim()
+    .toLowerCase();
+
+  if (!configuredEmail) return false;
+
+  const user = await currentUser(request, env);
+
+  return Boolean(
+    user &&
+    user.email_verified_at &&
+    String(user.email || "").trim().toLowerCase() === configuredEmail
+  );
+}
+
+export async function adminAuthorised(request, env) {
+  const suppliedToken = request.headers.get("Authorization");
+
+  // Preserve existing server-to-server and legacy admin-token access.
+  if (
+    env.ADMIN_TOKEN &&
+    suppliedToken === `Bearer ${env.ADMIN_TOKEN}`
+  ) {
+    return true;
+  }
+
+  // Cookie-based administrator actions must be same-origin.
+  if (request.method !== "GET" && request.method !== "HEAD") {
+    const origin = request.headers.get("Origin");
+    if (!origin || !validOrigin(request)) return false;
+  }
+
+  return await isSiteAdmin(request, env);
+}
