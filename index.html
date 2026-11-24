@@ -1947,29 +1947,40 @@ body.light-mode #facebook .social-feed-heading .section-kicker{color:#286eb2}
 @media(prefers-reduced-motion:reduce){#socials .section-head,#socials .social-link-card{animation:none!important}}
 
 
-/* Keep the two signed-in account actions visually identical */
+/* Signed-in homepage actions: greeting above two truly equal buttons */
 .homepage-account-logged-in{
-  display:flex;
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
   align-items:center;
-  flex-wrap:wrap;
-  gap:7px;
+  gap:4px 7px;
+  width:240px;
+  box-sizing:border-box;
 }
 .homepage-account-logged-in[hidden],
 .homepage-account-logged-out[hidden]{display:none!important}
+.homepage-account-logged-in .homepage-account-greeting{
+  grid-column:1 / -1;
+  justify-self:end;
+  line-height:1.2;
+}
 .homepage-account-logged-in .account-link{
   display:inline-flex;
   align-items:center;
   justify-content:center;
   box-sizing:border-box;
-  flex:1 1 0;
-  width:auto;
-  min-width:124px;
+  width:100%;
+  min-width:0;
   min-height:40px;
-  padding:0 12px;
+  height:40px;
+  margin:0;
+  padding:0 8px;
+  border:1px solid #3978c8;
   border-radius:8px;
   font-size:10px;
   font-weight:950;
   line-height:1;
+  letter-spacing:0;
+  text-align:center;
   white-space:nowrap;
 }
 .homepage-account-logged-in .account-link.homepage-admin-link{
@@ -1977,27 +1988,23 @@ body.light-mode #facebook .social-feed-heading .section-kicker{color:#286eb2}
   border-color:#3978c8;
   color:#fff;
 }
-@media(max-width:760px){
-  .homepage-account-logged-in{gap:5px}
+@media(min-width:721px) and (max-width:1000px){
+  .homepage-account-logged-in{width:204px;gap:4px}
+  .homepage-account-logged-in .account-link{font-size:8px;padding:0 4px;min-height:36px;height:36px}
+}
+@media(max-width:720px){
+  .homepage-account-logged-in{
+    width:150px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:3px 5px;
+  }
+  .homepage-account-logged-in .homepage-account-greeting{font-size:9px}
   .homepage-account-logged-in .account-link{
-    flex:1 1 0;
-    min-width:0;
     min-height:34px;
-    padding:0 6px;
-    font-size:8px;
-    letter-spacing:.02em;
-  }
-  .nav nav .homepage-account-logged-in{
-    width:100%;
-    flex-direction:column;
-    align-items:stretch;
-    gap:9px;
-  }
-  .nav nav .homepage-account-logged-in .account-link{
-    width:100%;
-    min-height:42px;
-    padding:0 12px;
-    font-size:10px;
+    height:34px;
+    padding:0 2px;
+    font-size:7px;
+    letter-spacing:-.02em;
   }
 }
 
