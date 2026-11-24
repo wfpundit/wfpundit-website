@@ -2032,6 +2032,20 @@ body.light-mode #facebook .social-feed-heading .section-kicker{color:#286eb2}
   }
 }
 
+/* Desktop header balance: lower the signed-in action buttons while keeping
+   Translate and the theme switch clearly visible on the upper control line. */
+@media(min-width:721px){
+  .homepage-account-logged-in{
+    align-self:flex-start;
+    margin-top:24px;
+  }
+  .navright>.language-box,
+  .navright>.theme-toggle{
+    align-self:flex-start;
+    margin-top:0;
+  }
+}
+
 </style>
 <style>
 /* Final spacing and matchday copy refinements */
