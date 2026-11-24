@@ -122,6 +122,8 @@ gap:10px;
 padding-right:38px;
 white-space:nowrap
 }
+.topline-group--mobile{display:none}
+.topline-group--desktop{display:inline-flex}
 .topline-live{
 display:inline-flex;
 align-items:center;
@@ -1618,6 +1620,8 @@ body.light-mode .foot .brand{color:#1c2939}/* DESKTOP-SITE HEADER ON TABLETS AND
 .topline{height:27px}
 .topline .wrap{width:100%;padding:0}
 .topline-group{gap:8px;padding-right:30px}
+.topline-group--mobile{display:inline-flex}
+.topline-group--desktop{display:none}
 .topline-live,.topline-location,.topline-message{font-size:8px}
 .topline-dot{width:5px;height:5px}
 .nav{min-height:66px;justify-content:flex-start;gap:9px}
@@ -2163,12 +2167,19 @@ LIVE
 <span class="topline-separator">•</span>
 <span class="topline-message">THE HOME OF WOMEN'S FOOTBALL</span>
 </div>
-<div class="topline-group" aria-hidden="true">
+<div class="topline-group topline-group--mobile" aria-hidden="true">
 <span class="topline-live"><span class="topline-dot"></span>LIVE</span>
 <span class="topline-separator">•</span>
 <span class="topline-location">UNITED KINGDOM</span>
 <span class="topline-separator">•</span>
 <span class="topline-message">LATEST NEWS · TRANSFERS · MATCHDAY</span>
+</div>
+<div class="topline-group topline-group--desktop" aria-hidden="true">
+<span class="topline-live"><span class="topline-dot"></span>LIVE</span>
+<span class="topline-separator">•</span>
+<span class="topline-location">UNITED KINGDOM</span>
+<span class="topline-separator">•</span>
+<span class="topline-message">THE HOME OF WOMEN'S FOOTBALL</span>
 </div>
 </div>
 </div>
