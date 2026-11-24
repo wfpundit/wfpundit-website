@@ -338,13 +338,248 @@ body.light .theme-toggle {
     min-height:38px;
   }
 }
+
+/* PREMIUM WF PUNDIT NEWSROOM EXPERIENCE */
+:root{
+  --bg:#080f1c;
+  --panel:#111d30;
+  --text:#f4f7fc;
+  --muted:#9eacc1;
+  --border:rgba(143,170,207,.19);
+  --accent:#2878e8;
+  --danger:#d93649;
+  --input-bg:#0b1525;
+}
+body{
+  min-height:100vh;
+  padding:26px clamp(14px,3vw,38px) 48px;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:
+    radial-gradient(ellipse at 12% 0%,rgba(31,111,218,.18),transparent 34rem),
+    radial-gradient(ellipse at 92% 8%,rgba(18,177,199,.10),transparent 28rem),
+    var(--bg);
+}
+body.light{
+  --bg:#eef3f9;
+  --panel:#fff;
+  --text:#142238;
+  --muted:#63738b;
+  --border:rgba(64,91,130,.17);
+  --input-bg:#f6f9fd;
+  background:
+    radial-gradient(ellipse at 10% 0%,rgba(40,120,232,.10),transparent 32rem),
+    #eef3f9;
+}
+.container{max-width:1180px}
+header{
+  min-height:62px;
+  padding:0 0 17px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:22px;
+}
+header h1{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:clamp(21px,3vw,27px);
+  font-weight:950;
+  letter-spacing:-.045em;
+}
+header h1:before{
+  content:"WF";
+  display:grid;
+  place-items:center;
+  width:42px;height:42px;
+  border-radius:13px;
+  color:#fff;
+  font-size:14px;
+  letter-spacing:-.04em;
+  background:linear-gradient(145deg,#35b6e8,#1769e8 65%,#123c8c);
+  box-shadow:0 8px 24px rgba(23,105,232,.28);
+}
+.admin-hero{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  padding:clamp(23px,4vw,42px);
+  margin:0 0 20px;
+  border:1px solid rgba(102,163,236,.3);
+  border-radius:22px;
+  background:
+    radial-gradient(circle at 85% 18%,rgba(42,166,218,.22),transparent 18rem),
+    linear-gradient(115deg,#102b4d 0%,#10213a 52%,#111b2c 100%);
+  box-shadow:0 20px 48px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.08);
+}
+.admin-hero:after{
+  content:"WF";
+  position:absolute;
+  z-index:-1;
+  right:3%;bottom:-42%;
+  color:rgba(255,255,255,.035);
+  font-size:clamp(150px,26vw,310px);
+  line-height:1;
+  font-weight:1000;
+  letter-spacing:-.12em;
+}
+.admin-eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin:0 0 13px;
+  color:#8edcf5;
+  font-size:10px;
+  font-weight:950;
+  letter-spacing:.17em;
+  text-transform:uppercase;
+}
+.admin-eyebrow:before{
+  content:"";
+  width:7px;height:7px;border-radius:50%;
+  background:#34d399;
+  box-shadow:0 0 0 5px rgba(52,211,153,.12),0 0 14px #34d399;
+}
+.admin-hero h2{
+  max-width:700px;
+  margin:0;
+  color:#fff;
+  font-size:clamp(27px,4.8vw,44px);
+  line-height:1.06;
+  letter-spacing:-.055em;
+}
+.admin-hero p{
+  max-width:640px;
+  margin:13px 0 0;
+  color:#c0d0e5;
+  font-size:14px;
+  line-height:1.75;
+}
+.admin-shortcuts{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+  margin-top:23px;
+}
+.admin-shortcuts a{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:39px;
+  padding:0 14px;
+  border:1px solid rgba(191,216,246,.24);
+  border-radius:9px;
+  color:#f5f9ff;
+  background:rgba(255,255,255,.075);
+  text-decoration:none;
+  font-size:11px;
+  font-weight:850;
+  transition:transform .2s ease,background .2s ease,border-color .2s ease;
+}
+.admin-shortcuts a:hover{
+  transform:translateY(-2px);
+  border-color:rgba(121,198,244,.7);
+  background:rgba(48,132,219,.24);
+}
+.panel{
+  position:relative;
+  padding:clamp(17px,2.5vw,26px);
+  margin-bottom:17px;
+  border:1px solid var(--border);
+  border-radius:17px;
+  background:linear-gradient(145deg,rgba(255,255,255,.035),transparent 48%),var(--panel);
+  box-shadow:0 12px 30px rgba(0,0,0,.10);
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.panel:hover{
+  border-color:rgba(75,145,226,.38);
+  box-shadow:0 16px 36px rgba(0,0,0,.14);
+}
+.panel h2{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:0 0 9px;
+  font-size:clamp(17px,2vw,20px);
+  font-weight:900;
+  letter-spacing:-.025em;
+}
+.panel h2:before{
+  content:"";
+  width:4px;height:21px;
+  border-radius:5px;
+  background:linear-gradient(180deg,#32c5e8,#2878e8);
+  box-shadow:0 0 14px rgba(40,120,232,.25);
+}
+.panel>p.muted,.newsletter-help{
+  line-height:1.7;
+}
+#adminAccessPanel{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:12px 22px;
+  border-color:rgba(51,180,151,.25);
+  background:linear-gradient(110deg,rgba(25,153,127,.09),transparent 58%),var(--panel);
+}
+#adminAccessPanel h2{margin-bottom:5px}
+#adminAccessPanel .actions{margin:0}
+#adminAccessStatus{margin:0;line-height:1.6}
+.actions{gap:10px}
+button{
+  min-height:40px;
+  padding:10px 16px;
+  border-radius:9px;
+  font-size:12px;
+  font-weight:850;
+  letter-spacing:.015em;
+  box-shadow:0 5px 14px rgba(23,105,232,.14);
+}
+button:not(:disabled):hover{filter:brightness(1.08)}
+button.secondary{background:linear-gradient(135deg,#66758b,#45546a)}
+button.danger{background:linear-gradient(135deg,#e14c5e,#b9253a)}
+input,textarea,select{
+  border-radius:10px;
+  border-color:var(--border);
+  min-height:44px;
+}
+textarea{line-height:1.65}
+label{font-size:12px;letter-spacing:.015em}
+.article{
+  padding:17px;
+  border-radius:13px;
+  background:rgba(127,157,198,.045);
+}
+.article h3{line-height:1.45}
+.article-meta{line-height:1.6}
+#articleList .article{margin-top:13px}
+#message,#newsletterStatus{line-height:1.6}
+#uploadButton,#saveButton{min-height:47px;border-radius:11px}
+.editor-toolbar button{min-height:38px}
+.newsletter-preview{border-radius:13px}
+.newsletter-warning{border-radius:10px}
+.theme-toggle{min-height:42px;border-radius:13px}
+@media(max-width:700px){
+  body{padding:15px 12px 34px}
+  header{margin-bottom:16px}
+  .admin-hero{border-radius:17px;padding:23px 19px}
+  .admin-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .admin-shortcuts a{width:100%;padding:0 8px;font-size:10px}
+  #adminAccessPanel{align-items:flex-start}
+  #adminAccessPanel .actions{width:100%}
+  #adminAccessPanel .actions button{width:100%}
+  .panel{border-radius:14px;margin-bottom:13px}
+}
+@media(prefers-reduced-motion:reduce){
+  .panel,.admin-shortcuts a,button{transition:none}
+}
+
 </style>
 </head>
 
 <body>
 <div class="container">
 
-<header>
+<header class="admin-topbar">
   <h1>WF Pundit Admin</h1>
 
   <button type="button"
@@ -362,6 +597,18 @@ body.light .theme-toggle {
     <span class="theme-label" id="themeLabel">Light Mode</span>
   </button>
 </header>
+
+<section class="admin-hero" aria-labelledby="adminHeroTitle">
+  <div class="admin-eyebrow">WF PUNDIT · EDITORIAL CONTROL ROOM</div>
+  <h2 id="adminHeroTitle">Your newsroom,<br>in control.</h2>
+  <p>Shape the women’s football conversation. Review collected stories, publish your coverage and keep your readers informed — all from one place.</p>
+  <nav class="admin-shortcuts" aria-label="Admin dashboard shortcuts">
+    <a href="#collectedNewsPanel">Collected News</a>
+    <a href="#articleForm">Create Article</a>
+    <a href="#newsletterPanel">Newsletter</a>
+    <a href="#manageArticlesPanel">Manage Articles</a>
+  </nav>
+</section>
 
 <section class="panel" id="adminAccessPanel">
   <h2>Administrator Access</h2>
@@ -574,7 +821,7 @@ Official Club Website — https://example.com"></textarea>
     style="margin-top:13px;font-size:14px"></div>
 </section>
 
-<section class="panel">
+<section class="panel" id="manageArticlesPanel">
   <h2>Manage Articles</h2>
   <p class="muted">Published articles and drafts will appear here.</p>
   <div id="articleList">Tap Load Articles to display your articles.</div>
