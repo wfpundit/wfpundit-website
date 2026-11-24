@@ -20,10 +20,10 @@ export async function onRequestGet({ request, env }) {
     return json({ success: false, error: "Unauthorised" }, 401);
   }
 
-  if (!env.NEWS_AUTOMATION_URL) {
+  if (!env.NEWS_AUTOMATION_URL || !env.NEWS_AUTOMATION_TOKEN) {
     return json({
       success: false,
-      error: "The test news collector URL has not been configured in this Pages environment."
+      error: "The test news collector URL and token must be configured in this Pages environment."
     }, 503);
   }
 
@@ -61,7 +61,7 @@ export async function onRequestGet({ request, env }) {
     const response = await fetch(endpoint.toString(), {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${env.ADMIN_TOKEN}`,
+        "Authorization": `Bearer ${env.NEWS_AUTOMATION_TOKEN}`,
         "Accept": "application/json"
       },
       signal: AbortSignal.timeout(15000)
