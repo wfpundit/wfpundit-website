@@ -226,6 +226,10 @@ body.light .theme-toggle {
 .editor-toolbar button{background:linear-gradient(135deg,#2878dc,#1554a6);border:1px solid #5595e8;border-radius:9px;padding:10px 14px;font-size:12px;font-weight:900;box-shadow:0 5px 14px #0002}
 .editor-help{margin:7px 0 12px;color:var(--muted);font-size:12px;line-height:1.6}
 #uploadButton,#saveButton{min-height:46px;padding:13px 20px;border-radius:10px;font-weight:900;letter-spacing:.035em;box-shadow:0 7px 18px #1769e833}
+#collectedNewsList .article .actions{align-items:center}
+#collectedNewsList .article .actions button{min-height:36px}
+#collectedNewsList .article .actions button:disabled{opacity:.5}
+
 #uploadButton{background:linear-gradient(135deg,#13a6c7,#1769e8);border:1px solid #55c5e5}
 #saveButton{background:linear-gradient(135deg,#2679e8,#124aa0);border:1px solid #68a5f5}
 #photo{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
@@ -896,9 +900,11 @@ async function loadCollectedNews() {
       sourceLink.textContent = "Open original story";
       sourceLink.className = "muted";
 
+      let generatedImagePrompt = "";
+
       const useButton = document.createElement("button");
       useButton.type = "button";
-      useButton.className = "small";
+      useButton.className = "small secondary";
       useButton.textContent = "Use in Article Editor";
       useButton.addEventListener("click", () => {
         $("articleId").value = "";
@@ -913,13 +919,105 @@ async function loadCollectedNews() {
         $("cancelButton").classList.remove("hidden");
         $("content").focus();
         $("collectedNewsStatus").textContent =
-          "Story added to the editor as a draft. Review and write the article before saving.";
+          "Story added to the editor. Use AI Write Full Article to prepare a complete draft.";
         $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      const generateButton = document.createElement("button");
+      generateButton.type = "button";
+      generateButton.className = "small";
+      generateButton.textContent = "AI WRITE FULL ARTICLE";
+      generateButton.addEventListener("click", async () => {
+        if (!adminSessionReady) return;
+        generateButton.disabled = true;
+        generateButton.textContent = "WRITING ARTICLE...";
+        $("collectedNewsStatus").textContent = "AI is preparing an original article draft. Please wait...";
+        try {
+          const response = await fetch("/api/admin/generate-article", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(candidate)
+          });
+          const result = await response.json();
+          if (!response.ok || !result.success) {
+            throw new Error(result.error || "AI article generation failed.");
+          }
+
+          const article = result.article;
+          generatedImagePrompt = article.image_prompt || "";
+          photoButton.disabled = !generatedImagePrompt;
+          photoButton.title = generatedImagePrompt
+            ? "Generate a matching editorial image"
+            : "No image prompt was returned";
+          $("articleId").value = "";
+          $("title").value = article.title || candidate.title || "";
+          $("summary").value = article.summary || candidate.description || "";
+          $("content").value = article.content || "";
+          $("source").value = article.source || (candidate.source_name + " — " + candidate.url);
+          $("category").value = article.category || "Latest News";
+          updateSubcategories();
+          $("status").value = "draft";
+          $("author").value = "WF Pundit";
+          $("imageUrl").value = "";
+          generatedImageDataUrl = "";
+          setPreview("");
+          $("formHeading").textContent = "AI-Generated Article · Review Before Saving";
+          $("saveButton").textContent = "SAVE AS DRAFT";
+          $("cancelButton").classList.remove("hidden");
+          $("collectedNewsStatus").textContent =
+            "AI article prepared as a draft. Fact-check the notes and source before saving.";
+          if (article.fact_check_notes) {
+            $("message").textContent = "EDITORIAL FACT-CHECK NOTES: " + article.fact_check_notes;
+            $("message").style.color = "#d9ad61";
+          }
+          $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch (error) {
+          $("collectedNewsStatus").textContent = error.message;
+        } finally {
+          generateButton.disabled = false;
+          generateButton.textContent = "AI WRITE FULL ARTICLE";
+        }
+      });
+
+      const photoButton = document.createElement("button");
+      photoButton.type = "button";
+      photoButton.className = "small secondary";
+      photoButton.textContent = "GENERATE AI PHOTO";
+      photoButton.disabled = true;
+      photoButton.title = "Generate the article first";
+      photoButton.addEventListener("click", async () => {
+        if (!generatedImagePrompt || !adminSessionReady) return;
+        photoButton.disabled = true;
+        photoButton.textContent = "GENERATING PHOTO...";
+        $("collectedNewsStatus").textContent = "Creating an editorial image. This may take a little while...";
+        try {
+          const response = await fetch("/api/admin/generate-image", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ prompt: generatedImagePrompt })
+          });
+          const result = await response.json();
+          if (!response.ok || !result.success || !result.image_data) {
+            throw new Error(result.error || "AI photo generation failed.");
+          }
+          generatedImageDataUrl = "data:" + (result.mime_type || "image/png") + ";base64," + result.image_data;
+          setPreview(generatedImageDataUrl);
+          $("collectedNewsStatus").textContent =
+            "AI photo generated and attached to the editor preview. It will be uploaded when you save the article.";
+          $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch (error) {
+          $("collectedNewsStatus").textContent = error.message;
+        } finally {
+          photoButton.disabled = false;
+          photoButton.textContent = "GENERATE AI PHOTO";
+        }
       });
 
       const actions = document.createElement("div");
       actions.className = "actions";
-      actions.append(sourceLink, useButton);
+      actions.append(sourceLink, useButton, generateButton, photoButton);
       card.append(title, meta, description, actions);
       list.appendChild(card);
     });
@@ -1217,7 +1315,10 @@ async function uploadSelectedPhoto() {
 
 /* FORM RESET */
 
+let generatedImageDataUrl = "";
+
 function resetForm() {
+  generatedImageDataUrl = "";
   form.reset();
   $("articleId").value = "";
   $("author").value = "WF Pundit";
@@ -1280,6 +1381,24 @@ form.addEventListener("submit", async event => {
   showMessage(id ? "Updating article..." : "Creating article...");
 
   try {
+    if (generatedImageDataUrl) {
+      const imageBlob = await fetch(generatedImageDataUrl).then(response => response.blob());
+      const imageForm = new FormData();
+      imageForm.append("photo", imageBlob, "wf-pundit-ai-editorial.png");
+      const uploadResponse = await fetch("/api/upload-image", {
+        method: "POST",
+        credentials: "same-origin",
+        body: imageForm
+      });
+      const uploadResult = await uploadResponse.json();
+      if (!uploadResponse.ok || !uploadResult.success || !uploadResult.image_url) {
+        throw new Error(uploadResult.error || "The generated photo could not be uploaded.");
+      }
+      article.image_url = uploadResult.image_url;
+      $("imageUrl").value = uploadResult.image_url;
+      generatedImageDataUrl = "";
+    }
+
     const response = await fetch("/api/admin/articles", {
       method: id ? "PUT" : "POST",
       credentials: "same-origin",
