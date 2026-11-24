@@ -1,5 +1,6 @@
 
 import { notifyPublishedArticle } from "../_notifications.js";
+import { adminAuthorised } from "../_auth.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -8,14 +9,6 @@ function json(data, status = 200) {
   });
 }
 
-function authorised(request, env) {
-  const token = request.headers.get("Authorization");
-
-  return Boolean(
-    env.ADMIN_TOKEN &&
-    token === `Bearer ${env.ADMIN_TOKEN}`
-  );
-}
 
 function makeSlug(title) {
   return title
@@ -125,7 +118,7 @@ function validateSourceInformation(sourceValue, sourceUrlValue) {
 
 // LOAD ALL ARTICLES, INCLUDING DRAFTS
 export async function onRequestGet({ request, env }) {
-  if (!authorised(request, env)) {
+  if (!(await adminAuthorised(request, env))) {
     return json({ error: "Unauthorised" }, 401);
   }
 
@@ -151,7 +144,7 @@ export async function onRequestGet({ request, env }) {
 
 // CREATE ARTICLE
 export async function onRequestPost({ request, env }) {
-  if (!authorised(request, env)) {
+  if (!(await adminAuthorised(request, env))) {
     return json({ error: "Unauthorised" }, 401);
   }
 
@@ -252,7 +245,7 @@ export async function onRequestPost({ request, env }) {
 
 // UPDATE ARTICLE
 export async function onRequestPut({ request, env }) {
-  if (!authorised(request, env)) {
+  if (!(await adminAuthorised(request, env))) {
     return json({ error: "Unauthorised" }, 401);
   }
 
@@ -368,7 +361,7 @@ export async function onRequestPut({ request, env }) {
 
 // DELETE ARTICLE
 export async function onRequestDelete({ request, env }) {
-  if (!authorised(request, env)) {
+  if (!(await adminAuthorised(request, env))) {
     return json({ error: "Unauthorised" }, 401);
   }
 
