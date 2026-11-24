@@ -2065,6 +2065,60 @@ body.light-mode .matchday-friendly-note{background:linear-gradient(90deg,#edf5fd
   .newsletter{margin-top:15px;margin-bottom:22px}
 }
 </style>
+
+<style>
+/* ARTICLE CARDS: EQUAL HEIGHTS WITH COMPLETE TEXT */
+#latest .news-grid{
+  align-items:stretch;
+  overflow-y:visible;
+}
+#latest .news-card{
+  display:flex;
+  flex-direction:column;
+  align-self:stretch;
+  height:auto;
+  min-height:0;
+}
+#latest .news-card .thumb{
+  flex:0 0 190px;
+  min-height:190px;
+}
+#latest .news-card .news-body{
+  display:flex;
+  flex:1 1 auto;
+  flex-direction:column;
+  min-width:0;
+  overflow:visible;
+}
+#latest .news-card .news-body .meta,
+#latest .news-card .news-body h3,
+#latest .news-card .news-body p,
+#latest .news-card .news-body .date{
+  max-width:100%;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  white-space:normal;
+}
+#latest .news-card .news-body h3,
+#latest .news-card .news-body p{
+  display:block;
+  overflow:visible;
+  -webkit-line-clamp:unset;
+  line-clamp:unset;
+  -webkit-box-orient:initial;
+}
+#latest .news-card .news-body .date{
+  margin-top:auto;
+  padding-top:14px;
+}
+@media(max-width:720px){
+  #latest .news-card .thumb{
+    flex-basis:160px;
+    min-height:160px;
+  }
+}
+</style>
+
 </head><body>
 
 <div class="site-loader" id="siteLoader">
