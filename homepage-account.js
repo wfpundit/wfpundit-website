@@ -31,6 +31,9 @@ async function updateHomepageAccount() {
           <a class="account-link signup" href="/dashboard.html">
             VIEW DASHBOARD
           </a>
+          <a class="account-link signup homepage-admin-link" href="/admin.html" hidden>
+            MANAGE SITE
+          </a>
         </div>
       `;
     }
@@ -73,6 +76,12 @@ async function updateHomepageAccount() {
       const nameElement = container.querySelector(
         ".homepage-reader-name"
       );
+
+      const adminLink = container.querySelector(".homepage-admin-link");
+
+      if (adminLink) {
+        adminLink.hidden = !(loggedIn && result.user?.isAdmin === true);
+      }
 
       loggedOut.hidden = loggedIn;
       loggedInPanel.hidden = !loggedIn;

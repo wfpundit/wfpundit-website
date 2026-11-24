@@ -1,3 +1,5 @@
+import { adminAuthorised } from "../_auth.js";
+
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -9,10 +11,6 @@ function json(data, status = 200) {
   });
 }
 
-function authorised(request, env) {
-  const token = request.headers.get("Authorization");
-  return Boolean(env.ADMIN_TOKEN && token === "Bearer " + env.ADMIN_TOKEN);
-}
 
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, character => ({
@@ -102,7 +100,7 @@ function buildEmailHtml(message, buttons) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if (!authorised(request, env)) {
+  if (!(await adminAuthorised(request, env))) {
     return json({ success: false, error: "Unauthorised." }, 401);
   }
 
