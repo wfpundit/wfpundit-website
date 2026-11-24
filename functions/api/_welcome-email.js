@@ -6,7 +6,7 @@ function escapeHtml(value) {
 }
 export async function sendWelcomeEmail(env, email, displayName) {
   if (!env.RESEND_API_KEY) return;
-  const firstName = String(displayName || "").trim().split(/\\s+/)[0] || "there";
+  const firstName = String(displayName || "").trim().split(/\s+/)[0] || "there";
   const safeName = escapeHtml(firstName);
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
