@@ -1,3 +1,5 @@
+import { adminAuthorised } from "./_auth.js";
+
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -6,12 +8,6 @@ function json(data, status = 200) {
   });
 }
 
-function isAuthorised(request, env) {
-  return Boolean(
-    env.ADMIN_TOKEN &&
-    request.headers.get("Authorization") === `Bearer ${env.ADMIN_TOKEN}`
-  );
-}
 
 function bytesToBase64(bytes) {
   let binary = "";
@@ -27,7 +23,7 @@ function bytesToBase64(bytes) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if (!isAuthorised(request, env)) {
+  if (!(await adminAuthorised(request, env))) {
     return json({ error: "Unauthorised" }, 401);
   }
 
