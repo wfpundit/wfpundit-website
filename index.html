@@ -245,6 +245,39 @@ white-space:nowrap
 
 .homepage-admin-link[hidden]{display:none!important}
 
+.homepage-account-logout{
+  color:#ffd6d6;
+  background:rgba(164,42,55,.14);
+  border-color:rgba(225,105,117,.65);
+  transition:background .2s,border-color .2s,transform .2s;
+}
+.homepage-account-logout:hover{
+  background:rgba(164,42,55,.28);
+  border-color:#e77b86;
+  transform:translateY(-1px);
+}
+.homepage-mobile-logout{
+  display:none;
+  color:#ffd6d6;
+  background:rgba(164,42,55,.14);
+  border-color:rgba(225,105,117,.65);
+}
+.homepage-mobile-logout:disabled{opacity:.65;cursor:wait}
+.homepage-account-logout:disabled{
+  opacity:.65;
+  cursor:wait;
+  transform:none;
+}
+body.light-mode .homepage-account-logout{
+  color:#a52b38;
+  background:#fff5f5;
+  border-color:#d99aa1;
+}
+body.light-mode .homepage-account-logout:hover{
+  background:#ffe9eb;
+  border-color:#c85c68;
+}
+
 .account-link.signup{
 color:#fff;
 background:#3978c8;
@@ -1633,6 +1666,7 @@ body.light-mode .foot .brand{color:#1c2939}/* DESKTOP-SITE HEADER ON TABLETS AND
 .navright{margin-left:auto;gap:4px;min-width:0}
 .search{display:none}
 .account-actions{gap:4px}
+.navright .homepage-account-logout{display:none}
 .account-link{
 min-height:34px;
 padding:0 6px;
@@ -1683,6 +1717,18 @@ width:100%;
 min-height:42px;
 font-size:10px;
 justify-content:center
+}
+.nav nav .homepage-mobile-logout{
+display:inline-flex;
+margin-top:5px;
+color:#ffd6d6;
+background:rgba(164,42,55,.14);
+border-color:rgba(225,105,117,.65)
+}
+body.light-mode .nav nav .homepage-mobile-logout{
+color:#a52b38;
+background:#fff5f5;
+border-color:#d99aa1
 }
 
 body.light-mode .nav nav{background:#fff}
@@ -2248,6 +2294,9 @@ LIVE
 <a href="#competitions">Competitions</a>
 <a href="#matchday">Matchday</a>
 <a href="#about">About</a>
+<button class="account-link homepage-mobile-logout" type="button" hidden>
+  LOG OUT
+</button>
 
 </nav>
 
