@@ -108,11 +108,11 @@ align-items:center
 .topline-track{
 display:flex;
 align-items:center;
-justify-content:center;
-width:100%;
-min-width:0;
+width:max-content;
+min-width:max-content;
 white-space:nowrap;
-will-change:transform
+will-change:transform;
+animation:toplineSlide 25s linear infinite
 }
 .topline-group{
 display:inline-flex;
