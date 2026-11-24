@@ -16,6 +16,36 @@ async function updateHomepageAccount() {
     container.dataset.sessionState = "checking";
 
     if (!container.querySelector(".homepage-account-logged-out")) {
+      container.addEventListener("click", async event => {
+        const logoutButton = event.target.closest(".homepage-account-logout");
+        if (!logoutButton || logoutButton.disabled) return;
+
+        event.preventDefault();
+        logoutButton.disabled = true;
+        logoutButton.textContent = "LOGGING OUT…";
+
+        try {
+          const response = await fetch("/api/logout", {
+            method: "POST",
+            credentials: "same-origin",
+            headers: { "Accept": "application/json" }
+          });
+
+          const result = await response.json().catch(() => ({}));
+
+          if (!response.ok || !result.success) {
+            throw new Error(result.error || "Unable to log out right now.");
+          }
+
+          await updateHomepageAccount();
+        } catch (error) {
+          console.error("Homepage logout failed:", error);
+          logoutButton.disabled = false;
+          logoutButton.textContent = "LOG OUT";
+          alert(error.message || "Unable to log out right now. Please try again.");
+        }
+      });
+
       container.innerHTML = `
         <div class="homepage-account-logged-out">
           <a class="account-link login" href="/account.html">LOG IN</a>
@@ -34,6 +64,9 @@ async function updateHomepageAccount() {
           <a class="account-link signup homepage-admin-link" href="/admin.html" hidden>
             MANAGE SITE
           </a>
+          <button class="account-link homepage-account-logout" type="button">
+            LOG OUT
+          </button>
         </div>
       `;
     }
