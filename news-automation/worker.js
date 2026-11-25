@@ -786,7 +786,7 @@ export default {
         databaseConfigured: Boolean(env.DB),
         adminTokenConfigured: Boolean(env.ADMIN_TOKEN),
         automaticPublishing: AUTO_PUBLISH,
-        stage: "RSS and Atom collection with short publisher excerpts and editorial triage"
+        stage: "RSS and Atom collection with publisher article text references, excerpts and editorial triage"
       });
     }
     if (path === "/sources") return json({ success: true, feeds: RSS_FEEDS, officialClubFeeds: OFFICIAL_CLUB_FEEDS });
