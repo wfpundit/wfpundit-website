@@ -726,7 +726,15 @@ Official Club Website — https://example.com"></textarea>
       <input id="applyWfWatermark" type="checkbox">
       Add WF Pundit watermark to this photo
     </label>
-    <p class="watermark-note">Adds the WF Pundit wordmark and blue verified tick to an uploaded copy; your original file remains unchanged. For a photo automatically loaded from a publisher page, use an authorised image file with CHOOSE &amp; UPLOAD PHOTO to embed the watermark. A remote image URL alone cannot be altered by this preview.</p>
+    <label class="watermark-option" for="photoRightsConfirmed">
+      <input id="photoRightsConfirmed" type="checkbox">
+      I own this photo or have permission to modify it
+    </label>
+    <p class="watermark-note">The watermark is embedded in a separate uploaded copy. Your original file stays unchanged. Only watermark photos you own or are authorised to modify.</p>
+    <div class="actions">
+      <button type="button" class="secondary" id="watermarkRemoteButton">WATERMARK AUTHORISED IMAGE URL</button>
+    </div>
+    <p class="watermark-note">For a collected publisher image, this button attempts to load the image when the publisher allows it. If the publisher blocks access, upload your authorised image file instead.</p>
     <div id="previewWrap">
       <img id="preview" alt="Article image preview">
       <div id="wfWatermarkPreview" aria-hidden="true">
@@ -1327,12 +1335,22 @@ function setPreview(url) {
   mark.style.display = $("applyWfWatermark").checked && url && previewCanBeWatermarked ? "flex" : "none";
 }
 
-$("applyWfWatermark").addEventListener("change", () => {
-  $("wfWatermarkPreview").style.display = $("applyWfWatermark").checked && $("preview").src && previewCanBeWatermarked ? "flex" : "none";
-});
+function updateWatermarkPreview() {
+  $("wfWatermarkPreview").style.display =
+    $("applyWfWatermark").checked &&
+    $("photoRightsConfirmed").checked &&
+    $("preview").src &&
+    previewCanBeWatermarked ? "flex" : "none";
+}
+
+$("applyWfWatermark").addEventListener("change", updateWatermarkPreview);
+$("photoRightsConfirmed").addEventListener("change", updateWatermarkPreview);
 
 async function makeWatermarkedPhoto(file) {
   if (!$("applyWfWatermark").checked) return file;
+  if (!$("photoRightsConfirmed").checked) {
+    throw new Error("Please confirm that you own this photo or have permission to modify it.");
+  }
   const bitmap = await createImageBitmap(file);
   const canvas = document.createElement("canvas");
   canvas.width = bitmap.width; canvas.height = bitmap.height;
@@ -1396,17 +1414,67 @@ $("uploadButton").addEventListener("click", () => {
   $("photo").click();
 });
 
-async function uploadSelectedPhoto() {
+$("watermarkRemoteButton").addEventListener("click", async () => {
+  const url = $("imageUrl").value.trim();
+  const button = $("watermarkRemoteButton");
+
+  if (!adminSessionReady) {
+    showMessage("Administrator access is required.", true);
+    return;
+  }
+  if (!$("applyWfWatermark").checked) {
+    showMessage("Turn on the WF Pundit watermark option first.", true);
+    return;
+  }
+  if (!$("photoRightsConfirmed").checked) {
+    showMessage("Confirm that you own this photo or have permission to modify it.", true);
+    return;
+  }
+  if (!/^https:\\/\\//i.test(url)) {
+    showMessage("Load a secure HTTPS image URL first.", true);
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "LOADING AUTHORISED IMAGE...";
+  try {
+    const response = await fetch(url, { mode: "cors", credentials: "omit", cache: "no-store" });
+    if (!response.ok) throw new Error("The image host did not allow the image to be loaded.");
+    const blob = await response.blob();
+    if (!blob.type || !blob.type.startsWith("image/")) {
+      throw new Error("That URL did not return an image file.");
+    }
+    if (blob.size > 10 * 1024 * 1024) {
+      throw new Error("The image is larger than the 10 MB upload limit.");
+    }
+    const extension = blob.type.includes("png") ? "png" : blob.type.includes("webp") ? "webp" : blob.type.includes("gif") ? "gif" : "jpg";
+    const file = new File([blob], "authorised-wf-pundit-photo." + extension, { type: blob.type });
+    previewCanBeWatermarked = true;
+    setPreview(URL.createObjectURL(file));
+    updateWatermarkPreview();
+    await uploadSelectedPhoto(file, button);
+  } catch (error) {
+    const message = error && error.name === "TypeError"
+      ? "This publisher blocks direct image access. If you have permission, save an authorised copy and use CHOOSE & UPLOAD PHOTO."
+      : (error.message || "Could not load that image. Use an authorised local copy instead.");
+    showMessage(message, true);
+  } finally {
+    button.disabled = false;
+    button.textContent = "WATERMARK AUTHORISED IMAGE URL";
+  }
+});
+
+async function uploadSelectedPhoto(sourceFile = $("photo").files[0], actionButton = $("uploadButton")) {
   if (!adminSessionReady) {
     showMessage("Administrator access is required.", true);
     return;
   }
 
-  const file = $("photo").files[0];
+  const file = sourceFile;
 
   if (!file) return;
 
-  const button = $("uploadButton");
+  const button = actionButton;
   button.disabled = true;
   button.textContent = "UPLOADING PHOTO...";
   showMessage("Uploading photo...");
