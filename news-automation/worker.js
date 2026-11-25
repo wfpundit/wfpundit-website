@@ -96,7 +96,7 @@ function parseFeed(xml, feed) {
       ? (tagValue(block, "published") || tagValue(block, "updated") || null)
       : (tagValue(block, "pubDate") || tagValue(block, "dc:date") || null);
 
-    if (!title || !link || !matchesTopic(title, description)) return null;
+    if (!title || !link || (!feed.preFiltered && !matchesTopic(title, description))) return null;
     return {
       title, description, link, publishedAt,
       sourceName: feed.name, sourceRegion: feed.region,
