@@ -646,7 +646,6 @@ label{font-size:12px;letter-spacing:.015em}
   </p>
   <div class="actions">
     <button type="button" id="loadCollectedNewsButton">Load Collected News</button>
-    <button type="button" class="danger" id="deleteNonRssCollectedButton">DELETE NON-RSS STORIES</button>
   </div>
   <p id="collectedNewsStatus" class="muted" role="status" aria-live="polite">
     Your administrator session is verified. Load stories when you're ready.
@@ -888,42 +887,7 @@ const message = $("message");
 
 $("loadCollectedNewsButton").addEventListener("click", loadCollectedNews);
 
-$("deleteNonRssCollectedButton").addEventListener("click", async () => {
-  if (!adminSessionReady) {
-    $("collectedNewsStatus").textContent = "Administrator access is required.";
-    return;
-  }
-  const confirmed = confirm(
-    "Delete every collected-news candidate whose source is not one of the seven approved RSS feeds? Google News and other non-RSS candidates will be deleted. Approved RSS candidates and published WF Pundit articles will be preserved. This cannot be undone. Continue?"
-  );
-  if (!confirmed) return;
 
-  const button = $("deleteNonRssCollectedButton");
-  const status = $("collectedNewsStatus");
-  button.disabled = true;
-  button.textContent = "DELETING NON-RSS STORIES...";
-  status.textContent = "Removing non-RSS collected stories. Please wait.";
-
-  try {
-    const response = await fetch("/api/admin/collected-news?scope=non-rss", {
-      method: "DELETE",
-      credentials: "same-origin",
-      cache: "no-store"
-    });
-    const result = await response.json();
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || "Could not remove non-RSS collected stories.");
-    }
-    status.textContent = Number(result.deletedCount || 0) +
-      " non-RSS collected stories deleted. Approved RSS stories and published articles were preserved.";
-    await loadCollectedNews();
-  } catch (error) {
-    status.textContent = error.message || "Could not remove non-RSS collected stories.";
-  } finally {
-    button.disabled = false;
-    button.textContent = "DELETE NON-RSS STORIES";
-  }
-});
 
 /* FREE, RULE-BASED DRAFT BUILDER — NO PAID AI API */
 function buildAutomaticDraft(story) {
