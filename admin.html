@@ -1151,12 +1151,6 @@ generateAiDraftButton.addEventListener("click", async () => {
   const titleBefore = $("title").value.trim();
   const summaryBefore = $("summary").value.trim();
   const contentBefore = $("content").value.trim();
-  const articleText = $("sourceArticleText").value
-    .replace(/^REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\s*/i, "")
-    .trim();
-  const excerpt = $("sourceExcerpt").value
-    .replace(/^REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\s*/i, "")
-    .trim();
   const sourceLine = $("source").value.split(/\r?\n/).map(line => line.trim()).find(Boolean) || "";
   const separator = sourceLine.lastIndexOf(" — ");
   const sourceName = separator > 0 ? sourceLine.slice(0, separator).trim() : sourceLine;
@@ -1181,20 +1175,34 @@ generateAiDraftButton.addEventListener("click", async () => {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: titleBefore, summary: summaryBefore, articleText, excerpt, sourceName, sourceUrl })
+      body: JSON.stringify({
+        title: titleBefore,
+        description: summaryBefore,
+        source_name: sourceName,
+        url: sourceUrl,
+        source_region: "",
+        published_at: ""
+      })
     });
     const result = await response.json();
-    if (!response.ok || !result.success || !result.draft) {
+    if (!response.ok || !result.success || !result.article) {
       throw new Error(result.error || "GPT could not generate the article.");
     }
 
-    $("title").value = result.draft.title;
-    $("summary").value = result.draft.summary;
-    $("content").value = result.draft.content;
-    $("formHeading").textContent = "GPT-Assisted Original Article Draft";
+    const article = result.article;
+    $("title").value = article.title || titleBefore;
+    $("summary").value = article.summary || summaryBefore;
+    $("content").value = article.content || "";
+    $("category").value = article.category || "Latest News";
+    updateSubcategories(article.subcategory || "");
+    $("source").value = article.source || $("source").value;
     $("status").value = "draft";
+    $("formHeading").textContent = "GPT-Assisted Original Article Draft";
     syncSaveButtonLabel();
-    showMessage("GPT draft generated successfully. Review the facts, source attribution and wording before saving or publishing.");
+    const notes = article.fact_check_notes
+      ? " Fact-check notes: " + article.fact_check_notes
+      : "";
+    showMessage("GPT draft generated. Review all facts and notes before saving or publishing." + notes);
     $("content").focus();
   } catch (error) {
     showMessage(error.message || "GPT could not generate the article.", true);
