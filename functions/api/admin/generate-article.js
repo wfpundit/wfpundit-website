@@ -201,7 +201,7 @@ export async function onRequestPost({ request, env }) {
 
   try {
     const length = Number(request.headers.get("Content-Length") || 0);
-    if (length > 12000) {
+    if (length > 18000) {
       return json({ success: false, error: "The story details are too large." }, 413);
     }
 
@@ -212,6 +212,7 @@ export async function onRequestPost({ request, env }) {
     const sourceUrl = String(data.url || "").trim().slice(0, 2048);
     const region = String(data.source_region || "").trim().slice(0, 100);
     const publishedAt = String(data.published_at || "").trim().slice(0, 80);
+    const providedArticleText = String(data.article_source_text || "").trim().slice(0, 12000);
 
     if (!title || !description || !sourceUrl) {
       return json({
@@ -231,13 +232,19 @@ export async function onRequestPost({ request, env }) {
     }
 
     let sourceArticle;
-    try {
-      sourceArticle = await fetchSourceArticle(parsedUrl.href);
-    } catch (sourceError) {
-      return json({
-        success: false,
-        error: "WF Pundit could not read the original article, so it has not generated a rewritten report. " + sourceError.message
-      }, 422);
+    if (providedArticleText.length >= 500) {
+      // Prefer the publisher text already extracted by the RSS Worker.
+      // The text is used as factual reference material, never copied verbatim.
+      sourceArticle = { text: providedArticleText, finalUrl: parsedUrl.href };
+    } else {
+      try {
+        sourceArticle = await fetchSourceArticle(parsedUrl.href);
+      } catch (sourceError) {
+        return json({
+          success: false,
+          error: "WF Pundit could not read the original article, so it has not generated a rewritten report. " + sourceError.message
+        }, 422);
+      }
     }
 
     const facts = {
