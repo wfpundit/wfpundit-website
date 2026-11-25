@@ -87,6 +87,7 @@ export async function onRequestGet({ request, env }) {
         title: item.title.slice(0, 500),
         description: String(item.description || "").slice(0, 5000),
         article_excerpt: String(item.article_excerpt || "").slice(0, 1800),
+        article_source_text: String(item.article_source_text || "").slice(0, 12000),
         image_url: typeof item.image_url === "string" && item.image_url.startsWith("https://") ? item.image_url : "",
         url: item.url,
         source_name: String(item.source_name || "News source").slice(0, 180),
