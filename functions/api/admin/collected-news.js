@@ -15,6 +15,38 @@ function authorised(request, env) {
   );
 }
 
+function safeImageUrl(item) {
+  const candidates = [
+    item.image_url,
+    item.image,
+    item.thumbnail_url,
+    item.thumbnail,
+    item.media_thumbnail,
+    item.enclosure_url
+  ];
+
+  for (const candidate of candidates) {
+    const raw = typeof candidate === "string"
+      ? candidate
+      : candidate && typeof candidate === "object"
+        ? candidate.url || candidate.href || ""
+        : "";
+
+    if (!raw) continue;
+
+    try {
+      const url = new URL(String(raw).trim());
+      if (url.protocol === "https:" && url.hostname && !url.username && !url.password) {
+        return url.href.slice(0, 2000);
+      }
+    } catch {
+      // Ignore malformed image values and try the next supported field.
+    }
+  }
+
+  return "";
+}
+
 export async function onRequestGet({ request, env }) {
   if (!authorised(request, env)) {
     return json({ success: false, error: "Unauthorised" }, 401);
@@ -91,6 +123,7 @@ export async function onRequestGet({ request, env }) {
         title: item.title.slice(0, 500),
         description: String(item.description || "").slice(0, 5000),
         article_excerpt: String(item.article_excerpt || "").slice(0, 1800),
+        image_url: safeImageUrl(item),
         url: item.url,
         source_name: String(item.source_name || "News source").slice(0, 180),
         source_region: String(item.source_region || "").slice(0, 100),
