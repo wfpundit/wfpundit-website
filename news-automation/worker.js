@@ -417,16 +417,21 @@ async function saveCandidate(env, item, contentBudget) {
   ).bind(item.link).first();
   let articleExcerpt = item.articleExcerpt || existing?.article_excerpt || "";
   let imageUrl = item.imageUrl || existing?.image_url || "";
+  let publisherPageFetchAttempted = false;
+  let publisherPageImageFound = false;
   if ((!articleExcerpt || !imageUrl) && contentBudget.remaining > 0) {
     contentBudget.remaining--;
+    publisherPageFetchAttempted = true;
     try {
       const details = await fetchArticleDetails(item.link);
       if (!articleExcerpt) articleExcerpt = details.excerpt || "";
       if (!imageUrl) imageUrl = details.imageUrl || "";
+      publisherPageImageFound = Boolean(details.imageUrl);
     } catch {
       // Keep any RSS-provided text or image if the publisher page cannot be read.
     }
   }
+  const imageAvailable = Boolean(imageUrl);
 
   if (existing) {
     await env.DB.prepare(`
@@ -439,7 +444,11 @@ async function saveCandidate(env, item, contentBudget) {
     `).bind(item.title, item.description, item.sourceName, item.sourceRegion,
       item.publishedAt, editorial.status, flags, articleExcerpt, articleExcerpt,
       imageUrl, imageUrl, existing.id).run();
-    return { inserted: false, editorialStatus: editorial.status, excerptAvailable: Boolean(articleExcerpt) };
+    return {
+      inserted: false, editorialStatus: editorial.status,
+      excerptAvailable: Boolean(articleExcerpt), imageAvailable,
+      publisherPageFetchAttempted, publisherPageImageFound
+    };
   }
 
   const result = await env.DB.prepare(`
@@ -453,7 +462,8 @@ async function saveCandidate(env, item, contentBudget) {
   return {
     inserted: result.meta.changes > 0,
     editorialStatus: editorial.status,
-    excerptAvailable: Boolean(articleExcerpt)
+    excerptAvailable: Boolean(articleExcerpt), imageAvailable,
+    publisherPageFetchAttempted, publisherPageImageFound
   };
 }
 
@@ -472,19 +482,25 @@ async function scanFeed(env, feed, contentBudget) {
   }
 
   const candidates = parseFeed(xml, feed);
-  let inserted = 0, updated = 0, excluded = 0, flagged = 0, excerptAvailable = 0;
+  let inserted = 0, updated = 0, excluded = 0, flagged = 0;
+  let excerptAvailable = 0, imageAvailable = 0;
+  let publisherPageFetchAttempts = 0, publisherPageImagesFound = 0;
   for (const item of candidates) {
     const saved = await saveCandidate(env, item, contentBudget);
     if (saved.inserted) inserted++; else updated++;
     if (saved.editorialStatus === "excluded") excluded++;
     if (saved.editorialStatus === "needs_editorial_check") flagged++;
     if (saved.excerptAvailable) excerptAvailable++;
+    if (saved.imageAvailable) imageAvailable++;
+    if (saved.publisherPageFetchAttempted) publisherPageFetchAttempts++;
+    if (saved.publisherPageImageFound) publisherPageImagesFound++;
   }
   return {
     source: feed.name,
     format: /<entry(?:\s|>)/i.test(xml) ? "Atom" : "RSS",
-    fetched: candidates.length, inserted, updated, excluded, flagged, excerptAvailable,
-    success: true
+    fetched: candidates.length, inserted, updated, excluded, flagged,
+    excerptAvailable, imageAvailable, publisherPageFetchAttempts,
+    publisherPageImagesFound, success: true
   };
 }
 
@@ -512,7 +528,9 @@ async function scanAllFeeds(env) {
     excluded: results.reduce((sum, item) => sum + (item.excluded || 0), 0),
     flagged: results.reduce((sum, item) => sum + (item.flagged || 0), 0),
     articleExcerptsLoaded: results.reduce((sum, item) => sum + (item.excerptAvailable || 0), 0),
+    candidatesWithImages: results.reduce((sum, item) => sum + (item.imageAvailable || 0), 0),
     publisherPageFetchAttempts: 6 - contentBudget.remaining,
+    publisherPageImagesFound: results.reduce((sum, item) => sum + (item.publisherPageImagesFound || 0), 0),
     publisherPageFetchLimit: 6,
     automaticPublishing: AUTO_PUBLISH,
     results
