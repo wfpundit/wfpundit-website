@@ -210,8 +210,17 @@ function normaliseUrl(value) {
   } catch { return null; }
 }
 
-function matchesTopic(title, description) {
+function matchesTopic(title, description, feed = {}) {
+  // Dedicated women's-football RSS feeds are trusted as section-filtered.
+  // Mixed football feeds (such as Sky Sports Football) must carry an explicit
+  // women's-football, women's competition, or women's national-team signal.
+  if (feed.womenOnly === true) return true;
+
   const text = (title + " " + description).toLowerCase();
+  const explicitWomen'sFootballSignal =
+    /\\b(women'?s?\\s+(football|soccer|team|teams|league|super league|champions league|world cup|euros|national team)|female football|female soccer|wsl 2|barclays wsl|nwsl|uwcl|wafcon|liga f|liga mx femenil|serie a femminile|serie a women|frauen[- ]bundesliga|bundesliga women|a[- ]league women|we league|damallsvenskan|toppserien|uswnt|matildas|lionesses|copa libertadores femenina|afc women's champions league)\\b/i.test(text);
+
+  if (!explicitWomen'sFootballSignal) return false;
   return ARTICLE_KEYWORDS.some(keyword => text.includes(keyword.toLowerCase()));
 }
 
@@ -312,7 +321,7 @@ function parseFeed(xml, feed) {
       ? normalisedImageUrl
       : "";
 
-    if (!title || !link || (!feed.preFiltered && !matchesTopic(title, description))) return null;
+    if (!title || !link || !matchesTopic(title, description, feed)) return null;
     return {
       title, description, articleExcerpt, imageUrl, link, publishedAt,
       sourceName, sourceRegion: feed.region,
