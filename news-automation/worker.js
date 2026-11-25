@@ -354,6 +354,9 @@ async function ensureDatabase(env) {
   if (!names.has("article_excerpt")) {
     await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN article_excerpt TEXT DEFAULT ''").run();
   }
+  if (!names.has("image_url")) {
+    await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN image_url TEXT DEFAULT ''").run();
+  }
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_status ON wf_news_candidates(status)").run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_editorial_status ON wf_news_candidates(editorial_status)").run();
   await backfillPendingEditorial(env);
