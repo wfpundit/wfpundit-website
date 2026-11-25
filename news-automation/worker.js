@@ -218,7 +218,7 @@ function matchesTopic(title, description, feed = {}) {
 
   const text = (title + " " + description).toLowerCase();
   const explicitWomensFootballSignal =
-    /\b(women'?s?\s+(football|soccer|team|teams|league|super league|champions league|world cup|euros|national team)|female football|female soccer|wsl|nwsl|uwcl|wafcon|liga f|liga mx femenil|serie a femminile|serie a women|frauen[- ]bundesliga|bundesliga women|a[- ]league women|we league|damallsvenskan|toppserien|uswnt|matildas|lionesses|copa libertadores femenina|afc women's champions league)\b/i.test(text);
+    /\b(women|women'?s?\s+(football|soccer|team|teams|league|super league|champions league|world cup|euros|national team)|female football|female soccer|wsl|nwsl|uwcl|wafcon|liga f|liga mx femenil|serie a femminile|serie a women|frauen[- ]bundesliga|bundesliga women|a[- ]league women|we league|damallsvenskan|toppserien|uswnt|matildas|lionesses|copa libertadores femenina|afc women's champions league)\b/i.test(text);
 
   if (!explicitWomensFootballSignal) return false;
   return ARTICLE_KEYWORDS.some(keyword => text.includes(keyword.toLowerCase()));
