@@ -108,7 +108,7 @@ function extractArticleImage(html, baseUrl) {
     const safe = safePublicArticleUrl(resolved);
     if (!safe) return "";
     const pathname = safe.pathname.toLowerCase();
-    if (/\.(?:svg|ico)(?:$|\\?)/i.test(pathname)) return "";
+    if (/\.(?:svg|ico)$/i.test(pathname)) return "";
     return safe.toString();
   } catch {
     return "";
