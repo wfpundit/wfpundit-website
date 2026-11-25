@@ -151,17 +151,13 @@ export async function onRequestDelete({ request, env }) {
     return json({ success: false, error: "The configured collector must be the WF Pundit test Worker." }, 500);
   }
 
-  const requestUrl = new URL(request.url);
-  const cleanupNonRss = requestUrl.searchParams.get("scope") === "non-rss";
-  const id = requestUrl.searchParams.get("id");
-  if (!cleanupNonRss && (!id || !/^\d+$/.test(id) || Number(id) < 1)) {
-    return json({ success: false, error: "A valid collected-story ID or non-RSS cleanup scope is required." }, 400);
+  const id = new URL(request.url).searchParams.get("id");
+  if (!id || !/^\\d+$/.test(id) || Number(id) < 1) {
+    return json({ success: false, error: "A valid collected-story ID is required." }, 400);
   }
 
   endpoint.pathname = "/candidates";
-  endpoint.search = cleanupNonRss
-    ? new URLSearchParams({ scope: "non-rss" }).toString()
-    : new URLSearchParams({ id }).toString();
+  endpoint.search = new URLSearchParams({ id }).toString();
   try {
     const response = await fetch(endpoint.toString(), {
       method: "DELETE",
@@ -175,9 +171,7 @@ export async function onRequestDelete({ request, env }) {
     if (!response.ok || !result?.success) {
       return json({ success: false, error: result?.error || "Could not delete this collected story." }, response.status || 502);
     }
-    return cleanupNonRss
-      ? json({ success: true, deletedCount: Number(result.deletedCount || 0), preservedRssSources: result.preservedRssSources || [] })
-      : json({ success: true, deletedId: Number(id) });
+    return json({ success: true, deletedId: Number(id) });
   } catch (error) {
     console.error("Collected-news delete bridge error:", error);
     return json({ success: false, error: "Could not connect to the news collector." }, 502);
