@@ -41,7 +41,7 @@ function tagValue(xml, tag) {
 }
 
 function attributeValue(xml, attribute) {
-  const match = xml.match(new RegExp("\\b" + attribute + "\\s*=\\s*[\"']([^\"']+)[\"']", "i"));
+  const match = xml.match(new RegExp("\b" + attribute + "\\s*=\\s*[\"']([^\"']+)[\"']", "i"));
   return match ? decodeXML(match[1].trim()) : "";
 }
 
@@ -183,14 +183,14 @@ function parseFeed(xml, feed) {
       ? (tagValue(block, "published") || tagValue(block, "updated") || null)
       : (tagValue(block, "pubDate") || tagValue(block, "dc:date") || null);
 
-    const mediaContent = (block.match(/<media:content\\b[^>]*\\/?\s*>/i) || [])[0] || "";
-    const mediaThumbnail = (block.match(/<media:thumbnail\\b[^>]*\\/?\s*>/i) || [])[0] || "";
-    const enclosure = (block.match(/<enclosure\\b[^>]*\\/?\s*>/i) || [])[0] || "";
-    const encodedImage = (articleFeedContent.match(/<img\\b[^>]*>/i) || [])[0] || "";
+    const mediaContent = (block.match(/<media:content\b[^>]*\\/?\s*>/i) || [])[0] || "";
+    const mediaThumbnail = (block.match(/<media:thumbnail\b[^>]*\\/?\s*>/i) || [])[0] || "";
+    const enclosure = (block.match(/<enclosure\b[^>]*\\/?\s*>/i) || [])[0] || "";
+    const encodedImage = (articleFeedContent.match(/<img\b[^>]*>/i) || [])[0] || "";
     const rawImageUrl =
       attributeValue(mediaContent, "url") ||
       attributeValue(mediaThumbnail, "url") ||
-      (/^image\\//i.test(attributeValue(enclosure, "type")) ? attributeValue(enclosure, "url") : "") ||
+      (/^image\//i.test(attributeValue(enclosure, "type")) ? attributeValue(enclosure, "url") : "") ||
       attributeValue(encodedImage, "src");
     const normalisedImageUrl = rawImageUrl ? normaliseUrl(rawImageUrl) : null;
     const imageUrl = normalisedImageUrl && new URL(normalisedImageUrl).protocol === "https:"
