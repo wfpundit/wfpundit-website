@@ -900,8 +900,6 @@ async function loadCollectedNews() {
       sourceLink.textContent = "Open original story";
       sourceLink.className = "muted";
 
-      let generatedImagePrompt = "";
-
       const useButton = document.createElement("button");
       useButton.type = "button";
       useButton.className = "small secondary";
@@ -945,11 +943,6 @@ async function loadCollectedNews() {
           }
 
           const article = result.article;
-          generatedImagePrompt = article.image_prompt || "";
-          photoButton.disabled = !generatedImagePrompt;
-          photoButton.title = generatedImagePrompt
-            ? "Generate a matching editorial image"
-            : "No image prompt was returned";
           $("articleId").value = "";
           $("title").value = article.title || candidate.title || "";
           $("summary").value = article.summary || candidate.description || "";
@@ -960,7 +953,7 @@ async function loadCollectedNews() {
           $("status").value = "draft";
           $("author").value = "WF Pundit";
           $("imageUrl").value = "";
-          generatedImageDataUrl = "";
+
           setPreview("");
           $("formHeading").textContent = "AI-Generated Article · Review Before Saving";
           $("saveButton").textContent = "SAVE AS DRAFT";
@@ -983,35 +976,47 @@ async function loadCollectedNews() {
       const photoButton = document.createElement("button");
       photoButton.type = "button";
       photoButton.className = "small secondary";
-      photoButton.textContent = "GENERATE AI PHOTO";
-      photoButton.disabled = true;
-      photoButton.title = "Generate the article first";
+      photoButton.textContent = "FIND ORIGINAL PHOTO";
+      photoButton.title = "Look for the original article's featured photograph";
       photoButton.addEventListener("click", async () => {
-        if (!generatedImagePrompt || !adminSessionReady) return;
+        if (!adminSessionReady) return;
         photoButton.disabled = true;
-        photoButton.textContent = "GENERATING PHOTO...";
-        $("collectedNewsStatus").textContent = "Creating an editorial image. This may take a little while...";
+        photoButton.textContent = "SEARCHING...";
+        status.textContent = "Checking the original article for its featured photograph...";
         try {
-          const response = await fetch("/api/admin/generate-image", {
+          const response = await fetch("/api/admin/find-original-image", {
             method: "POST",
             credentials: "same-origin",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt: generatedImagePrompt })
+            body: JSON.stringify({ url: candidate.url })
           });
           const result = await response.json();
-          if (!response.ok || !result.success || !result.image_data) {
-            throw new Error(result.error || "AI photo generation failed.");
+          if (!response.ok || !result.success || !result.image_url) {
+            throw new Error(result.error || "No original article photograph was found.");
           }
-          generatedImageDataUrl = "data:" + (result.mime_type || "image/png") + ";base64," + result.image_data;
-          setPreview(generatedImageDataUrl);
+          const approved = confirm(
+            "An image was found on the original article.\n\n" +
+            "Finding an image does not grant reuse rights. Confirm that WF Pundit has permission or a licence to reproduce it.\n\n" +
+            "Have you confirmed permission to use this photograph?"
+          );
+          if (!approved) {
+            status.textContent = "Image found but not selected. Confirm reuse rights before using it.";
+            return;
+          }
+          if (!$("title").value.trim()) $("title").value = candidate.title || "";
+          if (!$("summary").value.trim()) $("summary").value = candidate.description || "";
+          if (!$("source").value.trim()) $("source").value = candidate.source_name + " — " + candidate.url;
+          $("status").value = "draft";
+          $("imageUrl").value = result.image_url;
+          setPreview(result.image_url);
           $("collectedNewsStatus").textContent =
-            "AI photo generated and attached to the editor preview. It will be uploaded when you save the article.";
+            "Original image selected for editorial review. Check its licence and attribution requirements again before publication.";
           $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
         } catch (error) {
-          $("collectedNewsStatus").textContent = error.message;
+          status.textContent = error.message;
         } finally {
           photoButton.disabled = false;
-          photoButton.textContent = "GENERATE AI PHOTO";
+          photoButton.textContent = "FIND ORIGINAL PHOTO";
         }
       });
 
@@ -1315,10 +1320,7 @@ async function uploadSelectedPhoto() {
 
 /* FORM RESET */
 
-let generatedImageDataUrl = "";
-
 function resetForm() {
-  generatedImageDataUrl = "";
   form.reset();
   $("articleId").value = "";
   $("author").value = "WF Pundit";
@@ -1381,23 +1383,6 @@ form.addEventListener("submit", async event => {
   showMessage(id ? "Updating article..." : "Creating article...");
 
   try {
-    if (generatedImageDataUrl) {
-      const imageBlob = await fetch(generatedImageDataUrl).then(response => response.blob());
-      const imageForm = new FormData();
-      imageForm.append("photo", imageBlob, "wf-pundit-ai-editorial.png");
-      const uploadResponse = await fetch("/api/upload-image", {
-        method: "POST",
-        credentials: "same-origin",
-        body: imageForm
-      });
-      const uploadResult = await uploadResponse.json();
-      if (!uploadResponse.ok || !uploadResult.success || !uploadResult.image_url) {
-        throw new Error(uploadResult.error || "The generated photo could not be uploaded.");
-      }
-      article.image_url = uploadResult.image_url;
-      $("imageUrl").value = uploadResult.image_url;
-      generatedImageDataUrl = "";
-    }
 
     const response = await fetch("/api/admin/articles", {
       method: id ? "PUT" : "POST",
