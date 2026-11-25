@@ -1014,7 +1014,7 @@ async function loadCollectedNews() {
 
       const description = document.createElement("p");
       description.className = "muted";
-      description.textContent = candidate.description || "No summary supplied by the source.";
+      description.textContent = decodeFeedEntities(candidate.description || "No summary supplied by the source.");
 
       const sourceLink = document.createElement("a");
       sourceLink.href = candidate.url;
@@ -1034,14 +1034,14 @@ async function loadCollectedNews() {
         $("title").value = decodeFeedEntities(candidate.title || "").toLocaleUpperCase();
         $("summary").value = decodeFeedEntities(candidate.description || "");
         $("content").value = buildAutomaticDraft({
-          title: candidate.title,
-          summary: candidate.description,
-          sourceName: candidate.source_name,
+          title: decodeFeedEntities(candidate.title),
+          summary: decodeFeedEntities(candidate.description),
+          sourceName: decodeFeedEntities(candidate.source_name),
           sourceUrl: candidate.url,
           publishedAt: candidate.published_at || candidate.discovered_at
         });
         $("sourceExcerpt").value = candidate.article_excerpt
-          ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + candidate.article_excerpt
+          ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + decodeFeedEntities(candidate.article_excerpt)
           : "";
         $("source").value = (decodeFeedEntities(candidate.source_name) || "Original publisher") + " — " + candidate.url;
         $("category").value = suggestCollectedStoryCategory(candidate.title, candidate.description);
