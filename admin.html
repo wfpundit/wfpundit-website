@@ -921,6 +921,38 @@ function suggestCollectedStoryCategory(title, summary) {
   return "Latest News";
 }
 
+function suggestCollectedStorySubcategory(title, summary, mainCategory) {
+  const text = (decodeFeedEntities(title) + " " + decodeFeedEntities(summary)).toLowerCase();
+  const rules = [
+    ["Women's Super League (WSL)", /\b(wsl|women's super league)\b/],
+    ["Women's Championship", /\b(women's championship|wsl 2)\b/],
+    ["NWSL", /\b(nwsl|national women's soccer league)\b/],
+    ["Liga F", /\bliga f\b/],
+    ["Première Ligue", /\b(première ligue|premiere ligue|arkema)\b/],
+    ["Serie A Femminile", /\bserie a femminile|serie a women\b/],
+    ["Bundesliga Women", /\b(frauen[- ]bundesliga|bundesliga women|google pixel frauen)\b/],
+    ["A-League Women", /\ba[- ]league women\b/],
+    ["Liga MX Femenil", /\bliga mx femenil\b/],
+    ["WE League", /\bwe league\b/],
+    ["Damallsvenskan", /\bdamallsvenskan\b/],
+    ["Toppserien", /\btoppserien\b/],
+    ["FIFA Women's World Cup", /\b(world cup|fifa women's world cup)\b/],
+    ["UEFA Women's Euros", /\b(women's euros|uefa women's euro|euro 20)\b/],
+    ["Women's Africa Cup of Nations (WAFCON)", /\b(wafcon|women's africa cup of nations)\b/],
+    ["Olympic Women's Football", /\b(olympic women's football|women's olympic)\b/],
+    ["AFC Women's Asian Cup", /\b(afc women's asian cup|women's asian cup)\b/],
+    ["Copa América Femenina", /\bcopa am[eé]rica femenina\b/],
+    ["UEFA Women's Nations League", /\b(women's nations league|uefa women's nations league)\b/]
+  ];
+  if (mainCategory === "Women's Champions League (UWCL)" ||
+      /\b(uwcl|women's champions league|uefa women's champions league)\b/.test(text)) {
+    return "UEFA Women's Champions League";
+  }
+  const match = rules.find(([, pattern]) => pattern.test(text));
+  if (match) return match[0];
+  return mainCategory === "Transfers" ? "Multiple leagues / unspecified" : "";
+}
+
 let collectedNewsVisibleLimit = 6;
 let activeCollectedCandidateId = null;
 function refreshCollectedNewsPagination() {
@@ -999,7 +1031,7 @@ async function loadCollectedNews() {
       const dateText = dateValue && !Number.isNaN(Date.parse(dateValue))
         ? new Date(dateValue).toLocaleString()
         : "Date not supplied";
-      meta.textContent = [decodeFeedEntities(candidate.source_name), decodeFeedEntities(candidate.source_region), dateText].filter(Boolean).join(" · ");
+      meta.textContent = [decodeFeedEntities(candidate.source_name), decodeFeedEntities(candidate.source_region), candidate.main_category || "Latest News", candidate.subcategory || "Subcategory not identified", dateText].filter(Boolean).join(" · ");
 
       const description = document.createElement("p");
       description.className = "muted";
@@ -1033,8 +1065,10 @@ async function loadCollectedNews() {
           ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + decodeFeedEntities(candidate.article_excerpt)
           : "";
         $("source").value = (decodeFeedEntities(candidate.source_name) || "Original publisher") + " — " + candidate.url;
-        $("category").value = suggestCollectedStoryCategory(candidate.title, candidate.description);
-        updateSubcategories("");
+        const detectedMainCategory = candidate.main_category || suggestCollectedStoryCategory(candidate.title, candidate.description);
+        const detectedSubcategory = candidate.subcategory || suggestCollectedStorySubcategory(candidate.title, candidate.description, detectedMainCategory);
+        $("category").value = detectedMainCategory;
+        updateSubcategories(detectedSubcategory);
         $("status").value = "draft";
         $("author").value = $("author").value.trim() || "WF Pundit";
         $("imageUrl").value = candidate.image_url || "";
