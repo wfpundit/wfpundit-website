@@ -600,7 +600,7 @@ function buildAutomaticDraft(story) {
   // Keep the article body limited to the supplied feed summary.
   // Publication-date checks and editorial instructions belong in the admin workflow,
   // not in the reader-facing article content.
-  return String(story.summary || "").replace(/\s+/g, " ").trim().slice(0, 900);
+  return String(story.summary || "").replace(/\s+/g, " ").trim().slice(0, 3000);
 }
 
 /* COLLECTED NEWS: LOAD TEST CANDIDATES INTO THE EXISTING EDITOR */
