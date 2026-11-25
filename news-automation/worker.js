@@ -428,6 +428,16 @@ async function backfillPendingEditorial(env) {
   }
 }
 
+async function backfillCandidateCategories(env) {
+  const pending = await env.DB.prepare("SELECT id, title, description FROM wf_news_candidates WHERE main_category = 'Latest News' AND (subcategory IS NULL OR subcategory = '') LIMIT 1000").all();
+  for (const row of pending.results || []) {
+    const detected = classifyCandidate(row.title || "", row.description || "");
+    if (detected.mainCategory !== "Latest News" || detected.subcategory) {
+      await env.DB.prepare("UPDATE wf_news_candidates SET main_category = ?, subcategory = ? WHERE id = ?").bind(detected.mainCategory, detected.subcategory, row.id).run();
+    }
+  }
+}
+
 async function ensureDatabase(env) {
   if (!env.DB) throw new Error("The D1 database binding DB is missing.");
   await env.DB.prepare(`
@@ -466,6 +476,7 @@ async function ensureDatabase(env) {
   }
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_status ON wf_news_candidates(status)").run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_editorial_status ON wf_news_candidates(editorial_status)").run();
+  await backfillCandidateCategories(env);
   await backfillPendingEditorial(env);
 }
 
@@ -614,10 +625,12 @@ async function getDiagnostics(env) {
     ORDER BY status, editorial_status
   `).all();
   const groups = result.results || [];
+  const categoryResult = await env.DB.prepare("SELECT main_category, subcategory, COUNT(*) AS total FROM wf_news_candidates GROUP BY main_category, subcategory ORDER BY main_category, subcategory").all();
   return json({
     success: true,
     total: groups.reduce((sum, row) => sum + Number(row.total || 0), 0),
     groups,
+    categoryGroups: categoryResult.results || [],
     checkedAt: new Date().toISOString()
   });
 }
