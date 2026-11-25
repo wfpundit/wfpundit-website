@@ -360,39 +360,57 @@ async function saveCandidate(env, item, contentBudget) {
     relatedCandidates: editorial.relatedCandidates || []
   });
   const existing = await env.DB.prepare(
-    "SELECT id, article_excerpt FROM wf_news_candidates WHERE url = ?"
+    "SELECT id, article_excerpt, image_url FROM wf_news_candidates WHERE url = ?"
   ).bind(item.link).first();
   let articleExcerpt = item.articleExcerpt || existing?.article_excerpt || "";
-  if (!articleExcerpt && contentBudget.remaining > 0) {
+  let imageUrl = item.imageUrl || existing?.image_url || "";
+  let publisherPageFetchAttempted = false;
+  let publisherPageImageFound = false;
+  if ((!articleExcerpt || !imageUrl) && contentBudget.remaining > 0) {
     contentBudget.remaining--;
-    try { articleExcerpt = await fetchArticleExcerpt(item.link); }
-    catch { articleExcerpt = ""; }
+    publisherPageFetchAttempted = true;
+    try {
+      const details = await fetchArticleDetails(item.link);
+      if (!articleExcerpt) articleExcerpt = details.excerpt || "";
+      if (!imageUrl) imageUrl = details.imageUrl || "";
+      publisherPageImageFound = Boolean(details.imageUrl);
+    } catch {
+      // Keep any RSS-provided text or image if the publisher page cannot be read.
+    }
   }
+  const imageAvailable = Boolean(imageUrl);
 
   if (existing) {
     await env.DB.prepare(`
       UPDATE wf_news_candidates
       SET title = ?, description = ?, source_name = ?, source_region = ?,
           published_at = ?, editorial_status = ?, editorial_flags = ?,
-          article_excerpt = CASE WHEN ? <> '' THEN ? ELSE article_excerpt END
+          article_excerpt = CASE WHEN ? <> '' THEN ? ELSE article_excerpt END,
+          image_url = CASE WHEN ? <> '' THEN ? ELSE image_url END
       WHERE id = ?
     `).bind(item.title, item.description, item.sourceName, item.sourceRegion,
-      item.publishedAt, editorial.status, flags, articleExcerpt, articleExcerpt, existing.id).run();
-    return { inserted: false, editorialStatus: editorial.status, excerptAvailable: Boolean(articleExcerpt) };
+      item.publishedAt, editorial.status, flags, articleExcerpt, articleExcerpt,
+      imageUrl, imageUrl, existing.id).run();
+    return {
+      inserted: false, editorialStatus: editorial.status,
+      excerptAvailable: Boolean(articleExcerpt), imageAvailable,
+      publisherPageFetchAttempted, publisherPageImageFound
+    };
   }
 
   const result = await env.DB.prepare(`
     INSERT INTO wf_news_candidates (
       title, description, url, source_name, source_region, published_at,
-      discovered_at, status, created_at, editorial_status, editorial_flags, article_excerpt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?)
+      discovered_at, status, created_at, editorial_status, editorial_flags, article_excerpt, image_url
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?)
   `).bind(item.title, item.description, item.link, item.sourceName, item.sourceRegion,
-    item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags, articleExcerpt).run();
+    item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags, articleExcerpt, imageUrl).run();
 
   return {
     inserted: result.meta.changes > 0,
     editorialStatus: editorial.status,
-    excerptAvailable: Boolean(articleExcerpt)
+    excerptAvailable: Boolean(articleExcerpt), imageAvailable,
+    publisherPageFetchAttempted, publisherPageImageFound
   };
 }
 
@@ -411,19 +429,25 @@ async function scanFeed(env, feed, contentBudget) {
   }
 
   const candidates = parseFeed(xml, feed);
-  let inserted = 0, updated = 0, excluded = 0, flagged = 0, excerptAvailable = 0;
+  let inserted = 0, updated = 0, excluded = 0, flagged = 0;
+  let excerptAvailable = 0, imageAvailable = 0;
+  let publisherPageFetchAttempts = 0, publisherPageImagesFound = 0;
   for (const item of candidates) {
     const saved = await saveCandidate(env, item, contentBudget);
     if (saved.inserted) inserted++; else updated++;
     if (saved.editorialStatus === "excluded") excluded++;
     if (saved.editorialStatus === "needs_editorial_check") flagged++;
     if (saved.excerptAvailable) excerptAvailable++;
+    if (saved.imageAvailable) imageAvailable++;
+    if (saved.publisherPageFetchAttempted) publisherPageFetchAttempts++;
+    if (saved.publisherPageImageFound) publisherPageImagesFound++;
   }
   return {
     source: feed.name,
     format: /<entry(?:\s|>)/i.test(xml) ? "Atom" : "RSS",
-    fetched: candidates.length, inserted, updated, excluded, flagged, excerptAvailable,
-    success: true
+    fetched: candidates.length, inserted, updated, excluded, flagged,
+    excerptAvailable, imageAvailable, publisherPageFetchAttempts,
+    publisherPageImagesFound, success: true
   };
 }
 
@@ -451,7 +475,9 @@ async function scanAllFeeds(env) {
     excluded: results.reduce((sum, item) => sum + (item.excluded || 0), 0),
     flagged: results.reduce((sum, item) => sum + (item.flagged || 0), 0),
     articleExcerptsLoaded: results.reduce((sum, item) => sum + (item.excerptAvailable || 0), 0),
+    candidatesWithImages: results.reduce((sum, item) => sum + (item.imageAvailable || 0), 0),
     publisherPageFetchAttempts: 6 - contentBudget.remaining,
+    publisherPageImagesFound: results.reduce((sum, item) => sum + (item.publisherPageImagesFound || 0), 0),
     publisherPageFetchLimit: 6,
     automaticPublishing: AUTO_PUBLISH,
     results
@@ -490,6 +516,25 @@ async function deleteCandidate(env, request) {
     return json({ success: false, error: "This collected story was not found. Refresh the list." }, 404);
   }
   return json({ success: true, deletedId: id });
+}
+
+async function markCandidateReviewed(env, request) {
+  await ensureDatabase(env);
+  const url = new URL(request.url);
+  const id = Number(url.searchParams.get("id"));
+  if (!Number.isSafeInteger(id) || id < 1) {
+    return json({ success: false, error: "A valid collected-story ID is required." }, 400);
+  }
+  const result = await env.DB.prepare(
+    "UPDATE wf_news_candidates SET status = 'reviewed' WHERE id = ? AND status = 'new'"
+  ).bind(id).run();
+  if (!result.meta || result.meta.changes < 1) {
+    const existing = await env.DB.prepare("SELECT status FROM wf_news_candidates WHERE id = ?").bind(id).first();
+    if (!existing) return json({ success: false, error: "Collected story not found." }, 404);
+    if (existing.status === "reviewed") return json({ success: true, alreadyReviewed: true, id });
+    return json({ success: false, error: "This story is no longer in the review queue." }, 409);
+  }
+  return json({ success: true, reviewedId: id });
 }
 
 async function getCandidates(env, request) {
@@ -548,6 +593,7 @@ export default {
     if (path === "/diagnostics" && request.method === "GET") return await getDiagnostics(env);
     if (path === "/candidates" && request.method === "GET") return await getCandidates(env, request);
     if (path === "/candidates" && request.method === "DELETE") return await deleteCandidate(env, request);
+    if (path === "/candidates" && request.method === "PATCH") return await markCandidateReviewed(env, request);
     return json({ error: "Route not found" }, 404);
   },
 
