@@ -90,6 +90,7 @@ export async function onRequestGet({ request, env }) {
         id: item.id,
         title: item.title.slice(0, 500),
         description: String(item.description || "").slice(0, 5000),
+        article_excerpt: String(item.article_excerpt || "").slice(0, 1800),
         url: item.url,
         source_name: String(item.source_name || "News source").slice(0, 180),
         source_region: String(item.source_region || "").slice(0, 100),
