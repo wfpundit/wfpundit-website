@@ -910,6 +910,7 @@ function suggestCollectedStoryCategory(title, summary) {
 }
 
 let collectedNewsVisibleLimit = 6;
+let activeCollectedCandidateId = null;
 function refreshCollectedNewsPagination() {
   const cards = [...$("collectedNewsList").querySelectorAll(".article[data-candidate-id]")];
   cards.forEach((card, index) => card.classList.toggle("hidden", index >= collectedNewsVisibleLimit));
@@ -967,6 +968,15 @@ async function loadCollectedNews() {
       card.className = "article";
       card.dataset.candidateId = String(candidate.id || "");
 
+      if (candidate.image_url && /^https:\/\//i.test(candidate.image_url)) {
+        const photo = document.createElement("img");
+        photo.src = candidate.image_url;
+        photo.alt = "Source photo for " + (candidate.title || "collected story");
+        photo.loading = "lazy";
+        photo.referrerPolicy = "no-referrer";
+        card.appendChild(photo);
+      }
+
       const title = document.createElement("h3");
       title.textContent = (candidate.title || "Untitled story").toLocaleUpperCase();
 
@@ -1002,6 +1012,7 @@ async function loadCollectedNews() {
       useButton.addEventListener("click", () => {
         if (!adminSessionReady) return;
         $("articleId").value = "";
+        activeCollectedCandidateId = Number(candidate.id) || null;
         $("title").value = String(candidate.title || "").toLocaleUpperCase();
         $("summary").value = candidate.description || "";
         $("content").value = buildAutomaticDraft({
@@ -1019,8 +1030,9 @@ async function loadCollectedNews() {
         updateSubcategories("");
         $("status").value = "draft";
         $("author").value = $("author").value.trim() || "WF Pundit";
-        $("imageUrl").value = "";
-        setPreview("");
+        $("imageUrl").value = candidate.image_url || "";
+        previewCanBeWatermarked = false;
+        setPreview(candidate.image_url || "");
         $("formHeading").textContent = "Collected Story · Original Article Draft";
         syncSaveButtonLabel();
         $("cancelButton").classList.remove("hidden");
@@ -1058,7 +1070,13 @@ async function loadCollectedNews() {
       const actions = document.createElement("div");
       actions.className = "actions";
       actions.append(sourceLink, useButton, deleteButton);
-      card.append(title, meta, description, excerptStatus, actions);
+      const photoRights = document.createElement("p");
+      photoRights.className = "muted";
+      photoRights.textContent = candidate.image_url
+        ? "Source photo loaded automatically. Confirm WF Pundit has permission to publish it before using it."
+        : "No usable photo was supplied in this feed item.";
+
+      card.append(title, meta, description, excerptStatus, photoRights, actions);
       list.appendChild(card);
     });
     refreshCollectedNewsPagination();
@@ -1446,6 +1464,7 @@ syncSaveButtonLabel();
 function resetForm() {
   form.reset();
   $("articleId").value = "";
+  activeCollectedCandidateId = null;
   $("author").value = "WF Pundit";
   $("applyWfWatermark").checked = false;
   $("wfWatermarkPreview").style.display = "none";
@@ -1537,14 +1556,37 @@ form.addEventListener("submit", async event => {
       throw new Error(result.error || "Unable to save article.");
     }
 
-    showMessage(
-      id
-        ? "Article updated successfully."
-        : "Article created successfully."
-    );
+    let collectedQueueMessage = "";
+    if (article.status === "published" && activeCollectedCandidateId) {
+      try {
+        const reviewedResponse = await fetch(
+          "/api/admin/collected-news?id=" + encodeURIComponent(String(activeCollectedCandidateId)),
+          {
+            method: "PATCH",
+            credentials: "same-origin",
+            cache: "no-store"
+          }
+        );
+        const reviewedResult = await reviewedResponse.json();
+        if (!reviewedResponse.ok || !reviewedResult.success) {
+          throw new Error(reviewedResult.error || "The article was published, but the collected story could not be cleared from the queue.");
+        }
+        collectedQueueMessage = " The collected story has been removed from Loading Collected Stories.";
+      } catch (queueError) {
+        collectedQueueMessage = " The article is published, but the collected story remains in the queue; refresh and try again.";
+      }
+    }
 
     resetForm();
     await loadArticles();
+    if (article.status === "published") {
+      showMessage((id ? "Article updated and published." : "Article published successfully.") + collectedQueueMessage);
+      if (activeCollectedCandidateId === null) {
+        await loadCollectedNews();
+      }
+    } else {
+      showMessage(id ? "Article draft updated successfully." : "Article draft saved successfully.");
+    }
 
   } catch (error) {
     showMessage(error.message, true);

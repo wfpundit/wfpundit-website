@@ -87,6 +87,7 @@ export async function onRequestGet({ request, env }) {
         title: item.title.slice(0, 500),
         description: String(item.description || "").slice(0, 5000),
         article_excerpt: String(item.article_excerpt || "").slice(0, 1800),
+        image_url: typeof item.image_url === "string" && item.image_url.startsWith("https://") ? item.image_url : "",
         url: item.url,
         source_name: String(item.source_name || "News source").slice(0, 180),
         source_region: String(item.source_region || "").slice(0, 100),
@@ -172,6 +173,52 @@ export async function onRequestDelete({ request, env }) {
     return json({ success: true, deletedId: Number(id) });
   } catch (error) {
     console.error("Collected-news delete bridge error:", error);
+    return json({ success: false, error: "Could not connect to the news collector." }, 502);
+  }
+}
+
+
+export async function onRequestPatch({ request, env }) {
+  if (!(await adminAuthorised(request, env))) {
+    return json({ success: false, error: "Unauthorised" }, 401);
+  }
+  if (!env.NEWS_AUTOMATION_URL || !env.NEWS_AUTOMATION_TOKEN) {
+    return json({ success: false, error: "The test news collector is not configured." }, 503);
+  }
+
+  let endpoint;
+  try { endpoint = new URL(env.NEWS_AUTOMATION_URL); }
+  catch { return json({ success: false, error: "The configured collector URL is invalid." }, 500); }
+
+  if (endpoint.protocol !== "https:" ||
+      !endpoint.hostname.endsWith(".workers.dev") ||
+      !endpoint.hostname.startsWith("wf-pundit-news-automation-test.")) {
+    return json({ success: false, error: "The configured collector must be the WF Pundit test Worker." }, 500);
+  }
+
+  const id = new URL(request.url).searchParams.get("id");
+  if (!id || !/^\d+$/.test(id) || Number(id) < 1) {
+    return json({ success: false, error: "A valid collected-story ID is required." }, 400);
+  }
+
+  endpoint.pathname = "/candidates";
+  endpoint.search = new URLSearchParams({ id }).toString();
+  try {
+    const response = await fetch(endpoint.toString(), {
+      method: "PATCH",
+      headers: {
+        "Authorization": `Bearer ${env.NEWS_AUTOMATION_TOKEN}`,
+        "Accept": "application/json"
+      },
+      signal: AbortSignal.timeout(15000)
+    });
+    const result = await response.json().catch(() => null);
+    if (!response.ok || !result?.success) {
+      return json({ success: false, error: result?.error || "Could not mark this collected story as reviewed." }, response.status || 502);
+    }
+    return json({ success: true, reviewedId: Number(id) });
+  } catch (error) {
+    console.error("Collected-news review bridge error:", error);
     return json({ success: false, error: "Could not connect to the news collector." }, 502);
   }
 }
