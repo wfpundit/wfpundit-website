@@ -183,9 +183,23 @@ function parseFeed(xml, feed) {
       ? (tagValue(block, "published") || tagValue(block, "updated") || null)
       : (tagValue(block, "pubDate") || tagValue(block, "dc:date") || null);
 
+    const mediaContent = (block.match(/<media:content\\b[^>]*\\/?\s*>/i) || [])[0] || "";
+    const mediaThumbnail = (block.match(/<media:thumbnail\\b[^>]*\\/?\s*>/i) || [])[0] || "";
+    const enclosure = (block.match(/<enclosure\\b[^>]*\\/?\s*>/i) || [])[0] || "";
+    const encodedImage = (articleFeedContent.match(/<img\\b[^>]*>/i) || [])[0] || "";
+    const rawImageUrl =
+      attributeValue(mediaContent, "url") ||
+      attributeValue(mediaThumbnail, "url") ||
+      (/^image\\//i.test(attributeValue(enclosure, "type")) ? attributeValue(enclosure, "url") : "") ||
+      attributeValue(encodedImage, "src");
+    const normalisedImageUrl = rawImageUrl ? normaliseUrl(rawImageUrl) : null;
+    const imageUrl = normalisedImageUrl && new URL(normalisedImageUrl).protocol === "https:"
+      ? normalisedImageUrl
+      : "";
+
     if (!title || !link || (!feed.preFiltered && !matchesTopic(title, description))) return null;
     return {
-      title, description, articleExcerpt, link, publishedAt,
+      title, description, articleExcerpt, imageUrl, link, publishedAt,
       sourceName, sourceRegion: feed.region,
       discoveredAt: new Date().toISOString()
     };
@@ -332,7 +346,8 @@ async function ensureDatabase(env) {
       source_name TEXT NOT NULL, source_region TEXT DEFAULT '',
       published_at TEXT, discovered_at TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'new', created_at TEXT NOT NULL,
-      article_excerpt TEXT DEFAULT ''
+      article_excerpt TEXT DEFAULT '',
+      image_url TEXT DEFAULT ''
     )
   `).run();
 
@@ -347,6 +362,9 @@ async function ensureDatabase(env) {
   if (!names.has("article_excerpt")) {
     await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN article_excerpt TEXT DEFAULT ''").run();
   }
+  if (!names.has("image_url")) {
+    await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN image_url TEXT DEFAULT ''").run();
+  }
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_status ON wf_news_candidates(status)").run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_editorial_status ON wf_news_candidates(editorial_status)").run();
   await backfillPendingEditorial(env);
@@ -360,9 +378,10 @@ async function saveCandidate(env, item, contentBudget) {
     relatedCandidates: editorial.relatedCandidates || []
   });
   const existing = await env.DB.prepare(
-    "SELECT id, article_excerpt FROM wf_news_candidates WHERE url = ?"
+    "SELECT id, article_excerpt, image_url FROM wf_news_candidates WHERE url = ?"
   ).bind(item.link).first();
   let articleExcerpt = item.articleExcerpt || existing?.article_excerpt || "";
+  const imageUrl = item.imageUrl || existing?.image_url || "";
   if (!articleExcerpt && contentBudget.remaining > 0) {
     contentBudget.remaining--;
     try { articleExcerpt = await fetchArticleExcerpt(item.link); }
@@ -374,20 +393,22 @@ async function saveCandidate(env, item, contentBudget) {
       UPDATE wf_news_candidates
       SET title = ?, description = ?, source_name = ?, source_region = ?,
           published_at = ?, editorial_status = ?, editorial_flags = ?,
-          article_excerpt = CASE WHEN ? <> '' THEN ? ELSE article_excerpt END
+          article_excerpt = CASE WHEN ? <> '' THEN ? ELSE article_excerpt END,
+          image_url = CASE WHEN ? <> '' THEN ? ELSE image_url END
       WHERE id = ?
     `).bind(item.title, item.description, item.sourceName, item.sourceRegion,
-      item.publishedAt, editorial.status, flags, articleExcerpt, articleExcerpt, existing.id).run();
+      item.publishedAt, editorial.status, flags, articleExcerpt, articleExcerpt,
+      imageUrl, imageUrl, existing.id).run();
     return { inserted: false, editorialStatus: editorial.status, excerptAvailable: Boolean(articleExcerpt) };
   }
 
   const result = await env.DB.prepare(`
     INSERT INTO wf_news_candidates (
       title, description, url, source_name, source_region, published_at,
-      discovered_at, status, created_at, editorial_status, editorial_flags, article_excerpt
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?)
+      discovered_at, status, created_at, editorial_status, editorial_flags, article_excerpt, image_url
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?)
   `).bind(item.title, item.description, item.link, item.sourceName, item.sourceRegion,
-    item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags, articleExcerpt).run();
+    item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags, articleExcerpt, imageUrl).run();
 
   return {
     inserted: result.meta.changes > 0,
@@ -492,6 +513,25 @@ async function deleteCandidate(env, request) {
   return json({ success: true, deletedId: id });
 }
 
+async function markCandidateReviewed(env, request) {
+  await ensureDatabase(env);
+  const url = new URL(request.url);
+  const id = Number(url.searchParams.get("id"));
+  if (!Number.isSafeInteger(id) || id < 1) {
+    return json({ success: false, error: "A valid collected-story ID is required." }, 400);
+  }
+  const result = await env.DB.prepare(
+    "UPDATE wf_news_candidates SET status = 'reviewed' WHERE id = ? AND status = 'new'"
+  ).bind(id).run();
+  if (!result.meta || result.meta.changes < 1) {
+    const existing = await env.DB.prepare("SELECT status FROM wf_news_candidates WHERE id = ?").bind(id).first();
+    if (!existing) return json({ success: false, error: "Collected story not found." }, 404);
+    if (existing.status === "reviewed") return json({ success: true, alreadyReviewed: true, id });
+    return json({ success: false, error: "This story is no longer in the review queue." }, 409);
+  }
+  return json({ success: true, reviewedId: id });
+}
+
 async function getCandidates(env, request) {
   await ensureDatabase(env);
   const url = new URL(request.url);
@@ -548,6 +588,7 @@ export default {
     if (path === "/diagnostics" && request.method === "GET") return await getDiagnostics(env);
     if (path === "/candidates" && request.method === "GET") return await getCandidates(env, request);
     if (path === "/candidates" && request.method === "DELETE") return await deleteCandidate(env, request);
+    if (path === "/candidates" && request.method === "PATCH") return await markCandidateReviewed(env, request);
     return json({ error: "Route not found" }, 404);
   },
 
