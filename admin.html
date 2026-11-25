@@ -773,6 +773,13 @@ async function loadCollectedNews() {
               ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + candidate.article_excerpt
               : "No readable publisher excerpt was retrieved. The draft uses only the RSS summary and headline. Open the original story and verify the details.";
             $("source").value = (candidate.source_name || "Original publisher") + " — " + candidate.url;
+
+            // Use the image supplied by the collector as the starting featured image.
+            // The editor can still replace it with a manually uploaded image.
+            const collectedImage = String(candidate.image_url || "").trim();
+            $("imageUrl").value = collectedImage;
+            setPreview(collectedImage);
+
             applySuggestedCategory(candidate.title || "", candidate.description || "");
             $("status").value = "draft";
             $("author").value = $("author").value.trim() || "WF Pundit";
