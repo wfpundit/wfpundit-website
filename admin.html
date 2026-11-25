@@ -1181,7 +1181,8 @@ generateAiDraftButton.addEventListener("click", async () => {
         source_name: sourceName,
         url: sourceUrl,
         source_region: "",
-        published_at: ""
+        published_at: "",
+        article_source_text: $("sourceArticleText").value.replace(/^REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\s*/i, "").trim()
       })
     });
     const result = await response.json();
