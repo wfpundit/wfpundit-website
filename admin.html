@@ -595,32 +595,12 @@ const subcategory = $("subcategory");
 const form = $("articleForm");
 const message = $("message");
 
-/* FREE, RULE-BASED DRAFT BUILDER — NO EXTERNAL AI API */
+/* SAFE STARTING TEXT — EDITORIAL INSTRUCTIONS NEVER ENTER ARTICLE BODY */
 function buildAutomaticDraft(story) {
-  const title = String(story.title || "").trim();
-  const summary = String(story.summary || "").replace(/\\s+/g, " ").trim().slice(0, 900);
-  const sourceName = String(story.sourceName || "the original publisher").trim();
-  const sourceUrl = String(story.sourceUrl || "").trim();
-  const date = story.publishedAt && !Number.isNaN(Date.parse(story.publishedAt))
-    ? new Date(story.publishedAt).toLocaleDateString()
-    : "";
-
-  const paragraphs = [];
-  if (title) {
-    paragraphs.push(title.toLocaleUpperCase() + ".");
-  }
-  if (summary) {
-    paragraphs.push("The available report from " + sourceName + " states: " + summary);
-  } else {
-    paragraphs.push("The collected headline indicates a developing women's-football story, but the feed did not provide enough supporting detail for a complete report.");
-  }
-  if (date) {
-    paragraphs.push("The source lists " + date + " as the publication or discovery date. Confirm the original publication date before this report is published.");
-  }
-  paragraphs.push("WF Pundit is treating this as an initial report. Confirm the key details against the original source and, where possible, an official club, league or player statement. Add independently verified context, relevant reactions and any confirmed updates before publication.");
-  paragraphs.push("EDITORIAL CHECK REQUIRED: This automatically assembled draft is a starting point, not a fully researched or independently written report. Do not add unverified scores, quotes, dates, injuries, transfer details or other claims. Keep the article as a draft until an editor has checked every detail.");
-  if (sourceUrl) paragraphs.push("Source for verification: " + sourceUrl);
-  return paragraphs.join("\\n\\n");
+  // Keep the article body limited to the supplied feed summary.
+  // Publication-date checks and editorial instructions belong in the admin workflow,
+  // not in the reader-facing article content.
+  return String(story.summary || "").replace(/\s+/g, " ").trim().slice(0, 900);
 }
 
 /* COLLECTED NEWS: LOAD TEST CANDIDATES INTO THE EXISTING EDITOR */
@@ -778,6 +758,7 @@ async function loadCollectedNews() {
           useButton.textContent = "LOAD STORY INTO EDITOR";
           useButton.addEventListener("click", () => {
             $("articleId").value = "";
+            $("status").value = "draft";
             $("title").value = String(candidate.title || "").toLocaleUpperCase();
             $("summary").value = candidate.description || "";
             $("content").value = buildAutomaticDraft({
