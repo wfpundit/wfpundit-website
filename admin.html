@@ -669,9 +669,9 @@ label{font-size:12px;letter-spacing:.015em}
 
     <label for="content">Article Content</label>
     <div class="editor-toolbar">
-      <button type="button" data-link-editor="content">INSERT LINK IN ARTICLE</button>
+      <button type="button" data-link-editor="content">ADD LINK TO SELECTED TEXT</button>
     </div>
-    <p class="editor-help">Highlight the words you want to link, then tap Insert Link. You can add unlimited links anywhere in the article.</p>
+    <p class="editor-help">Select the exact words in your article, tap “Add Link”, then enter the HTTPS address. The selected words become a clickable link on the published article.</p>
     <textarea id="content" rows="9"></textarea>
 
     <label for="sourceExcerpt">Publisher Article Excerpt (Reference Only)</label>
@@ -713,6 +713,7 @@ Official Club Website — https://example.com"></textarea>
       <option value="draft">Draft</option>
       <option value="published">Published</option>
     </select>
+    <p class="editor-help">Choose <strong>Published</strong> to publish immediately after confirmation. Choose <strong>Draft</strong> to save without showing it to readers.</p>
 
     <label for="photo">Featured Article Photo</label>
     <input id="photo" type="file" accept="image/jpeg,image/png,image/webp,image/gif">
@@ -725,7 +726,7 @@ Official Club Website — https://example.com"></textarea>
       <input id="applyWfWatermark" type="checkbox">
       Add WF Pundit watermark to this photo
     </label>
-    <p class="watermark-note">Optional. Adds the WF Pundit wordmark and blue verified tick in the upper-left corner of an authorised photo you upload. The original file remains unchanged.</p>
+    <p class="watermark-note">Optional. Adds the WF Pundit wordmark and blue verified tick to the uploaded copy. The small preview badge is temporary; after upload, the watermark is embedded in the photo itself. Your original file remains unchanged.</p>
     <div id="previewWrap">
       <img id="preview" alt="Article image preview">
       <div id="wfWatermarkPreview" aria-hidden="true">
@@ -737,7 +738,7 @@ Official Club Website — https://example.com"></textarea>
     <input id="imageUrl" type="url" placeholder="Uploaded image URL">
 
     <div class="actions">
-      <button type="submit" id="saveButton">PUBLISH ARTICLE</button>
+      <button type="submit" id="saveButton">SAVE AS DRAFT</button>
       <button type="button" class="secondary hidden" id="cancelButton">
         Cancel Edit
       </button>
@@ -1021,7 +1022,7 @@ async function loadCollectedNews() {
         $("imageUrl").value = "";
         setPreview("");
         $("formHeading").textContent = "Collected Story · Original Article Draft";
-        $("saveButton").textContent = "SAVE AS DRAFT";
+        syncSaveButtonLabel();
         $("cancelButton").classList.remove("hidden");
         $("message").textContent = "A free structured draft has been prepared. It is not independently researched or ready to publish. Verify facts and add original reporting.";
         $("message").style.color = "#d9ad61";
@@ -1314,8 +1315,24 @@ async function makeWatermarkedPhoto(file) {
   const word = "wf_pundit", wordWidth = ctx.measureText(word).width;
   const pillW = pad * 2 + wordWidth + gap + badge, pillH = pad * 2 + badge;
   const margin = Math.round(bitmap.width * 0.018), x = margin, y = margin;
-  ctx.fillStyle = "rgba(5,15,35,0.72)";
-  const radius = Math.round(pillH * 0.22); ctx.beginPath(); ctx.roundRect(x, y, pillW, pillH, radius); ctx.fill();
+  ctx.fillStyle = "rgba(5,15,35,0.78)";
+  const radius = Math.round(pillH * 0.22);
+  ctx.beginPath();
+  if (typeof ctx.roundRect === "function") {
+    ctx.roundRect(x, y, pillW, pillH, radius);
+  } else {
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + pillW - radius, y);
+    ctx.quadraticCurveTo(x + pillW, y, x + pillW, y + radius);
+    ctx.lineTo(x + pillW, y + pillH - radius);
+    ctx.quadraticCurveTo(x + pillW, y + pillH, x + pillW - radius, y + pillH);
+    ctx.lineTo(x + radius, y + pillH);
+    ctx.quadraticCurveTo(x, y + pillH, x, y + pillH - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+  }
+  ctx.closePath();
+  ctx.fill();
   ctx.fillStyle = "#ffffff"; ctx.textBaseline = "middle"; ctx.fillText(word, x + pad, y + pillH / 2);
   const cx = x + pad + wordWidth + gap + badge / 2, cy = y + pillH / 2;
   ctx.beginPath(); ctx.arc(cx, cy, badge / 2, 0, Math.PI * 2); ctx.fillStyle = "#168cff"; ctx.fill();
@@ -1404,6 +1421,26 @@ async function uploadSelectedPhoto() {
   }
 }
 
+/* KEEP THE PRIMARY ACTION IN SYNC WITH THE ARTICLE STATUS */
+
+function syncSaveButtonLabel() {
+  const isPublished = $("status").value === "published";
+  const isEditing = Boolean($("articleId").value);
+
+  if (isPublished) {
+    $("saveButton").textContent = isEditing
+      ? "UPDATE & PUBLISH"
+      : "PUBLISH NOW";
+  } else {
+    $("saveButton").textContent = isEditing
+      ? "UPDATE DRAFT"
+      : "SAVE AS DRAFT";
+  }
+}
+
+$("status").addEventListener("change", syncSaveButtonLabel);
+syncSaveButtonLabel();
+
 /* FORM RESET */
 
 function resetForm() {
@@ -1413,7 +1450,7 @@ function resetForm() {
   $("applyWfWatermark").checked = false;
   $("wfWatermarkPreview").style.display = "none";
   $("formHeading").textContent = "Create New Article";
-  $("saveButton").textContent = "PUBLISH ARTICLE";
+  syncSaveButtonLabel();
   $("source").value = "";
   $("cancelButton").classList.add("hidden");
   setPreview("");
@@ -1465,10 +1502,23 @@ form.addEventListener("submit", async event => {
     return;
   }
 
+  if (article.status === "published") {
+    const confirmed = confirm(
+      "PUBLISH THIS ARTICLE NOW?\n\n" +
+      "It will become visible to readers and publication notifications may be sent. " +
+      "Check the headline, article text, photo, links and sources before continuing."
+    );
+    if (!confirmed) return;
+  }
+
   const button = $("saveButton");
   button.disabled = true;
 
-  showMessage(id ? "Updating article..." : "Creating article...");
+  showMessage(
+    article.status === "published"
+      ? (id ? "Publishing article update..." : "Publishing article...")
+      : (id ? "Updating draft..." : "Saving draft...")
+  );
 
   try {
 
@@ -1645,7 +1695,7 @@ function editArticle(article) {
   setPreview(article.image_url || "");
 
   $("formHeading").textContent = "Edit Article #" + article.id;
-  $("saveButton").textContent = "UPDATE ARTICLE";
+  syncSaveButtonLabel();
   $("cancelButton").classList.remove("hidden");
 
   window.scrollTo({ top: 0, behavior: "smooth" });
