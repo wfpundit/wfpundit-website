@@ -900,8 +900,30 @@ function buildAutomaticDraft(story) {
   return paragraphs.join("\n\n");
 }
 
+function decodeFeedEntities(value = "") {
+  const named = { nbsp: " ", amp: "&", quot: '"', apos: "'", lt: "<", gt: ">" };
+  let text = String(value ?? "");
+  for (let pass = 0; pass < 2; pass++) {
+    text = text.replace(/&(#x[0-9a-f]+|#\d+|nbsp|amp|quot|apos|lt|gt);/gi, (entity, code) => {
+      const key = code.toLowerCase();
+      if (key === "nbsp") return " ";
+      if (named[key]) return named[key];
+      if (key.startsWith("#x")) {
+        const point = parseInt(key.slice(2), 16);
+        return Number.isFinite(point) && point <= 0x10ffff ? String.fromCodePoint(point) : entity;
+      }
+      if (key.startsWith("#")) {
+        const point = Number(key.slice(1));
+        return Number.isFinite(point) && point <= 0x10ffff ? (point === 160 ? " " : String.fromCodePoint(point)) : entity;
+      }
+      return entity;
+    });
+  }
+  return text;
+}
+
 function suggestCollectedStoryCategory(title, summary) {
-  const text = (String(title || "") + " " + String(summary || "")).toLowerCase();
+  const text = (decodeFeedEntities(title) + " " + decodeFeedEntities(summary)).toLowerCase();
   if (/transfer|signs? for|joins?|loan deal|contract extension/.test(text)) return "Transfers";
   if (/champions league|uwcl|women's champions league/.test(text)) return "Women's Champions League (UWCL)";
   if (/world cup|euro 20|wafcon|olympic|national team|international/.test(text)) return "International Football";
@@ -980,7 +1002,7 @@ async function loadCollectedNews() {
       }
 
       const title = document.createElement("h3");
-      title.textContent = (candidate.title || "Untitled story").toLocaleUpperCase();
+      title.textContent = decodeFeedEntities(candidate.title || "Untitled story").toLocaleUpperCase();
 
       const meta = document.createElement("div");
       meta.className = "article-meta";
@@ -988,7 +1010,7 @@ async function loadCollectedNews() {
       const dateText = dateValue && !Number.isNaN(Date.parse(dateValue))
         ? new Date(dateValue).toLocaleString()
         : "Date not supplied";
-      meta.textContent = [candidate.source_name, candidate.source_region, dateText].filter(Boolean).join(" · ");
+      meta.textContent = [decodeFeedEntities(candidate.source_name), decodeFeedEntities(candidate.source_region), dateText].filter(Boolean).join(" · ");
 
       const description = document.createElement("p");
       description.className = "muted";
@@ -1009,8 +1031,8 @@ async function loadCollectedNews() {
         if (!adminSessionReady) return;
         $("articleId").value = "";
         activeCollectedCandidateId = Number(candidate.id) || null;
-        $("title").value = String(candidate.title || "").toLocaleUpperCase();
-        $("summary").value = candidate.description || "";
+        $("title").value = decodeFeedEntities(candidate.title || "").toLocaleUpperCase();
+        $("summary").value = decodeFeedEntities(candidate.description || "");
         $("content").value = buildAutomaticDraft({
           title: candidate.title,
           summary: candidate.description,
@@ -1021,7 +1043,7 @@ async function loadCollectedNews() {
         $("sourceExcerpt").value = candidate.article_excerpt
           ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + candidate.article_excerpt
           : "";
-        $("source").value = (candidate.source_name || "Original publisher") + " — " + candidate.url;
+        $("source").value = (decodeFeedEntities(candidate.source_name) || "Original publisher") + " — " + candidate.url;
         $("category").value = suggestCollectedStoryCategory(candidate.title, candidate.description);
         updateSubcategories("");
         $("status").value = "draft";
