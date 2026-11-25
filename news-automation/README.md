@@ -5,10 +5,11 @@ This is the separate test news-monitoring Worker used by the WF Pundit publishin
 ## Behaviour
 - Collects women's-football stories from the configured RSS and Atom sources.
 - Performs editorial triage and exposes only stories marked ready for editorial review to the admin list.
-- Stores short publisher excerpts separately for internal reference.
+- Stores short publisher excerpts and attempts to extract readable article paragraphs from the RSS-linked publisher page. The extracted text is shown in a separate read-only reference field in the admin, never inserted into the publishable article body.
+- Article text extraction is best-effort: publisher page structure, paywalls, anti-bot protections, timeouts and content limits can prevent a full extraction. The Worker does not bypass access controls.
 - Reads image URLs exposed by RSS/Atom media metadata and displays available source photos in the admin review queue. These are reference images; confirm publication rights before using them.
 - Keeps reviewed stories in the database with status `reviewed`, while excluding them from the active `new` review queue. Publishing a collected story marks it reviewed; saving it as a draft does not.
-- Provides a free, rule-based article-body starting draft in the admin. It is not AI-written original journalism and must be independently checked and rewritten by an editor.
+- Provides a free, rule-based article-body starting draft in the admin from the RSS summary. It is not AI-written original journalism; use the extracted source text only to check facts and write original coverage.
 - Automatic publishing is disabled in the Worker (`AUTO_PUBLISH = false`).
 
 ## Cloudflare configuration
