@@ -370,6 +370,22 @@ async function getDiagnostics(env) {
   });
 }
 
+async function deleteCandidate(env, request) {
+  await ensureDatabase(env);
+  const url = new URL(request.url);
+  const id = Number(url.searchParams.get("id"));
+  if (!Number.isSafeInteger(id) || id < 1) {
+    return json({ success: false, error: "A valid collected-story ID is required." }, 400);
+  }
+  const result = await env.DB.prepare(
+    "DELETE FROM wf_news_candidates WHERE id = ?"
+  ).bind(id).run();
+  if (!result.meta || result.meta.changes < 1) {
+    return json({ success: false, error: "This collected story was not found. Refresh the list." }, 404);
+  }
+  return json({ success: true, deletedId: id });
+}
+
 async function getCandidates(env, request) {
   await ensureDatabase(env);
   const url = new URL(request.url);
@@ -425,6 +441,7 @@ export default {
     }
     if (path === "/diagnostics" && request.method === "GET") return await getDiagnostics(env);
     if (path === "/candidates" && request.method === "GET") return await getCandidates(env, request);
+    if (path === "/candidates" && request.method === "DELETE") return await deleteCandidate(env, request);
     return json({ error: "Route not found" }, 404);
   },
 
