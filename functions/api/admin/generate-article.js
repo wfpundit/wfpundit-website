@@ -1,15 +1,43 @@
 import { adminAuthorised } from "../_auth.js";
 
 const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
-const ALLOWED_CATEGORIES = [
-  "Latest News",
-  "Women's Leagues",
-  "Transfers",
-  "Women's Champions League (UWCL)",
-  "International Football",
-  "Interviews & Features",
-  "Match Reports & Analysis"
-];
+const CATEGORY_SUBCATEGORIES = {
+  "Latest News": [],
+  "Women's Leagues": [
+    "Women's Super League (WSL)", "Women's Championship", "NWSL", "Liga F",
+    "Première Ligue", "Serie A Femminile", "Bundesliga Women", "A-League Women",
+    "Liga MX Femenil", "WE League", "Damallsvenskan", "Toppserien"
+  ],
+  "Transfers": [
+    "Women's Super League (WSL)", "Women's Championship", "NWSL", "Liga F",
+    "Première Ligue", "Serie A Femminile", "Bundesliga Women", "A-League Women",
+    "Liga MX Femenil", "WE League", "Damallsvenskan", "Toppserien",
+    "Multiple leagues / unspecified"
+  ],
+  "Women's Champions League (UWCL)": ["UEFA Women's Champions League"],
+  "International Football": [
+    "FIFA Women's World Cup", "UEFA Women's Euros",
+    "Women's Africa Cup of Nations (WAFCON)", "Olympic Women's Football",
+    "AFC Women's Asian Cup", "Copa América Femenina", "UEFA Women's Nations League"
+  ],
+  "Interviews & Features": [
+    "Women's Super League (WSL)", "Women's Championship", "NWSL", "Liga F",
+    "Première Ligue", "Serie A Femminile", "Bundesliga Women", "A-League Women",
+    "Liga MX Femenil", "WE League", "Damallsvenskan", "Toppserien",
+    "UEFA Women's Champions League", "FIFA Women's World Cup", "UEFA Women's Euros",
+    "Women's Africa Cup of Nations (WAFCON)", "Olympic Women's Football",
+    "AFC Women's Asian Cup", "Copa América Femenina", "UEFA Women's Nations League"
+  ],
+  "Match Reports & Analysis": [
+    "Women's Super League (WSL)", "Women's Championship", "NWSL", "Liga F",
+    "Première Ligue", "Serie A Femminile", "Bundesliga Women", "A-League Women",
+    "Liga MX Femenil", "WE League", "Damallsvenskan", "Toppserien",
+    "UEFA Women's Champions League", "FIFA Women's World Cup", "UEFA Women's Euros",
+    "Women's Africa Cup of Nations (WAFCON)", "Olympic Women's Football",
+    "AFC Women's Asian Cup", "Copa América Femenina", "UEFA Women's Nations League"
+  ]
+};
+const ALLOWED_CATEGORIES = Object.keys(CATEGORY_SUBCATEGORIES);
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -99,7 +127,9 @@ export async function onRequestPost({ request, env }) {
           "Do not claim you opened or verified the linked page. Do not invent match scores, dates, player quotes, transfers, injuries, statistics, line-ups, standings, reactions, or other facts.",
           "Do not fabricate direct quotations. Do not closely imitate or reproduce source wording. Write original reporting language.",
           "If the supplied information is too thin for a long report, write a shorter but useful article rather than padding it with invented context. Include clear fact-check notes for anything an editor should verify.",
-          "Return ONLY valid JSON with keys: title, summary, content, category, image_prompt, fact_check_notes.",
+          "Return ONLY valid JSON with keys: title, summary, content, category, subcategory, image_prompt, fact_check_notes.",
+          "Choose one main category from the supplied allowed categories and choose a subcategory only from that category's permitted subcategory list. If no subcategory genuinely applies, return an empty string.",
+          "Category and subcategory options: " + JSON.stringify(CATEGORY_SUBCATEGORIES) + ".",
           "The content field must be plain text with clear paragraph breaks and useful short section headings where appropriate. Aim for 350-550 words only when the facts support that length.",
           "The image_prompt must describe a compelling generic editorial women's football photograph relevant to the story. Do not depict a named real player, copy a real person's likeness, include club crests, sponsors, watermarks, captions or text.",
           "Choose category only from this exact list: " + ALLOWED_CATEGORIES.join(" | ") + "."
@@ -125,6 +155,10 @@ export async function onRequestPost({ request, env }) {
     const category = ALLOWED_CATEGORIES.includes(generated.category)
       ? generated.category
       : "Latest News";
+    const requestedSubcategory = String(generated.subcategory || "").trim();
+    const subcategory = (CATEGORY_SUBCATEGORIES[category] || []).includes(requestedSubcategory)
+      ? requestedSubcategory
+      : "";
     const imagePrompt = String(generated.image_prompt || "").trim().slice(0, 1800);
     const factCheckNotes = String(generated.fact_check_notes || "").trim().slice(0, 3000);
 
@@ -142,6 +176,7 @@ export async function onRequestPost({ request, env }) {
         summary,
         content,
         category,
+        subcategory,
         image_prompt: imagePrompt,
         fact_check_notes: factCheckNotes,
         source: sourceName + " — " + parsedUrl.href,
