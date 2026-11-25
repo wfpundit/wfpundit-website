@@ -41,7 +41,7 @@ function tagValue(xml, tag) {
 }
 
 function attributeValue(xml, attribute) {
-  const match = xml.match(new RegExp("\b" + attribute + "\\s*=\\s*[\"']([^\"']+)[\"']", "i"));
+  const match = xml.match(new RegExp("\\b" + attribute + "\\s*=\\s*[\"']([^\"']+)[\"']", "i"));
   return match ? decodeXML(match[1].trim()) : "";
 }
 
@@ -85,9 +85,39 @@ async function readLimitedText(response, maxBytes = 1200000) {
   return text;
 }
 
-async function fetchArticleExcerpt(articleUrl) {
+function metaContent(html, names) {
+  const tags = html.match(/<meta\\b[^>]*>/gi) || [];
+  for (const tag of tags) {
+    const name = (attributeValue(tag, "property") || attributeValue(tag, "name") || "").toLowerCase();
+    if (!names.includes(name)) continue;
+    const content = attributeValue(tag, "content");
+    if (content) return content;
+  }
+  return "";
+}
+
+function extractArticleImage(html, baseUrl) {
+  const metaImage = metaContent(html, ["og:image", "og:image:url", "twitter:image", "twitter:image:src"]);
+  const imageTag = (html.match(/<img\\b[^>]*>/i) || [])[0] || "";
+  const linkTag = (html.match(/<link\\b(?=[^>]*\\brel=[\"'][^\\"']*image_src)[^>]*>/i) || [])[0] || "";
+  const raw = metaImage || attributeValue(linkTag, "href") ||
+    attributeValue(imageTag, "src") || attributeValue(imageTag, "data-src");
+  if (!raw) return "";
+  try {
+    const resolved = new URL(raw, baseUrl).toString();
+    const safe = safePublicArticleUrl(resolved);
+    if (!safe) return "";
+    const pathname = safe.pathname.toLowerCase();
+    if (/\\.(?:svg|ico)(?:$|\\?)/i.test(pathname)) return "";
+    return safe.toString();
+  } catch {
+    return "";
+  }
+}
+
+async function fetchArticleDetails(articleUrl) {
   let current = safePublicArticleUrl(articleUrl);
-  if (!current) return "";
+  if (!current) return { excerpt: "", imageUrl: "" };
   for (let redirects = 0; redirects <= 3; redirects++) {
     let response;
     try {
@@ -95,41 +125,46 @@ async function fetchArticleExcerpt(articleUrl) {
         redirect: "manual",
         headers: {
           "Accept": "text/html,application/xhtml+xml",
-          "User-Agent": "WF-Pundit-NewsMonitor/2.1"
+          "User-Agent": "WF-Pundit-NewsMonitor/2.2"
         },
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(6000)
       });
     } catch {
-      return "";
+      return { excerpt: "", imageUrl: "" };
     }
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get("Location");
-      if (!location || redirects === 3) return "";
+      if (!location || redirects === 3) return { excerpt: "", imageUrl: "" };
       try { current = safePublicArticleUrl(new URL(location, current).toString()); }
-      catch { return ""; }
-      if (!current) return "";
+      catch { return { excerpt: "", imageUrl: "" }; }
+      if (!current) return { excerpt: "", imageUrl: "" };
       continue;
     }
-    if (!response.ok || !(response.headers.get("content-type") || "").toLowerCase().includes("html")) return "";
+    if (!response.ok || !(response.headers.get("content-type") || "").toLowerCase().includes("html")) {
+      return { excerpt: "", imageUrl: "" };
+    }
     const contentLength = Number(response.headers.get("content-length") || 0);
-    if (contentLength > 1200000) return "";
+    if (contentLength > 1200000) return { excerpt: "", imageUrl: "" };
     const finalUrl = safePublicArticleUrl(response.url || current.toString());
-    if (!finalUrl) return "";
+    if (!finalUrl) return { excerpt: "", imageUrl: "" };
     const html = await readLimitedText(response);
-    const articleMatch = html.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i);
-    const mainMatch = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i);
+    const imageUrl = extractArticleImage(html, finalUrl);
+    const articleMatch = html.match(/<article\\b[^>]*>([\\s\\S]*?)<\\/article>/i);
+    const mainMatch = html.match(/<main\\b[^>]*>([\\s\\S]*?)<\\/main>/i);
     let body = articleMatch?.[1] || mainMatch?.[1] || html;
-    body = body.replace(/<!--[\s\S]*?-->/g, " ")
-      .replace(/<(script|style|svg|nav|footer|header|aside|form|noscript)\b[\s\S]*?<\/\1>/gi, " ");
-    const paragraphs = [...body.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)]
+    body = body.replace(/<!--[\\s\\S]*?-->/g, " ")
+      .replace(/<(script|style|svg|nav|footer|header|aside|form|noscript)\\b[\\s\\S]*?<\\/\\1>/gi, " ");
+    const paragraphs = [...body.matchAll(/<p\\b[^>]*>([\\s\\S]*?)<\\/p>/gi)]
       .map(match => cleanText(match[1]))
       .filter(paragraph => paragraph.length > 45);
-    const excerpt = paragraphs.join(" ").slice(0, 1800);
-    if (excerpt) return excerpt;
-    const meta = html.match(/<meta\b[^>]*(?:name|property)=["'](?:description|og:description)["'][^>]*content=["']([^"']+)["'][^>]*>/i);
-    return meta ? cleanText(meta[1]).slice(0, 700) : "";
+    let excerpt = paragraphs.join(" ").slice(0, 1800);
+    if (!excerpt) {
+      const description = metaContent(html, ["description", "og:description", "twitter:description"]);
+      excerpt = cleanText(description).slice(0, 700);
+    }
+    return { excerpt, imageUrl };
   }
-  return "";
+  return { excerpt: "", imageUrl: "" };
 }
 
 function normaliseUrl(value) {
@@ -381,11 +416,16 @@ async function saveCandidate(env, item, contentBudget) {
     "SELECT id, article_excerpt, image_url FROM wf_news_candidates WHERE url = ?"
   ).bind(item.link).first();
   let articleExcerpt = item.articleExcerpt || existing?.article_excerpt || "";
-  const imageUrl = item.imageUrl || existing?.image_url || "";
-  if (!articleExcerpt && contentBudget.remaining > 0) {
+  let imageUrl = item.imageUrl || existing?.image_url || "";
+  if ((!articleExcerpt || !imageUrl) && contentBudget.remaining > 0) {
     contentBudget.remaining--;
-    try { articleExcerpt = await fetchArticleExcerpt(item.link); }
-    catch { articleExcerpt = ""; }
+    try {
+      const details = await fetchArticleDetails(item.link);
+      if (!articleExcerpt) articleExcerpt = details.excerpt || "";
+      if (!imageUrl) imageUrl = details.imageUrl || "";
+    } catch {
+      // Keep any RSS-provided text or image if the publisher page cannot be read.
+    }
   }
 
   if (existing) {
