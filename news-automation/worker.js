@@ -101,22 +101,47 @@ function metaContent(html, names) {
 }
 
 function extractArticleImage(html, baseUrl) {
+  const candidates = [];
   const metaImage = metaContent(html, ["og:image", "og:image:url", "twitter:image", "twitter:image:src"]);
-  const imageTag = (html.match(/<img\b[^>]*>/i) || [])[0] || "";
-  const linkTag = (html.match(/<link\b(?=[^>]*\brel=[\"'][^\\"']*image_src)[^>]*>/i) || [])[0] || "";
-  const raw = metaImage || attributeValue(linkTag, "href") ||
-    attributeValue(imageTag, "src") || attributeValue(imageTag, "data-src");
-  if (!raw) return "";
-  try {
-    const resolved = new URL(raw, baseUrl).toString();
-    const safe = safePublicArticleUrl(resolved);
-    if (!safe) return "";
-    const pathname = safe.pathname.toLowerCase();
-    if (/\.(?:svg|ico)$/i.test(pathname)) return "";
-    return safe.toString();
-  } catch {
-    return "";
+  if (metaImage) candidates.push(metaImage);
+
+  const linkTags = html.match(/<link\\b[^>]*>/gi) || [];
+  for (const tag of linkTags) {
+    const rel = attributeValue(tag, "rel").toLowerCase();
+    if (rel.split(/\\s+/).includes("image_src")) {
+      const href = attributeValue(tag, "href");
+      if (href) candidates.push(href);
+    }
   }
+
+  // Publishers often lazy-load lead images instead of placing them in src.
+  const imageTags = html.match(/<img\\b[^>]*>/gi) || [];
+  for (const tag of imageTags.slice(0, 20)) {
+    for (const attr of ["src", "data-src", "data-lazy-src", "data-original", "data-image"]) {
+      const value = attributeValue(tag, attr);
+      if (value) candidates.push(value);
+    }
+    for (const attr of ["srcset", "data-srcset"]) {
+      const value = attributeValue(tag, attr);
+      if (value) {
+        const first = value.split(",")[0].trim().split(/\\s+/)[0];
+        if (first) candidates.push(first);
+      }
+    }
+  }
+
+  // Some publishers expose the article's lead image only in JSON-LD.
+  const jsonImage = html.match(/["']image["']\\s*:\\s*(?:["']([^"']+)["']|\\[\\s*["']([^"']+)["'])/i);
+  if (jsonImage) candidates.push(jsonImage[1] || jsonImage[2]);
+
+  for (const raw of candidates) {
+    try {
+      const safe = safePublicArticleUrl(new URL(raw, baseUrl).toString());
+      if (!safe || /\\.(?:svg|ico)$/i.test(safe.pathname)) continue;
+      return safe.toString();
+    } catch {}
+  }
+  return "";
 }
 
 async function fetchArticleDetails(articleUrl) {
@@ -129,7 +154,7 @@ async function fetchArticleDetails(articleUrl) {
         redirect: "manual",
         headers: {
           "Accept": "text/html,application/xhtml+xml",
-          "User-Agent": "WF-Pundit-NewsMonitor/2.2"
+          "User-Agent": "WF-Pundit-NewsMonitor/2.3"
         },
         signal: AbortSignal.timeout(6000)
       });
@@ -153,12 +178,12 @@ async function fetchArticleDetails(articleUrl) {
     if (!finalUrl) return { excerpt: "", imageUrl: "" };
     const html = await readLimitedText(response);
     const imageUrl = extractArticleImage(html, finalUrl);
-    const articleMatch = html.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i);
-    const mainMatch = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i);
+    const articleMatch = html.match(/<article\\b[^>]*>([\\s\\S]*?)<\\/article>/i);
+    const mainMatch = html.match(/<main\\b[^>]*>([\\s\\S]*?)<\\/main>/i);
     let body = articleMatch?.[1] || mainMatch?.[1] || html;
-    body = body.replace(/<!--[\s\S]*?-->/g, " ")
-      .replace(/<(script|style|svg|nav|footer|header|aside|form|noscript)\b[\s\S]*?<\/\1>/gi, " ");
-    const paragraphs = [...body.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)]
+    body = body.replace(/<!--[\\s\\S]*?-->/g, " ")
+      .replace(/<(script|style|svg|nav|footer|header|aside|form|noscript)\\b[\\s\\S]*?<\\/\\1>/gi, " ");
+    const paragraphs = [...body.matchAll(/<p\\b[^>]*>([\\s\\S]*?)<\\/p>/gi)]
       .map(match => cleanText(match[1]))
       .filter(paragraph => paragraph.length > 45);
     let excerpt = paragraphs.join(" ").slice(0, 1800);
@@ -496,6 +521,7 @@ async function saveCandidate(env, item, contentBudget) {
   let publisherPageImageFound = false;
   if ((!articleExcerpt || !imageUrl) && contentBudget.remaining > 0) {
     contentBudget.remaining--;
+    contentBudget.used++;
     publisherPageFetchAttempted = true;
     try {
       const details = await fetchArticleDetails(item.link);
@@ -545,15 +571,37 @@ async function saveCandidate(env, item, contentBudget) {
   };
 }
 
+async function fetchFeedWithRetry(feed) {
+  const retryableStatuses = new Set([429, 500, 502, 503, 504]);
+  for (let attempt = 0; attempt < 3; attempt++) {
+    let response;
+    try {
+      response = await fetch(feed.url, {
+        headers: {
+          "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml",
+          "User-Agent": "WF-Pundit-NewsMonitor/2.3"
+        },
+        signal: AbortSignal.timeout(20000)
+      });
+    } catch (error) {
+      if (attempt === 2) throw error;
+      await new Promise(resolve => setTimeout(resolve, [500, 1200][attempt]));
+      continue;
+    }
+    if (response.ok) return response;
+    const status = response.status;
+    try { await response.body?.cancel(); } catch {}
+    const error = new Error(feed.name + " returned HTTP " + status);
+    if (!retryableStatuses.has(status) || attempt === 2) throw error;
+    const retryAfter = Number(response.headers.get("Retry-After") || 0);
+    const delay = retryAfter > 0 ? Math.min(retryAfter * 1000, 2500) : [500, 1200][attempt];
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+  throw new Error(feed.name + " could not be fetched after retries.");
+}
+
 async function scanFeed(env, feed, contentBudget) {
-  const response = await fetch(feed.url, {
-    headers: {
-      "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml",
-      "User-Agent": "WF-Pundit-NewsMonitor/2.0"
-    },
-    signal: AbortSignal.timeout(20000)
-  });
-  if (!response.ok) throw new Error(feed.name + " returned HTTP " + response.status);
+  const response = await fetchFeedWithRetry(feed);
   const xml = await response.text();
   if (!/<rss(?:\s|>)/i.test(xml) && !/<feed(?:\s|>)/i.test(xml)) {
     throw new Error(feed.name + " did not return recognisable RSS or Atom XML.");
@@ -585,12 +633,17 @@ async function scanFeed(env, feed, contentBudget) {
 async function scanAllFeeds(env) {
   await ensureDatabase(env);
   const results = [];
-  const contentBudget = { remaining: 6 };
+  // Spread publisher-page image/excerpt lookups across feeds instead of exhausting
+  // the entire allowance on the first publisher in the registry.
+  const contentBudget = { remaining: 12, perFeedLimit: 2 };
   for (const feed of RSS_FEEDS.filter(item => item.enabled)) {
-    try { results.push(await scanFeed(env, feed, contentBudget)); }
+    const feedBudget = { remaining: Math.min(contentBudget.perFeedLimit, contentBudget.remaining), used: 0 };
+    try { results.push(await scanFeed(env, feed, feedBudget)); }
     catch (error) {
       console.error("Feed error: " + feed.name, error);
       results.push({ source: feed.name, success: false, error: error.message });
+    } finally {
+      contentBudget.remaining -= feedBudget.used;
     }
   }
   const successful = results.filter(item => item.success).length;
@@ -609,7 +662,7 @@ async function scanAllFeeds(env) {
     candidatesWithImages: results.reduce((sum, item) => sum + (item.imageAvailable || 0), 0),
     publisherPageFetchAttempts: 6 - contentBudget.remaining,
     publisherPageImagesFound: results.reduce((sum, item) => sum + (item.publisherPageImagesFound || 0), 0),
-    publisherPageFetchLimit: 6,
+    publisherPageFetchLimit: 12,
     automaticPublishing: AUTO_PUBLISH,
     results
   };
