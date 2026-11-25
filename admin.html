@@ -650,7 +650,9 @@ label{font-size:12px;letter-spacing:.015em}
   <p id="collectedNewsStatus" class="muted" role="status" aria-live="polite">
     Your administrator session is verified. Load stories when you're ready.
   </p>
+  <div id="collectedNewsDiagnostics" class="article-meta" aria-live="polite"></div>
   <div id="collectedNewsList"></div>
+  <div class="actions"><button type="button" class="secondary hidden" id="loadMoreCollectedNewsButton">LOAD MORE STORIES</button></div>
 </section>
 
 <section class="panel">
@@ -671,6 +673,11 @@ label{font-size:12px;letter-spacing:.015em}
     </div>
     <p class="editor-help">Highlight the words you want to link, then tap Insert Link. You can add unlimited links anywhere in the article.</p>
     <textarea id="content" rows="9"></textarea>
+
+    <label for="sourceExcerpt">Publisher Article Excerpt (Reference Only)</label>
+    <textarea id="sourceExcerpt" rows="7" readonly
+      placeholder="A short source excerpt may appear here when the publisher makes content available."></textarea>
+    <p class="editor-help">Reference only — do not republish this excerpt. Write an original WF Pundit article and verify all facts against the original source.</p>
 
     <label for="source">News Sources (Maximum 4)</label>
     <textarea id="source" rows="5" maxlength="12000" placeholder="BBC Sport — https://www.bbc.com/sport
@@ -865,12 +872,71 @@ const message = $("message");
 
 $("loadCollectedNewsButton").addEventListener("click", loadCollectedNews);
 
+/* FREE, RULE-BASED DRAFT BUILDER — NO PAID AI API */
+function buildAutomaticDraft(story) {
+  const title = String(story.title || "").trim();
+  const summary = String(story.summary || "").replace(/\s+/g, " ").trim().slice(0, 900);
+  const sourceName = String(story.sourceName || "the original publisher").trim();
+  const sourceUrl = String(story.sourceUrl || "").trim();
+  const date = story.publishedAt && !Number.isNaN(Date.parse(story.publishedAt))
+    ? new Date(story.publishedAt).toLocaleDateString()
+    : "";
+
+  const paragraphs = [];
+  if (title) paragraphs.push(title.toLocaleUpperCase() + ".");
+  if (summary) {
+    paragraphs.push("The available report from " + sourceName + " states: " + summary);
+  } else {
+    paragraphs.push("The collected headline indicates a developing women's-football story, but the feed did not provide enough supporting detail for a complete report.");
+  }
+  if (date) {
+    paragraphs.push("The source lists " + date + " as its publication or discovery date. Confirm the original publication date before publishing.");
+  }
+  paragraphs.push("WF Pundit is treating this as an initial report. Confirm the key details against the original source and, where possible, an official club, league or player statement. Add independently verified context, relevant reactions and confirmed updates before publication.");
+  paragraphs.push("EDITORIAL CHECK REQUIRED: This is a structured starting draft, not a fully researched or independently written report. Do not add unverified scores, quotes, dates, injuries, transfer details or other claims. Keep the article as a draft until every detail has been checked.");
+  if (sourceUrl) paragraphs.push("Source for verification: " + sourceUrl);
+  return paragraphs.join("\n\n");
+}
+
+function suggestCollectedStoryCategory(title, summary) {
+  const text = (String(title || "") + " " + String(summary || "")).toLowerCase();
+  if (/transfer|signs? for|joins?|loan deal|contract extension/.test(text)) return "Transfers";
+  if (/champions league|uwcl|women's champions league/.test(text)) return "Women's Champions League (UWCL)";
+  if (/world cup|euro 20|wafcon|olympic|national team|international/.test(text)) return "International Football";
+  if (/super league|wsl|nwsl|liga f|bundesliga|serie a femminile|première ligue|women's league/.test(text)) return "Women's Leagues";
+  if (/match report|full.?time|defeats?|beats?|draw|win|victory|analysis/.test(text)) return "Match Reports & Analysis";
+  return "Latest News";
+}
+
+let collectedNewsVisibleLimit = 6;
+function refreshCollectedNewsPagination() {
+  const cards = [...$("collectedNewsList").querySelectorAll(".article[data-candidate-id]")];
+  cards.forEach((card, index) => card.classList.toggle("hidden", index >= collectedNewsVisibleLimit));
+  const more = $("loadMoreCollectedNewsButton");
+  const remaining = Math.max(0, cards.length - collectedNewsVisibleLimit);
+  more.classList.toggle("hidden", remaining === 0);
+  more.textContent = remaining ? "LOAD MORE STORIES (" + remaining + " LEFT)" : "LOAD MORE STORIES";
+}
+$("loadMoreCollectedNewsButton").addEventListener("click", () => {
+  collectedNewsVisibleLimit += 6;
+  refreshCollectedNewsPagination();
+});
+
 async function loadCollectedNews() {
   const status = $("collectedNewsStatus");
   const list = $("collectedNewsList");
-
-  status.textContent = "Loading recent collected stories...";
+  const diagnosticsBox = $("collectedNewsDiagnostics");
+  const moreButton = $("loadMoreCollectedNewsButton");
+  moreButton.classList.add("hidden");
+  collectedNewsVisibleLimit = 6;
+  status.textContent = "Loading collected stories...";
   list.replaceChildren();
+  diagnosticsBox.textContent = "";
+
+  if (!adminSessionReady) {
+    status.textContent = "Please sign in with your WF Pundit administrator account.";
+    return;
+  }
 
   try {
     const response = await fetch("/api/admin/collected-news", {
@@ -879,24 +945,29 @@ async function loadCollectedNews() {
       cache: "no-store"
     });
     const result = await response.json();
+    if (!response.ok || !result.success) throw new Error(result.error || "Unable to load collected news.");
 
-    if (!response.ok || !result.success) {
-      throw new Error(result.error || "Unable to load collected news.");
+    if (result.diagnostics && Array.isArray(result.diagnostics.groups)) {
+      diagnosticsBox.textContent = "Database records: " + Number(result.diagnostics.total || 0) + " · " +
+        result.diagnostics.groups.map(group => (group.editorial_status || "pending") + ": " + Number(group.total || 0)).join(" · ");
+    } else {
+      diagnosticsBox.textContent = "Collector diagnostics are not available for this scan.";
     }
 
-    if (!result.candidates || !result.candidates.length) {
+    const candidates = Array.isArray(result.candidates) ? result.candidates : [];
+    if (!candidates.length) {
       status.textContent = "No new stories are currently ready for editorial review.";
       return;
     }
+    status.textContent = candidates.length + " stories ready for editorial review.";
 
-    status.textContent = result.count + " stories ready for editorial review.";
-
-    result.candidates.forEach(candidate => {
+    candidates.forEach(candidate => {
       const card = document.createElement("article");
       card.className = "article";
+      card.dataset.candidateId = String(candidate.id || "");
 
       const title = document.createElement("h3");
-      title.textContent = candidate.title || "Untitled story";
+      title.textContent = (candidate.title || "Untitled story").toLocaleUpperCase();
 
       const meta = document.createElement("div");
       meta.className = "article-meta";
@@ -904,12 +975,17 @@ async function loadCollectedNews() {
       const dateText = dateValue && !Number.isNaN(Date.parse(dateValue))
         ? new Date(dateValue).toLocaleString()
         : "Date not supplied";
-      meta.textContent = [candidate.source_name, candidate.source_region, dateText]
-        .filter(Boolean).join(" · ");
+      meta.textContent = [candidate.source_name, candidate.source_region, dateText].filter(Boolean).join(" · ");
 
       const description = document.createElement("p");
       description.className = "muted";
       description.textContent = candidate.description || "No summary supplied by the source.";
+
+      const excerptStatus = document.createElement("p");
+      excerptStatus.className = "muted";
+      excerptStatus.textContent = candidate.article_excerpt
+        ? "Publisher reference excerpt available."
+        : "No additional publisher excerpt was available; the draft will use the RSS summary.";
 
       const sourceLink = document.createElement("a");
       sourceLink.href = candidate.url;
@@ -921,125 +997,72 @@ async function loadCollectedNews() {
       const useButton = document.createElement("button");
       useButton.type = "button";
       useButton.className = "small";
-      useButton.textContent = "USE IN EDITOR · AUTO PREPARE";
-      useButton.addEventListener("click", async () => {
+      useButton.textContent = "LOAD STORY INTO EDITOR";
+      useButton.addEventListener("click", () => {
         if (!adminSessionReady) return;
-
-        useButton.disabled = true;
-        useButton.textContent = "PREPARING ARTICLE...";
-        status.textContent = "Preparing your article and checking the original source for a featured photo. This may take a moment...";
-
         $("articleId").value = "";
-        $("title").value = candidate.title || "";
+        $("title").value = String(candidate.title || "").toLocaleUpperCase();
         $("summary").value = candidate.description || "";
-        $("content").value = "";
-        $("source").value = candidate.source_name + " — " + candidate.url;
+        $("content").value = buildAutomaticDraft({
+          title: candidate.title,
+          summary: candidate.description,
+          sourceName: candidate.source_name,
+          sourceUrl: candidate.url,
+          publishedAt: candidate.published_at || candidate.discovered_at
+        });
+        $("sourceExcerpt").value = candidate.article_excerpt
+          ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + candidate.article_excerpt
+          : "No readable publisher excerpt was retrieved. The draft uses only the RSS summary and headline. Open the original story and verify the details.";
+        $("source").value = (candidate.source_name || "Original publisher") + " — " + candidate.url;
+        $("category").value = suggestCollectedStoryCategory(candidate.title, candidate.description);
+        updateSubcategories("");
         $("status").value = "draft";
         $("author").value = $("author").value.trim() || "WF Pundit";
         $("imageUrl").value = "";
         setPreview("");
-        $("formHeading").textContent = "Preparing Collected Story...";
+        $("formHeading").textContent = "Collected Story · Original Article Draft";
         $("saveButton").textContent = "SAVE AS DRAFT";
         $("cancelButton").classList.remove("hidden");
+        $("message").textContent = "A free structured draft has been prepared. It is not independently researched or ready to publish. Verify facts and add original reporting.";
+        $("message").style.color = "#d9ad61";
+        $("collectedNewsStatus").textContent = "Story details and a starting draft loaded. Automatic publishing is disabled.";
         $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
+        $("content").focus();
+      });
 
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "small danger";
+      deleteButton.textContent = "DELETE STORY";
+      deleteButton.addEventListener("click", async () => {
+        if (!confirm("Delete this collected story from the review queue? This will not delete a published article.")) return;
+        deleteButton.disabled = true;
         try {
-          const [articleResult, imageResult] = await Promise.allSettled([
-            fetch("/api/admin/generate-article", {
-              method: "POST",
-              credentials: "same-origin",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(candidate)
-            }).then(async response => {
-              const result = await response.json();
-              if (!response.ok || !result.success) {
-                throw new Error(result.error || "AI article generation failed.");
-              }
-              return result.article;
-            }),
-            fetch("/api/admin/find-original-image", {
-              method: "POST",
-              credentials: "same-origin",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ url: candidate.url })
-            }).then(async response => {
-              const result = await response.json();
-              if (!response.ok || !result.success || !result.image_url) {
-                throw new Error(result.error || "No original article photo was found.");
-              }
-              return result.image_url;
-            })
-          ]);
-
-          if (articleResult.status !== "fulfilled") {
-            throw articleResult.reason || new Error("AI article generation failed.");
-          }
-
-          const article = articleResult.value;
-          $("title").value = article.title || candidate.title || "";
-          $("summary").value = article.summary || candidate.description || "";
-          const sourceName = candidate.source_name || "Original source";
-          const sourceUrl = candidate.url;
-          const generatedBody = String(article.content || "").trim();
-          const safeSourceLabel = sourceName.replace(/[\[\]]/g, "");
-          const sourceLinkLine = "Source: [" + safeSourceLabel + " — original report](" + sourceUrl + ")";
-          const bodyHasSourceLink = /\[[^\]]+\]\(https:\/\//.test(generatedBody);
-          $("content").value = generatedBody +
-            (bodyHasSourceLink ? "" : "\n\n" + sourceLinkLine);
-          $("source").value = article.source || (sourceName + " — " + sourceUrl);
-          $("category").value = article.category || "Latest News";
-          updateSubcategories(article.subcategory || "");
-          $("status").value = "draft";
-          $("author").value = "WF Pundit";
-          $("formHeading").textContent = "AI-Prepared Article · Review Before Saving";
-          $("saveButton").textContent = "SAVE AS DRAFT";
-
-          let photoMessage = "No usable featured photo was found automatically. You can add an authorised photo manually.";
-          if (imageResult.status === "fulfilled") {
-            const imageUrl = imageResult.value;
-            const approved = confirm(
-              "WF Pundit found a featured image on the original article.\n\n" +
-              "Finding an image does not grant permission to reuse it. Only select it if WF Pundit has a licence or permission to reproduce it.\n\n" +
-              "Are you authorised to use this photograph?"
-            );
-            if (approved) {
-              $("imageUrl").value = imageUrl;
-              setPreview(imageUrl);
-              photoMessage = "The original photo is selected for your review. Check any licence and attribution requirements before publication.";
-            } else {
-              photoMessage = "The original photo was found but left unused because reuse permission was not confirmed.";
-            }
-          }
-
-          $("collectedNewsStatus").textContent =
-            "Your article draft is ready. " + photoMessage +
-            " Please check the facts and source, then save it as a draft.";
-          if (article.fact_check_notes) {
-            $("message").textContent = "EDITORIAL FACT-CHECK NOTES: " + article.fact_check_notes;
-            $("message").style.color = "#d9ad61";
-          } else {
-            $("message").textContent = "";
-          }
-          $("content").focus();
+          const deleteResponse = await fetch("/api/admin/collected-news?id=" + encodeURIComponent(String(candidate.id)), {
+            method: "DELETE",
+            credentials: "same-origin",
+            cache: "no-store"
+          });
+          const deleteResult = await deleteResponse.json();
+          if (!deleteResponse.ok || !deleteResult.success) throw new Error(deleteResult.error || "Could not delete this story.");
+          card.remove();
+          refreshCollectedNewsPagination();
+          status.textContent = "Collected story deleted from the review queue.";
         } catch (error) {
-          $("formHeading").textContent = "Collected Story · Complete the Draft";
-          $("collectedNewsStatus").textContent =
-            (error.message || "AI article generation failed.") +
-            " The source details remain in the editor so you can retry or continue manually.";
-        } finally {
-          useButton.disabled = false;
-          useButton.textContent = "USE IN EDITOR · AUTO PREPARE";
+          status.textContent = error.message || "Could not delete this story.";
+          deleteButton.disabled = false;
         }
       });
 
       const actions = document.createElement("div");
       actions.className = "actions";
-      actions.append(sourceLink, useButton);
-      card.append(title, meta, description, actions);
+      actions.append(sourceLink, useButton, deleteButton);
+      card.append(title, meta, description, excerptStatus, actions);
       list.appendChild(card);
     });
+    refreshCollectedNewsPagination();
   } catch (error) {
-    status.textContent = error.message;
+    status.textContent = error.message || "Unable to load collected news.";
   }
 }
 
