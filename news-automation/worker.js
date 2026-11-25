@@ -105,17 +105,17 @@ function extractArticleImage(html, baseUrl) {
   const metaImage = metaContent(html, ["og:image", "og:image:url", "twitter:image", "twitter:image:src"]);
   if (metaImage) candidates.push(metaImage);
 
-  const linkTags = html.match(/<link\\b[^>]*>/gi) || [];
+  const linkTags = html.match(/<link\b[^>]*>/gi) || [];
   for (const tag of linkTags) {
     const rel = attributeValue(tag, "rel").toLowerCase();
-    if (rel.split(/\\s+/).includes("image_src")) {
+    if (rel.split(/\s+/).includes("image_src")) {
       const href = attributeValue(tag, "href");
       if (href) candidates.push(href);
     }
   }
 
   // Publishers often lazy-load lead images instead of placing them in src.
-  const imageTags = html.match(/<img\\b[^>]*>/gi) || [];
+  const imageTags = html.match(/<img\b[^>]*>/gi) || [];
   for (const tag of imageTags.slice(0, 20)) {
     for (const attr of ["src", "data-src", "data-lazy-src", "data-original", "data-image"]) {
       const value = attributeValue(tag, attr);
@@ -124,20 +124,20 @@ function extractArticleImage(html, baseUrl) {
     for (const attr of ["srcset", "data-srcset"]) {
       const value = attributeValue(tag, attr);
       if (value) {
-        const first = value.split(",")[0].trim().split(/\\s+/)[0];
+        const first = value.split(",")[0].trim().split(/\s+/)[0];
         if (first) candidates.push(first);
       }
     }
   }
 
   // Some publishers expose the article's lead image only in JSON-LD.
-  const jsonImage = html.match(/["']image["']\\s*:\\s*(?:["']([^"']+)["']|\\[\\s*["']([^"']+)["'])/i);
+  const jsonImage = html.match(/["']image["']\s*:\s*(?:["']([^"']+)["']|\[\s*["']([^"']+)["'])/i);
   if (jsonImage) candidates.push(jsonImage[1] || jsonImage[2]);
 
   for (const raw of candidates) {
     try {
       const safe = safePublicArticleUrl(new URL(raw, baseUrl).toString());
-      if (!safe || /\\.(?:svg|ico)$/i.test(safe.pathname)) continue;
+      if (!safe || /\.(?:svg|ico)$/i.test(safe.pathname)) continue;
       return safe.toString();
     } catch {}
   }
@@ -178,12 +178,12 @@ async function fetchArticleDetails(articleUrl) {
     if (!finalUrl) return { excerpt: "", imageUrl: "" };
     const html = await readLimitedText(response);
     const imageUrl = extractArticleImage(html, finalUrl);
-    const articleMatch = html.match(/<article\\b[^>]*>([\\s\\S]*?)<\\/article>/i);
-    const mainMatch = html.match(/<main\\b[^>]*>([\\s\\S]*?)<\\/main>/i);
+    const articleMatch = html.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i);
+    const mainMatch = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i);
     let body = articleMatch?.[1] || mainMatch?.[1] || html;
-    body = body.replace(/<!--[\\s\\S]*?-->/g, " ")
-      .replace(/<(script|style|svg|nav|footer|header|aside|form|noscript)\\b[\\s\\S]*?<\\/\\1>/gi, " ");
-    const paragraphs = [...body.matchAll(/<p\\b[^>]*>([\\s\\S]*?)<\\/p>/gi)]
+    body = body.replace(/<!--[\s\S]*?-->/g, " ")
+      .replace(/<(script|style|svg|nav|footer|header|aside|form|noscript)\b[\s\S]*?<\/\1>/gi, " ");
+    const paragraphs = [...body.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)]
       .map(match => cleanText(match[1]))
       .filter(paragraph => paragraph.length > 45);
     let excerpt = paragraphs.join(" ").slice(0, 1800);
