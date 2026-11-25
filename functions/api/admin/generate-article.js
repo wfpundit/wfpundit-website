@@ -71,7 +71,8 @@ function isPublicHttpsUrl(value) {
   try { url = new URL(value); } catch { return false; }
   if (url.protocol !== "https:" || url.username || url.password) return false;
   const host = url.hostname.toLowerCase().replace(/^\[|\]$/g, "");
-  if (!host || host === "localhost" || host.endsWith(".localhost") ||
+  // Reject IP-literal destinations entirely; only normal public hostnames are fetched.
+  if (!host || host.includes(":") || /^\d{1,3}(\.\d{1,3}){3}$/.test(host) || host === "localhost" || host.endsWith(".localhost") ||
       host.endsWith(".local") || host.endsWith(".internal") ||
       host === "0.0.0.0" || host === "::1" || host.startsWith("127.") ||
       host.startsWith("10.") || host.startsWith("192.168.") ||
