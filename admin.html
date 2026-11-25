@@ -679,6 +679,11 @@ label{font-size:12px;letter-spacing:.015em}
       placeholder="A short source excerpt may appear here when the publisher makes content available."></textarea>
     <p class="editor-help">Reference only — do not republish this excerpt. Write an original WF Pundit article and verify all facts against the original source.</p>
 
+    <label for="sourceArticleText">Extracted Publisher Article Text (Reference Only)</label>
+    <textarea id="sourceArticleText" rows="12" readonly
+      placeholder="The system will attempt to retrieve the readable article text from the original publisher page. Some sites may block extraction or show only a limited preview."></textarea>
+    <p class="editor-help">This is a private editorial reference, not your article body. Use it to check facts and write original WF Pundit coverage. Extraction may be limited by publisher access, paywalls or page structure.</p>
+
     <label for="source">News Sources (Maximum 4)</label>
     <textarea id="source" rows="5" maxlength="12000" placeholder="BBC Sport — https://www.bbc.com/sport
 The Guardian — https://www.theguardian.com
@@ -1071,6 +1076,9 @@ async function loadCollectedNews() {
         });
         $("sourceExcerpt").value = candidate.article_excerpt
           ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + decodeFeedEntities(candidate.article_excerpt)
+          : "";
+        $("sourceArticleText").value = candidate.article_source_text
+          ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + decodeFeedEntities(candidate.article_source_text)
           : "";
         $("source").value = (decodeFeedEntities(candidate.source_name) || "Original publisher") + " — " + candidate.url;
         const detectedMainCategory = candidate.main_category || suggestCollectedStoryCategory(candidate.title, candidate.description);
