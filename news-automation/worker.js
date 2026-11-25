@@ -88,8 +88,11 @@ function parseFeed(xml, feed) {
   return blocks.slice(0, MAX_ITEMS_PER_FEED).map(block => {
     const title = cleanText(tagValue(block, "title"));
     const description = cleanText(tagValue(block, "description") ||
-      tagValue(block, "content:encoded") || tagValue(block, "summary") ||
-      tagValue(block, "content"));
+      tagValue(block, "summary") || tagValue(block, "content"));
+    // Google News RSS includes the actual publisher in its <source> element.
+    // Preserve that attribution rather than displaying "Google News".
+    const publisher = cleanText(tagValue(block, "source"));
+    const sourceName = publisher || feed.name;
     const rawLink = isAtom ? getAtomLink(block) : (tagValue(block, "link") || tagValue(block, "guid"));
     const link = normaliseUrl(rawLink);
     const publishedAt = isAtom
@@ -99,7 +102,7 @@ function parseFeed(xml, feed) {
     if (!title || !link || (!feed.preFiltered && !matchesTopic(title, description))) return null;
     return {
       title, description, link, publishedAt,
-      sourceName: feed.name, sourceRegion: feed.region,
+      sourceName, sourceRegion: feed.region,
       discoveredAt: new Date().toISOString()
     };
   }).filter(Boolean);
