@@ -183,9 +183,9 @@ function parseFeed(xml, feed) {
       ? (tagValue(block, "published") || tagValue(block, "updated") || null)
       : (tagValue(block, "pubDate") || tagValue(block, "dc:date") || null);
 
-    const mediaContent = (block.match(/<media:content\b[^>]*\\/?\s*>/i) || [])[0] || "";
-    const mediaThumbnail = (block.match(/<media:thumbnail\b[^>]*\\/?\s*>/i) || [])[0] || "";
-    const enclosure = (block.match(/<enclosure\b[^>]*\\/?\s*>/i) || [])[0] || "";
+    const mediaContent = (block.match(/<media:content\b[^>]*\/?\s*>/i) || [])[0] || "";
+    const mediaThumbnail = (block.match(/<media:thumbnail\b[^>]*\/?\s*>/i) || [])[0] || "";
+    const enclosure = (block.match(/<enclosure\b[^>]*\/?\s*>/i) || [])[0] || "";
     const encodedImage = (articleFeedContent.match(/<img\b[^>]*>/i) || [])[0] || "";
     const rawImageUrl =
       attributeValue(mediaContent, "url") ||
