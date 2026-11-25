@@ -233,6 +233,13 @@ body.light .theme-toggle {
 #uploadButton{background:linear-gradient(135deg,#13a6c7,#1769e8);border:1px solid #55c5e5}
 #saveButton{background:linear-gradient(135deg,#2679e8,#124aa0);border:1px solid #68a5f5}
 #photo{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#previewWrap{display:none;position:relative;width:min(100%,720px);margin:12px 0}
+#preview{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:12px}
+#wfWatermarkPreview{display:none;position:absolute;right:14px;bottom:14px;align-items:center;gap:6px;padding:7px 10px;border-radius:7px;background:rgba(5,15,35,.72);color:#fff;font:800 13px/1 Arial,sans-serif;letter-spacing:.2px;text-shadow:0 1px 2px #000}
+#wfWatermarkPreview .verified{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#168cff;color:#fff;font-size:11px}
+.watermark-option{display:flex;align-items:center;gap:9px;margin:12px 0;color:var(--text);font-size:13px}
+.watermark-option input{width:17px;height:17px;accent-color:#168cff}
+.watermark-note{margin:-4px 0 12px;color:var(--muted);font-size:11px;line-height:1.5}
 
 .hidden {display:none!important}
 
@@ -706,7 +713,17 @@ Official Club Website — https://example.com"></textarea>
       <button type="button" id="uploadButton">CHOOSE &amp; UPLOAD PHOTO</button>
     </div>
 
-    <img id="preview" alt="Article image preview">
+    <label class="watermark-option" for="applyWfWatermark">
+      <input id="applyWfWatermark" type="checkbox">
+      Add WF Pundit watermark to this photo
+    </label>
+    <p class="watermark-note">Optional. The watermark is permanently applied only to a photo you upload after selecting this option. The original file remains unchanged.</p>
+    <div id="previewWrap">
+      <img id="preview" alt="Article image preview">
+      <div id="wfWatermarkPreview" aria-hidden="true">
+        <span>wf_pundit</span><span class="verified">✓</span>
+      </div>
+    </div>
 
     <label for="imageUrl">Featured Image URL</label>
     <input id="imageUrl" type="url" placeholder="Uploaded image URL">
@@ -1237,14 +1254,43 @@ function showMessage(text, isError = false) {
 
 function setPreview(url) {
   const preview = $("preview");
+  const wrap = $("previewWrap");
+  const mark = $("wfWatermarkPreview");
+  if (url) { preview.src = url; wrap.style.display = "block"; }
+  else { preview.removeAttribute("src"); wrap.style.display = "none"; }
+  mark.style.display = $("applyWfWatermark").checked && url ? "flex" : "none";
+}
 
-  if (url) {
-    preview.src = url;
-    preview.style.display = "block";
-  } else {
-    preview.removeAttribute("src");
-    preview.style.display = "none";
-  }
+$("applyWfWatermark").addEventListener("change", () => {
+  $("wfWatermarkPreview").style.display = $("applyWfWatermark").checked && $("preview").src ? "flex" : "none";
+});
+
+async function makeWatermarkedPhoto(file) {
+  if (!$("applyWfWatermark").checked) return file;
+  const bitmap = await createImageBitmap(file);
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width; canvas.height = bitmap.height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Could not prepare the watermark.");
+  ctx.drawImage(bitmap, 0, 0);
+  const fontSize = Math.max(16, Math.round(bitmap.width * 0.022));
+  const pad = Math.round(fontSize * 0.55), badge = Math.round(fontSize * 1.12), gap = Math.round(fontSize * 0.35);
+  ctx.font = "800 " + fontSize + "px Arial, sans-serif";
+  const word = "wf_pundit", wordWidth = ctx.measureText(word).width;
+  const pillW = pad * 2 + wordWidth + gap + badge, pillH = pad * 2 + badge;
+  const margin = Math.round(bitmap.width * 0.018), x = bitmap.width - pillW - margin, y = bitmap.height - pillH - margin;
+  ctx.fillStyle = "rgba(5,15,35,0.72)";
+  const radius = Math.round(pillH * 0.22); ctx.beginPath(); ctx.roundRect(x, y, pillW, pillH, radius); ctx.fill();
+  ctx.fillStyle = "#ffffff"; ctx.textBaseline = "middle"; ctx.fillText(word, x + pad, y + pillH / 2);
+  const cx = x + pad + wordWidth + gap + badge / 2, cy = y + pillH / 2;
+  ctx.beginPath(); ctx.arc(cx, cy, badge / 2, 0, Math.PI * 2); ctx.fillStyle = "#168cff"; ctx.fill();
+  ctx.strokeStyle = "#ffffff"; ctx.lineWidth = Math.max(2, badge * 0.12); ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.beginPath(); ctx.moveTo(cx - badge * 0.22, cy); ctx.lineTo(cx - badge * 0.05, cy + badge * 0.18); ctx.lineTo(cx + badge * 0.25, cy - badge * 0.2); ctx.stroke();
+  bitmap.close();
+  const type = file.type === "image/png" ? "image/png" : file.type === "image/webp" ? "image/webp" : "image/jpeg";
+  const blob = await new Promise((resolve, reject) => canvas.toBlob(result => result ? resolve(result) : reject(new Error("Could not export the watermarked photo.")), type, 0.94));
+  const extension = type === "image/png" ? "png" : type === "image/webp" ? "webp" : "jpg";
+  return new File([blob], file.name.replace(/\.[^.]+$/, "") + "-wf-pundit." + extension, { type });
 }
 
 $("imageUrl").addEventListener("input", () => {
@@ -1283,7 +1329,9 @@ async function uploadSelectedPhoto() {
 
   try {
     const data = new FormData();
-    data.append("photo", file);
+    showMessage($("applyWfWatermark").checked ? "Applying WF Pundit watermark and uploading photo..." : "Uploading photo...");
+    const uploadFile = await makeWatermarkedPhoto(file);
+    data.append("photo", uploadFile, uploadFile.name);
 
     const response = await fetch("/api/upload-image", {
       method: "POST",
@@ -1307,7 +1355,7 @@ async function uploadSelectedPhoto() {
 
     $("imageUrl").value = uploadedUrl;
     setPreview(uploadedUrl);
-    showMessage("Photo uploaded successfully.");
+    showMessage($("applyWfWatermark").checked ? "Watermarked photo uploaded. The original file was not changed." : "Photo uploaded successfully.");
 
   } catch (error) {
     showMessage(error.message, true);
@@ -1324,6 +1372,8 @@ function resetForm() {
   form.reset();
   $("articleId").value = "";
   $("author").value = "WF Pundit";
+  $("applyWfWatermark").checked = false;
+  $("wfWatermarkPreview").style.display = "none";
   $("formHeading").textContent = "Create New Article";
   $("saveButton").textContent = "PUBLISH ARTICLE";
   $("source").value = "";
