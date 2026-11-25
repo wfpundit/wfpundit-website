@@ -146,7 +146,7 @@ function extractArticleImage(html, baseUrl) {
 
 async function fetchArticleDetails(articleUrl) {
   let current = safePublicArticleUrl(articleUrl);
-  if (!current) return { excerpt: "", imageUrl: "" };
+  if (!current) return { excerpt: "", imageUrl: "", articleText: "" };
   for (let redirects = 0; redirects <= 3; redirects++) {
     let response;
     try {
@@ -159,23 +159,23 @@ async function fetchArticleDetails(articleUrl) {
         signal: AbortSignal.timeout(6000)
       });
     } catch {
-      return { excerpt: "", imageUrl: "" };
+      return { excerpt: "", imageUrl: "", articleText: "" };
     }
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get("Location");
-      if (!location || redirects === 3) return { excerpt: "", imageUrl: "" };
+      if (!location || redirects === 3) return { excerpt: "", imageUrl: "", articleText: "" };
       try { current = safePublicArticleUrl(new URL(location, current).toString()); }
-      catch { return { excerpt: "", imageUrl: "" }; }
-      if (!current) return { excerpt: "", imageUrl: "" };
+      catch { return { excerpt: "", imageUrl: "", articleText: "" }; }
+      if (!current) return { excerpt: "", imageUrl: "", articleText: "" };
       continue;
     }
     if (!response.ok || !(response.headers.get("content-type") || "").toLowerCase().includes("html")) {
-      return { excerpt: "", imageUrl: "" };
+      return { excerpt: "", imageUrl: "", articleText: "" };
     }
     const contentLength = Number(response.headers.get("content-length") || 0);
-    if (contentLength > 1200000) return { excerpt: "", imageUrl: "" };
+    if (contentLength > 1200000) return { excerpt: "", imageUrl: "", articleText: "" };
     const finalUrl = safePublicArticleUrl(response.url || current.toString());
-    if (!finalUrl) return { excerpt: "", imageUrl: "" };
+    if (!finalUrl) return { excerpt: "", imageUrl: "", articleText: "" };
     const html = await readLimitedText(response);
     const imageUrl = extractArticleImage(html, finalUrl);
     const articleMatch = html.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i);
@@ -186,14 +186,17 @@ async function fetchArticleDetails(articleUrl) {
     const paragraphs = [...body.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)]
       .map(match => cleanText(match[1]))
       .filter(paragraph => paragraph.length > 45);
+    // Keep extracted publisher text in a separate reference-only field.
+    // It is never copied into the publishable article body.
+    const articleText = paragraphs.join("\n\n").slice(0, 12000);
     let excerpt = paragraphs.join(" ").slice(0, 1800);
     if (!excerpt) {
       const description = metaContent(html, ["description", "og:description", "twitter:description"]);
       excerpt = cleanText(description).slice(0, 700);
     }
-    return { excerpt, imageUrl };
+    return { excerpt, imageUrl, articleText };
   }
-  return { excerpt: "", imageUrl: "" };
+  return { excerpt: "", imageUrl: "", articleText: "" };
 }
 
 function normaliseUrl(value) {
@@ -499,6 +502,9 @@ async function ensureDatabase(env) {
   if (!names.has("article_excerpt")) {
     await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN article_excerpt TEXT DEFAULT ''").run();
   }
+  if (!names.has("article_source_text")) {
+    await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN article_source_text TEXT DEFAULT ''").run();
+  }
   if (!names.has("image_url")) {
     await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN image_url TEXT DEFAULT ''").run();
   }
@@ -522,19 +528,21 @@ async function saveCandidate(env, item, contentBudget) {
     relatedCandidates: editorial.relatedCandidates || []
   });
   const existing = await env.DB.prepare(
-    "SELECT id, article_excerpt, image_url FROM wf_news_candidates WHERE url = ?"
+    "SELECT id, article_excerpt, article_source_text, image_url FROM wf_news_candidates WHERE url = ?"
   ).bind(item.link).first();
   let articleExcerpt = item.articleExcerpt || existing?.article_excerpt || "";
+  let articleSourceText = item.articleText || existing?.article_source_text || "";
   let imageUrl = item.imageUrl || existing?.image_url || "";
   let publisherPageFetchAttempted = false;
   let publisherPageImageFound = false;
-  if ((!articleExcerpt || !imageUrl) && contentBudget.remaining > 0) {
+  if ((!articleExcerpt || !articleSourceText || !imageUrl) && contentBudget.remaining > 0) {
     contentBudget.remaining--;
     contentBudget.used++;
     publisherPageFetchAttempted = true;
     try {
       const details = await fetchArticleDetails(item.link);
       if (!articleExcerpt) articleExcerpt = details.excerpt || "";
+      if (!articleSourceText) articleSourceText = details.articleText || "";
       if (!imageUrl) imageUrl = details.imageUrl || "";
       publisherPageImageFound = Boolean(details.imageUrl);
     } catch {
@@ -550,32 +558,34 @@ async function saveCandidate(env, item, contentBudget) {
           published_at = ?, editorial_status = ?, editorial_flags = ?,
           main_category = ?, subcategory = ?,
           article_excerpt = CASE WHEN ? <> '' THEN ? ELSE article_excerpt END,
+          article_source_text = CASE WHEN ? <> '' THEN ? ELSE article_source_text END,
           image_url = CASE WHEN ? <> '' THEN ? ELSE image_url END
       WHERE id = ?
     `).bind(item.title, item.description, item.sourceName, item.sourceRegion,
       item.publishedAt, editorial.status, flags, item.mainCategory || "Latest News", item.subcategory || "", articleExcerpt, articleExcerpt,
-      imageUrl, imageUrl, existing.id).run();
+      articleSourceText, articleSourceText, imageUrl, imageUrl, existing.id).run();
     return {
       inserted: false, editorialStatus: editorial.status,
       excerptAvailable: Boolean(articleExcerpt), imageAvailable,
-      publisherPageFetchAttempted, publisherPageImageFound
+      publisherPageFetchAttempted, publisherPageImageFound,
+      articleTextAvailable: Boolean(articleSourceText)
     };
   }
 
   const result = await env.DB.prepare(`
     INSERT INTO wf_news_candidates (
       title, description, url, source_name, source_region, published_at,
-      discovered_at, status, created_at, editorial_status, editorial_flags, article_excerpt, image_url,
+      discovered_at, status, created_at, editorial_status, editorial_flags, article_excerpt, article_source_text, image_url,
       main_category, subcategory
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?, ?)
   `).bind(item.title, item.description, item.link, item.sourceName, item.sourceRegion,
-    item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags, articleExcerpt, imageUrl,
+    item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags, articleExcerpt, articleSourceText, imageUrl,
     item.mainCategory || "Latest News", item.subcategory || "").run();
 
   return {
     inserted: result.meta.changes > 0,
     editorialStatus: editorial.status,
-    excerptAvailable: Boolean(articleExcerpt), imageAvailable,
+    excerptAvailable: Boolean(articleExcerpt), articleTextAvailable: Boolean(articleSourceText), imageAvailable,
     publisherPageFetchAttempted, publisherPageImageFound
   };
 }
@@ -618,7 +628,7 @@ async function scanFeed(env, feed, contentBudget) {
 
   const candidates = parseFeed(xml, feed);
   let inserted = 0, updated = 0, excluded = 0, flagged = 0;
-  let excerptAvailable = 0, imageAvailable = 0;
+  let excerptAvailable = 0, articleTextAvailable = 0, imageAvailable = 0;
   let publisherPageFetchAttempts = 0, publisherPageImagesFound = 0;
   for (const item of candidates) {
     const saved = await saveCandidate(env, item, contentBudget);
@@ -626,6 +636,7 @@ async function scanFeed(env, feed, contentBudget) {
     if (saved.editorialStatus === "excluded") excluded++;
     if (saved.editorialStatus === "needs_editorial_check") flagged++;
     if (saved.excerptAvailable) excerptAvailable++;
+    if (saved.articleTextAvailable) articleTextAvailable++;
     if (saved.imageAvailable) imageAvailable++;
     if (saved.publisherPageFetchAttempted) publisherPageFetchAttempts++;
     if (saved.publisherPageImageFound) publisherPageImagesFound++;
@@ -634,7 +645,7 @@ async function scanFeed(env, feed, contentBudget) {
     source: feed.name,
     format: /<entry(?:\s|>)/i.test(xml) ? "Atom" : "RSS",
     fetched: candidates.length, inserted, updated, excluded, flagged,
-    excerptAvailable, imageAvailable, publisherPageFetchAttempts,
+    excerptAvailable, articleTextAvailable, imageAvailable, publisherPageFetchAttempts,
     publisherPageImagesFound, success: true
   };
 }
@@ -668,6 +679,7 @@ async function scanAllFeeds(env) {
     excluded: results.reduce((sum, item) => sum + (item.excluded || 0), 0),
     flagged: results.reduce((sum, item) => sum + (item.flagged || 0), 0),
     articleExcerptsLoaded: results.reduce((sum, item) => sum + (item.excerptAvailable || 0), 0),
+    articleTextsLoaded: results.reduce((sum, item) => sum + (item.articleTextAvailable || 0), 0),
     candidatesWithImages: results.reduce((sum, item) => sum + (item.imageAvailable || 0), 0),
     publisherPageFetchAttempts: 6 - contentBudget.remaining,
     publisherPageImagesFound: results.reduce((sum, item) => sum + (item.publisherPageImagesFound || 0), 0),
