@@ -642,7 +642,7 @@ label{font-size:12px;letter-spacing:.015em}
   <p class="muted">
     Review recent stories gathered by the test news collector. Choosing a story
     fills the article editor as a draft; nothing is published automatically.
-    BBC photo sources are excluded from automatic photo lookup. Every selected image still needs reuse permission.
+    BBC articles may be used as reporting sources, but BBC-hosted photographs are excluded from photo lookup. Only use separately licensed or authorised images.
   </p>
   <div class="actions">
     <button type="button" id="loadCollectedNewsButton">Load Collected News</button>
@@ -978,10 +978,17 @@ async function loadCollectedNews() {
           const article = articleResult.value;
           $("title").value = article.title || candidate.title || "";
           $("summary").value = article.summary || candidate.description || "";
-          $("content").value = article.content || "";
-          $("source").value = article.source || (candidate.source_name + " — " + candidate.url);
+          const sourceName = candidate.source_name || "Original source";
+          const sourceUrl = candidate.url;
+          const generatedBody = String(article.content || "").trim();
+          const sourceLinkLine = "Source: [" + sourceName.replace(/[\\[\\]]/g, "") +
+            " — original report] (" + sourceUrl + ")";
+          const bodyHasSourceLink = /\\[[^\\]]+\\]\\(https:\\/\\//.test(generatedBody);
+          $("content").value = generatedBody +
+            (bodyHasSourceLink ? "" : "\\n\\n" + sourceLinkLine.replace("] (", "](" ));
+          $("source").value = article.source || (sourceName + " — " + sourceUrl);
           $("category").value = article.category || "Latest News";
-          updateSubcategories();
+          updateSubcategories(article.subcategory || "");
           $("status").value = "draft";
           $("author").value = "WF Pundit";
           $("formHeading").textContent = "AI-Prepared Article · Review Before Saving";
@@ -1086,30 +1093,45 @@ themeButton.addEventListener("click", () => {
 
 /* ARTICLE CATEGORIES */
 
-const subcategories = {
-  "Women's Leagues": [
-    "Women's Super League (WSL)",
-    "Women's Championship",
-    "NWSL",
-    "Liga F",
-    "Première Ligue",
-    "Serie A Femminile",
-    "Bundesliga Women",
-    "A-League Women",
-    "Liga MX Femenil",
-    "WE League",
-    "Damallsvenskan",
-    "Toppserien"
-  ],
+const leagueSubcategories = [
+  "Women's Super League (WSL)",
+  "Women's Championship",
+  "NWSL",
+  "Liga F",
+  "Première Ligue",
+  "Serie A Femminile",
+  "Bundesliga Women",
+  "A-League Women",
+  "Liga MX Femenil",
+  "WE League",
+  "Damallsvenskan",
+  "Toppserien"
+];
 
-  "International Football": [
-    "FIFA Women's World Cup",
-    "UEFA Women's Euros",
-    "Women's Africa Cup of Nations (WAFCON)",
-    "Olympic Women's Football",
-    "AFC Women's Asian Cup",
-    "Copa América Femenina",
-    "UEFA Women's Nations League"
+const internationalSubcategories = [
+  "FIFA Women's World Cup",
+  "UEFA Women's Euros",
+  "Women's Africa Cup of Nations (WAFCON)",
+  "Olympic Women's Football",
+  "AFC Women's Asian Cup",
+  "Copa América Femenina",
+  "UEFA Women's Nations League"
+];
+
+const subcategories = {
+  "Women's Leagues": leagueSubcategories,
+  "International Football": internationalSubcategories,
+  "Women's Champions League (UWCL)": ["UEFA Women's Champions League"],
+  "Transfers": [...leagueSubcategories, "Multiple leagues / unspecified"],
+  "Match Reports & Analysis": [
+    ...leagueSubcategories,
+    "UEFA Women's Champions League",
+    ...internationalSubcategories
+  ],
+  "Interviews & Features": [
+    ...leagueSubcategories,
+    "UEFA Women's Champions League",
+    ...internationalSubcategories
   ]
 };
 
