@@ -86,7 +86,7 @@ async function readLimitedText(response, maxBytes = 1200000) {
 }
 
 function metaContent(html, names) {
-  const tags = html.match(/<meta\\b[^>]*>/gi) || [];
+  const tags = html.match(/<meta\b[^>]*>/gi) || [];
   for (const tag of tags) {
     const name = (attributeValue(tag, "property") || attributeValue(tag, "name") || "").toLowerCase();
     if (!names.includes(name)) continue;
@@ -98,8 +98,8 @@ function metaContent(html, names) {
 
 function extractArticleImage(html, baseUrl) {
   const metaImage = metaContent(html, ["og:image", "og:image:url", "twitter:image", "twitter:image:src"]);
-  const imageTag = (html.match(/<img\\b[^>]*>/i) || [])[0] || "";
-  const linkTag = (html.match(/<link\\b(?=[^>]*\\brel=[\"'][^\\"']*image_src)[^>]*>/i) || [])[0] || "";
+  const imageTag = (html.match(/<img\b[^>]*>/i) || [])[0] || "";
+  const linkTag = (html.match(/<link\b(?=[^>]*\brel=[\"'][^\\"']*image_src)[^>]*>/i) || [])[0] || "";
   const raw = metaImage || attributeValue(linkTag, "href") ||
     attributeValue(imageTag, "src") || attributeValue(imageTag, "data-src");
   if (!raw) return "";
@@ -108,7 +108,7 @@ function extractArticleImage(html, baseUrl) {
     const safe = safePublicArticleUrl(resolved);
     if (!safe) return "";
     const pathname = safe.pathname.toLowerCase();
-    if (/\\.(?:svg|ico)(?:$|\\?)/i.test(pathname)) return "";
+    if (/\.(?:svg|ico)(?:$|\\?)/i.test(pathname)) return "";
     return safe.toString();
   } catch {
     return "";
@@ -149,12 +149,12 @@ async function fetchArticleDetails(articleUrl) {
     if (!finalUrl) return { excerpt: "", imageUrl: "" };
     const html = await readLimitedText(response);
     const imageUrl = extractArticleImage(html, finalUrl);
-    const articleMatch = html.match(/<article\\b[^>]*>([\\s\\S]*?)<\\/article>/i);
-    const mainMatch = html.match(/<main\\b[^>]*>([\\s\\S]*?)<\\/main>/i);
+    const articleMatch = html.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i);
+    const mainMatch = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i);
     let body = articleMatch?.[1] || mainMatch?.[1] || html;
-    body = body.replace(/<!--[\\s\\S]*?-->/g, " ")
-      .replace(/<(script|style|svg|nav|footer|header|aside|form|noscript)\\b[\\s\\S]*?<\\/\\1>/gi, " ");
-    const paragraphs = [...body.matchAll(/<p\\b[^>]*>([\\s\\S]*?)<\\/p>/gi)]
+    body = body.replace(/<!--[\s\S]*?-->/g, " ")
+      .replace(/<(script|style|svg|nav|footer|header|aside|form|noscript)\b[\s\S]*?<\/\1>/gi, " ");
+    const paragraphs = [...body.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)]
       .map(match => cleanText(match[1]))
       .filter(paragraph => paragraph.length > 45);
     let excerpt = paragraphs.join(" ").slice(0, 1800);
