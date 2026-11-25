@@ -919,9 +919,15 @@ async function loadCollectedNews() {
 
       const useButton = document.createElement("button");
       useButton.type = "button";
-      useButton.className = "small secondary";
-      useButton.textContent = "Use in Article Editor";
-      useButton.addEventListener("click", () => {
+      useButton.className = "small";
+      useButton.textContent = "USE IN EDITOR · AUTO PREPARE";
+      useButton.addEventListener("click", async () => {
+        if (!adminSessionReady) return;
+
+        useButton.disabled = true;
+        useButton.textContent = "PREPARING ARTICLE...";
+        status.textContent = "Preparing your article and checking the original source for a featured photo. This may take a moment...";
+
         $("articleId").value = "";
         $("title").value = candidate.title || "";
         $("summary").value = candidate.description || "";
@@ -929,38 +935,46 @@ async function loadCollectedNews() {
         $("source").value = candidate.source_name + " — " + candidate.url;
         $("status").value = "draft";
         $("author").value = $("author").value.trim() || "WF Pundit";
-        $("formHeading").textContent = "Review Collected Story";
+        $("imageUrl").value = "";
+        setPreview("");
+        $("formHeading").textContent = "Preparing Collected Story...";
         $("saveButton").textContent = "SAVE AS DRAFT";
         $("cancelButton").classList.remove("hidden");
-        $("content").focus();
-        $("collectedNewsStatus").textContent =
-          "Story added to the editor. Use AI Write Full Article to prepare a complete draft.";
         $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
-      });
 
-      const generateButton = document.createElement("button");
-      generateButton.type = "button";
-      generateButton.className = "small";
-      generateButton.textContent = "AI WRITE FULL ARTICLE";
-      generateButton.addEventListener("click", async () => {
-        if (!adminSessionReady) return;
-        generateButton.disabled = true;
-        generateButton.textContent = "WRITING ARTICLE...";
-        $("collectedNewsStatus").textContent = "AI is preparing an original article draft. Please wait...";
         try {
-          const response = await fetch("/api/admin/generate-article", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(candidate)
-          });
-          const result = await response.json();
-          if (!response.ok || !result.success) {
-            throw new Error(result.error || "AI article generation failed.");
+          const [articleResult, imageResult] = await Promise.allSettled([
+            fetch("/api/admin/generate-article", {
+              method: "POST",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(candidate)
+            }).then(async response => {
+              const result = await response.json();
+              if (!response.ok || !result.success) {
+                throw new Error(result.error || "AI article generation failed.");
+              }
+              return result.article;
+            }),
+            fetch("/api/admin/find-original-image", {
+              method: "POST",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ url: candidate.url })
+            }).then(async response => {
+              const result = await response.json();
+              if (!response.ok || !result.success || !result.image_url) {
+                throw new Error(result.error || "No original article photo was found.");
+              }
+              return result.image_url;
+            })
+          ]);
+
+          if (articleResult.status !== "fulfilled") {
+            throw articleResult.reason || new Error("AI article generation failed.");
           }
 
-          const article = result.article;
-          $("articleId").value = "";
+          const article = articleResult.value;
           $("title").value = article.title || candidate.title || "";
           $("summary").value = article.summary || candidate.description || "";
           $("content").value = article.content || "";
@@ -969,77 +983,50 @@ async function loadCollectedNews() {
           updateSubcategories();
           $("status").value = "draft";
           $("author").value = "WF Pundit";
-          $("imageUrl").value = "";
-
-          setPreview("");
-          $("formHeading").textContent = "AI-Generated Article · Review Before Saving";
+          $("formHeading").textContent = "AI-Prepared Article · Review Before Saving";
           $("saveButton").textContent = "SAVE AS DRAFT";
-          $("cancelButton").classList.remove("hidden");
+
+          let photoMessage = "No usable featured photo was found automatically. You can add an authorised photo manually.";
+          if (imageResult.status === "fulfilled") {
+            const imageUrl = imageResult.value;
+            const approved = confirm(
+              "WF Pundit found a featured image on the original article.\n\n" +
+              "Finding an image does not grant permission to reuse it. Only select it if WF Pundit has a licence or permission to reproduce it.\n\n" +
+              "Are you authorised to use this photograph?"
+            );
+            if (approved) {
+              $("imageUrl").value = imageUrl;
+              setPreview(imageUrl);
+              photoMessage = "The original photo is selected for your review. Check any licence and attribution requirements before publication.";
+            } else {
+              photoMessage = "The original photo was found but left unused because reuse permission was not confirmed.";
+            }
+          }
+
           $("collectedNewsStatus").textContent =
-            "AI article prepared as a draft. Fact-check the notes and source before saving.";
+            "Your article draft is ready. " + photoMessage +
+            " Please check the facts and source, then save it as a draft.";
           if (article.fact_check_notes) {
             $("message").textContent = "EDITORIAL FACT-CHECK NOTES: " + article.fact_check_notes;
             $("message").style.color = "#d9ad61";
+          } else {
+            $("message").textContent = "";
           }
-          $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
+          $("content").focus();
         } catch (error) {
-          $("collectedNewsStatus").textContent = error.message;
-        } finally {
-          generateButton.disabled = false;
-          generateButton.textContent = "AI WRITE FULL ARTICLE";
-        }
-      });
-
-      const photoButton = document.createElement("button");
-      photoButton.type = "button";
-      photoButton.className = "small secondary";
-      photoButton.textContent = "FIND ORIGINAL PHOTO";
-      photoButton.title = "Look for the original article's featured photograph";
-      photoButton.addEventListener("click", async () => {
-        if (!adminSessionReady) return;
-        photoButton.disabled = true;
-        photoButton.textContent = "SEARCHING...";
-        status.textContent = "Checking the original article for its featured photograph...";
-        try {
-          const response = await fetch("/api/admin/find-original-image", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: candidate.url })
-          });
-          const result = await response.json();
-          if (!response.ok || !result.success || !result.image_url) {
-            throw new Error(result.error || "No original article photograph was found.");
-          }
-          const approved = confirm(
-            "An image was found on the original article.\n\n" +
-            "Finding an image does not grant reuse rights. Confirm that WF Pundit has permission or a licence to reproduce it.\n\n" +
-            "Have you confirmed permission to use this photograph?"
-          );
-          if (!approved) {
-            status.textContent = "Image found but not selected. Confirm reuse rights before using it.";
-            return;
-          }
-          if (!$("title").value.trim()) $("title").value = candidate.title || "";
-          if (!$("summary").value.trim()) $("summary").value = candidate.description || "";
-          if (!$("source").value.trim()) $("source").value = candidate.source_name + " — " + candidate.url;
-          $("status").value = "draft";
-          $("imageUrl").value = result.image_url;
-          setPreview(result.image_url);
+          $("formHeading").textContent = "Collected Story · Complete the Draft";
           $("collectedNewsStatus").textContent =
-            "Original image selected for editorial review. Check its licence and attribution requirements again before publication.";
-          $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
-        } catch (error) {
-          status.textContent = error.message;
+            (error.message || "AI article generation failed.") +
+            " The source details remain in the editor so you can retry or continue manually.";
         } finally {
-          photoButton.disabled = false;
-          photoButton.textContent = "FIND ORIGINAL PHOTO";
+          useButton.disabled = false;
+          useButton.textContent = "USE IN EDITOR · AUTO PREPARE";
         }
       });
 
       const actions = document.createElement("div");
       actions.className = "actions";
-      actions.append(sourceLink, useButton, generateButton, photoButton);
+      actions.append(sourceLink, useButton);
       card.append(title, meta, description, actions);
       list.appendChild(card);
     });
