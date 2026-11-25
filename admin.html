@@ -726,7 +726,7 @@ Official Club Website — https://example.com"></textarea>
       <input id="applyWfWatermark" type="checkbox">
       Add WF Pundit watermark to this photo
     </label>
-    <p class="watermark-note">Optional. Adds the WF Pundit wordmark and blue verified tick to the uploaded copy. The small preview badge is temporary; after upload, the watermark is embedded in the photo itself. Your original file remains unchanged.</p>
+    <p class="watermark-note">Adds the WF Pundit wordmark and blue verified tick to an uploaded copy; your original file remains unchanged. For a photo automatically loaded from a publisher page, use an authorised image file with CHOOSE &amp; UPLOAD PHOTO to embed the watermark. A remote image URL alone cannot be altered by this preview.</p>
     <div id="previewWrap">
       <img id="preview" alt="Article image preview">
       <div id="wfWatermarkPreview" aria-hidden="true">
@@ -739,6 +739,7 @@ Official Club Website — https://example.com"></textarea>
 
     <div class="actions">
       <button type="submit" id="saveButton">SAVE AS DRAFT</button>
+      <button type="button" id="publishNowButton">PUBLISH NOW</button>
       <button type="button" class="secondary hidden" id="cancelButton">
         Cancel Edit
       </button>
@@ -1446,15 +1447,18 @@ function syncSaveButtonLabel() {
   const isEditing = Boolean($("articleId").value);
 
   if (isPublished) {
-    $("saveButton").textContent = isEditing
-      ? "UPDATE & PUBLISH"
-      : "PUBLISH NOW";
+    $("saveButton").textContent = isEditing ? "UPDATE & PUBLISH" : "PUBLISH NOW";
   } else {
-    $("saveButton").textContent = isEditing
-      ? "UPDATE DRAFT"
-      : "SAVE AS DRAFT";
+    $("saveButton").textContent = isEditing ? "UPDATE DRAFT" : "SAVE AS DRAFT";
   }
+  $("publishNowButton").textContent = isEditing ? "UPDATE & PUBLISH NOW" : "PUBLISH NOW";
 }
+
+$("publishNowButton").addEventListener("click", () => {
+  $("status").value = "published";
+  syncSaveButtonLabel();
+  form.requestSubmit($("saveButton"));
+});
 
 $("status").addEventListener("change", syncSaveButtonLabel);
 syncSaveButtonLabel();
@@ -1532,6 +1536,7 @@ form.addEventListener("submit", async event => {
 
   const button = $("saveButton");
   button.disabled = true;
+  $("publishNowButton").disabled = true;
 
   showMessage(
     article.status === "published"
@@ -1593,6 +1598,7 @@ form.addEventListener("submit", async event => {
 
   } finally {
     button.disabled = false;
+    $("publishNowButton").disabled = false;
   }
 });
 
