@@ -199,7 +199,7 @@ export const DISCOVERY_TOPICS = [
 ];
 
 export const ARTICLE_KEYWORDS = [
-  "women's football", "women’s football", "women's soccer", "women’s soccer",
+  "women", "women's football", "women’s football", "women's soccer", "women’s soccer",
   "women's super league", "barclays wsl", "wsl", "wsl 2", "nwsl",
   "uefa women's champions league", "women's champions league", "uwcl",
   "wafcon", "afc women's champions league", "liga mx femenil",
