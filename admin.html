@@ -670,9 +670,7 @@ label{font-size:12px;letter-spacing:.015em}
     <label for="content">Article Content</label>
     <div class="editor-toolbar">
       <button type="button" data-link-editor="content">ADD LINK TO SELECTED TEXT</button>
-      <button type="button" id="generateAiDraftButton">✨ GENERATE ORIGINAL DRAFT WITH GPT</button>
     </div>
-    <p class="editor-help">GPT uses the collected story details and extracted publisher text as factual references, then prepares an original draft. It never publishes automatically. Review every fact before saving or publishing.</p>
     <p class="editor-help">Select the exact words in your article, tap “Add Link”, then enter the HTTPS address. The selected words become a clickable link on the published article.</p>
     <textarea id="content" rows="9"></textarea>
 
@@ -1137,81 +1135,6 @@ async function loadCollectedNews() {
     status.textContent = error.message || "Unable to load collected news.";
   }
 }
-
-/* GPT-ASSISTED ORIGINAL ARTICLE DRAFTING */
-
-const generateAiDraftButton = $("generateAiDraftButton");
-
-generateAiDraftButton.addEventListener("click", async () => {
-  if (!adminSessionReady) {
-    showMessage("Please sign in with your WF Pundit administrator account first.", true);
-    return;
-  }
-
-  const titleBefore = $("title").value.trim();
-  const summaryBefore = $("summary").value.trim();
-  const contentBefore = $("content").value.trim();
-  const sourceLine = $("source").value.split(/\r?\n/).map(line => line.trim()).find(Boolean) || "";
-  const separator = sourceLine.lastIndexOf(" — ");
-  const sourceName = separator > 0 ? sourceLine.slice(0, separator).trim() : sourceLine;
-  const sourceUrl = separator > 0 ? sourceLine.slice(separator + 3).trim() : "";
-
-  if (!titleBefore && !summaryBefore && !articleText && !excerpt) {
-    showMessage("Load a collected story first so GPT has material to work from.", true);
-    return;
-  }
-
-  if ((titleBefore || summaryBefore || contentBefore) &&
-      !confirm("GPT will replace the current headline, summary and article text with a newly generated draft. Your source reference fields and photo will remain unchanged. Continue?")) {
-    return;
-  }
-
-  generateAiDraftButton.disabled = true;
-  generateAiDraftButton.textContent = "GENERATING YOUR WF PUNDIT DRAFT...";
-  showMessage("GPT is preparing an original article. Please wait...");
-
-  try {
-    const response = await fetch("/api/admin/generate-article", {
-      method: "POST",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        title: titleBefore,
-        description: summaryBefore,
-        source_name: sourceName,
-        url: sourceUrl,
-        source_region: "",
-        published_at: "",
-        article_source_text: $("sourceArticleText").value.replace(/^REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\s*/i, "").trim()
-      })
-    });
-    const result = await response.json();
-    if (!response.ok || !result.success || !result.article) {
-      throw new Error(result.error || "GPT could not generate the article.");
-    }
-
-    const article = result.article;
-    $("title").value = article.title || titleBefore;
-    $("summary").value = article.summary || summaryBefore;
-    $("content").value = article.content || "";
-    $("category").value = article.category || "Latest News";
-    updateSubcategories(article.subcategory || "");
-    $("source").value = article.source || $("source").value;
-    $("status").value = "draft";
-    $("formHeading").textContent = "GPT-Assisted Original Article Draft";
-    syncSaveButtonLabel();
-    const notes = article.fact_check_notes
-      ? " Fact-check notes: " + article.fact_check_notes
-      : "";
-    showMessage("GPT draft generated. Review all facts and notes before saving or publishing." + notes);
-    $("content").focus();
-  } catch (error) {
-    showMessage(error.message || "GPT could not generate the article.", true);
-  } finally {
-    generateAiDraftButton.disabled = false;
-    generateAiDraftButton.textContent = "✨ GENERATE ORIGINAL DRAFT WITH GPT";
-  }
-});
 
 /* DARK / LIGHT THEME */
 
