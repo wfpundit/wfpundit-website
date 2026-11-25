@@ -994,8 +994,16 @@ async function loadCollectedNews() {
     if (!response.ok || !result.success) throw new Error(result.error || "Unable to load collected news.");
 
     if (result.diagnostics && Array.isArray(result.diagnostics.groups)) {
-      diagnosticsBox.textContent = "Database records: " + Number(result.diagnostics.total || 0) + " · " +
-        result.diagnostics.groups.map(group => (group.editorial_status || "pending") + ": " + Number(group.total || 0)).join(" · ");
+      const editorialCounts = result.diagnostics.groups.map(group =>
+        (group.editorial_status || "pending") + ": " + Number(group.total || 0)
+      ).join(" · ");
+      const categoryCounts = (result.diagnostics.categoryGroups || []).map(group =>
+        (group.main_category || "Uncategorised") + " / " +
+        (group.subcategory || "No subcategory identified") + ": " + Number(group.total || 0)
+      ).join(" · ");
+      diagnosticsBox.textContent = "Database records: " + Number(result.diagnostics.total || 0) +
+        " · Editorial: " + editorialCounts +
+        (categoryCounts ? " · Category tracking: " + categoryCounts : " · Category tracking is being populated.");
     } else {
       diagnosticsBox.textContent = "Collector diagnostics are not available for this scan.";
     }
