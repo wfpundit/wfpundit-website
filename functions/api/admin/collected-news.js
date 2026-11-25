@@ -197,7 +197,7 @@ export async function onRequestPatch({ request, env }) {
   }
 
   const id = new URL(request.url).searchParams.get("id");
-  if (!id || !/^\\d+$/.test(id) || Number(id) < 1) {
+  if (!id || !/^\d+$/.test(id) || Number(id) < 1) {
     return json({ success: false, error: "A valid collected-story ID is required." }, 400);
   }
 
