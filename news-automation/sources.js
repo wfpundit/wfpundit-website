@@ -11,6 +11,7 @@ export const RSS_FEEDS = [
     region: "International",
     language: "en",
     url: "https://feeds.bbci.co.uk/sport/football/womens/rss.xml",
+    womenOnly: true,
     enabled: true
   },
   {
@@ -19,6 +20,7 @@ export const RSS_FEEDS = [
     region: "International",
     language: "en",
     url: "https://www.theguardian.com/football/womensfootball/rss",
+    womenOnly: true,
     enabled: true
   },
   {
@@ -27,6 +29,7 @@ export const RSS_FEEDS = [
     region: "North America",
     language: "en",
     url: "https://equalizersoccer.com/feed/",
+    womenOnly: true,
     enabled: true
   },
   {
@@ -35,6 +38,7 @@ export const RSS_FEEDS = [
     region: "United Kingdom and International",
     language: "en",
     url: "https://shekicks.net/feed/",
+    womenOnly: true,
     enabled: true
   },
   {
@@ -43,9 +47,27 @@ export const RSS_FEEDS = [
     region: "United Kingdom",
     language: "en",
     url: "https://fawslfulltime.co.uk/feed/",
+    womenOnly: true,
     enabled: true
   },
-
+  {
+    id: "her-football-hub",
+    name: "Her Football Hub",
+    region: "International",
+    language: "en",
+    url: "https://herfootballhub.com/feed/",
+    womenOnly: true,
+    enabled: true
+  },
+  {
+    id: "sky-sports-football",
+    name: "Sky Sports — Football",
+    region: "United Kingdom",
+    language: "en",
+    url: "https://www.skysports.com/rss/11095",
+    womenOnly: false,
+    enabled: true
+  }
 ];
 
 // Current club directory snapshot: WSL / WSL2, NWSL, Serie A Women, Liga F and Frauen-Bundesliga.
@@ -177,12 +199,15 @@ export const DISCOVERY_TOPICS = [
 ];
 
 export const ARTICLE_KEYWORDS = [
-  "women's football", "women's soccer", "Women's Super League", "WSL",
-  "NWSL", "UWCL", "UEFA Women's Champions League", "WAFCON",
-  "AFC Women's Champions League", "Liga MX Femenil", "Copa Libertadores Femenina",
-  "transfer", "transfer rumour", "transfer rumor", "rumoured", "rumored",
-  "linked with", "in talks", "loan move", "contract extension", "injury",
-  "manager", "coach", "match report", "national team", "qualifier", "tournament"
+  "women's football", "women’s football", "women's soccer", "women’s soccer",
+  "women's super league", "barclays wsl", "wsl 2", "nwsl",
+  "uefa women's champions league", "women's champions league", "uwcl",
+  "wafcon", "afc women's champions league", "liga mx femenil",
+  "copa libertadores femenina", "liga f", "serie a femminile",
+  "serie a women", "frauen-bundesliga", "bundesliga women",
+  "a-league women", "we league", "damallsvenskan", "toppserien",
+  "women's world cup", "women's euros", "uswnt", "matildas",
+  "lionesses", "female football", "women's national team"
 ];
 
-export const SOURCE_REGISTRY_VERSION = 8;
+export const SOURCE_REGISTRY_VERSION = 9;
