@@ -349,6 +349,24 @@ async function scanAllFeeds(env) {
   };
 }
 
+async function getDiagnostics(env) {
+  await ensureDatabase(env);
+  const result = await env.DB.prepare(`
+    SELECT status, editorial_status, COUNT(*) AS total,
+      MAX(discovered_at) AS latest_discovered
+    FROM wf_news_candidates
+    GROUP BY status, editorial_status
+    ORDER BY status, editorial_status
+  `).all();
+  const groups = result.results || [];
+  return json({
+    success: true,
+    total: groups.reduce((sum, row) => sum + Number(row.total || 0), 0),
+    groups,
+    checkedAt: new Date().toISOString()
+  });
+}
+
 async function getCandidates(env, request) {
   await ensureDatabase(env);
   const url = new URL(request.url);
@@ -402,6 +420,7 @@ export default {
       const result = await scanAllFeeds(env);
       return json(result, result.success ? 200 : 502);
     }
+    if (path === "/diagnostics" && request.method === "GET") return await getDiagnostics(env);
     if (path === "/candidates" && request.method === "GET") return await getCandidates(env, request);
     return json({ error: "Route not found" }, 404);
   },

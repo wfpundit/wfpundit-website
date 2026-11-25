@@ -387,6 +387,7 @@ body.light .theme-toggle {
   <p id="collectedNewsStatus" class="muted" role="status" aria-live="polite">
     Enter your admin token, then load collected news.
   </p>
+  <div id="collectedNewsDiagnostics" class="article-meta" aria-live="polite"></div>
   <div id="collectedNewsList"></div>
 </section>
 
@@ -593,14 +594,16 @@ $("loadCollectedNewsButton").addEventListener("click", loadCollectedNews);
 async function loadCollectedNews() {
   const status = $("collectedNewsStatus");
   const list = $("collectedNewsList");
+  const diagnosticsBox = $("collectedNewsDiagnostics");
 
   if (!getToken()) {
     status.textContent = "Enter your admin token first.";
     return;
   }
 
-  status.textContent = "Loading recent collected stories...";
+  status.textContent = "Loading collected stories and diagnostics...";
   list.replaceChildren();
+  diagnosticsBox.textContent = "";
 
   try {
     const response = await fetch("/api/admin/collected-news", {
@@ -614,67 +617,159 @@ async function loadCollectedNews() {
       throw new Error(result.error || "Unable to load collected news.");
     }
 
-    if (!result.candidates || !result.candidates.length) {
-      status.textContent = "No new stories are currently ready for editorial review.";
+    const candidates = Array.isArray(result.candidates) ? result.candidates : [];
+    if (result.diagnostics && Array.isArray(result.diagnostics.groups)) {
+      const total = Number(result.diagnostics.total || 0);
+      const grouped = result.diagnostics.groups.map(group =>
+        (group.editorial_status || "pending_triage") + ": " + Number(group.total || 0)
+      );
+      diagnosticsBox.textContent =
+        "Database records: " + total + " · " + grouped.join(" · ");
+    } else {
+      diagnosticsBox.textContent =
+        "Diagnostics are temporarily unavailable. Story categories below are still shown.";
+    }
+
+    if (!candidates.length) {
+      status.textContent = "No collected stories were returned. Check the diagnostics above.";
       return;
     }
 
-    status.textContent = result.count + " stories ready for editorial review.";
+    const categories = [
+      {
+        key: "ready_for_editorial_review",
+        title: "Ready for editorial review",
+        note: "These stories passed the initial automated checks. Review and verify before writing."
+      },
+      {
+        key: "needs_editorial_check",
+        title: "Needs an editorial check",
+        note: "Check these stories carefully before deciding whether to use them."
+      },
+      {
+        key: "excluded",
+        title: "Older or excluded stories",
+        note: "These are retained for reference only and cannot be sent to the article editor from this list."
+      },
+      {
+        key: "pending_triage",
+        title: "Pending classification",
+        note: "These records have not completed editorial classification yet."
+      }
+    ];
 
-    result.candidates.forEach(candidate => {
-      const card = document.createElement("article");
-      card.className = "article";
+    status.textContent = candidates.length + " collected stories returned.";
+    categories.forEach(category => {
+      const matching = candidates.filter(candidate =>
+        (candidate.editorial_status || "pending_triage") === category.key
+      );
+      if (!matching.length) return;
 
-      const title = document.createElement("h3");
-      title.textContent = candidate.title || "Untitled story";
+      const section = document.createElement("section");
+      section.className = "collected-news-category";
+      const heading = document.createElement("h3");
+      heading.textContent = category.title + " (" + matching.length + ")";
+      const note = document.createElement("p");
+      note.className = "muted";
+      note.textContent = category.note;
+      section.append(heading, note);
 
-      const meta = document.createElement("div");
-      meta.className = "article-meta";
-      const dateValue = candidate.published_at || candidate.discovered_at;
-      const dateText = dateValue && !Number.isNaN(Date.parse(dateValue))
-        ? new Date(dateValue).toLocaleString()
-        : "Date not supplied";
-      meta.textContent = [candidate.source_name, candidate.source_region, dateText]
-        .filter(Boolean).join(" · ");
+      matching.forEach(candidate => {
+        const card = document.createElement("article");
+        card.className = "article";
 
-      const description = document.createElement("p");
-      description.className = "muted";
-      description.textContent = candidate.description || "No summary supplied by the source.";
+        const title = document.createElement("h3");
+        title.textContent = candidate.title || "Untitled story";
 
-      const sourceLink = document.createElement("a");
-      sourceLink.href = candidate.url;
-      sourceLink.target = "_blank";
-      sourceLink.rel = "noopener noreferrer";
-      sourceLink.textContent = "Open original story";
-      sourceLink.className = "muted";
+        const meta = document.createElement("div");
+        meta.className = "article-meta";
+        const dateValue = candidate.published_at || candidate.discovered_at;
+        const dateText = dateValue && !Number.isNaN(Date.parse(dateValue))
+          ? new Date(dateValue).toLocaleString()
+          : "Date not supplied";
+        meta.textContent = [
+          candidate.source_name,
+          candidate.source_region,
+          dateText,
+          category.title
+        ].filter(Boolean).join(" · ");
 
-      const useButton = document.createElement("button");
-      useButton.type = "button";
-      useButton.className = "small";
-      useButton.textContent = "Use in Article Editor";
-      useButton.addEventListener("click", () => {
-        $("articleId").value = "";
-        $("title").value = candidate.title || "";
-        $("summary").value = candidate.description || "";
-        $("content").value = "";
-        $("source").value = candidate.source_name + " — " + candidate.url;
-        $("status").value = "draft";
-        $("author").value = $("author").value.trim() || "WF Pundit";
-        $("formHeading").textContent = "Review Collected Story";
-        $("saveButton").textContent = "SAVE AS DRAFT";
-        $("cancelButton").classList.remove("hidden");
-        $("content").focus();
-        $("collectedNewsStatus").textContent =
-          "Story added to the editor as a draft. Review and write the article before saving.";
-        $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
+        const description = document.createElement("p");
+        description.className = "muted";
+        description.textContent = candidate.description ||
+          "No summary supplied by the source.";
+
+        const sourceLink = document.createElement("a");
+        sourceLink.href = candidate.url;
+        sourceLink.target = "_blank";
+        sourceLink.rel = "noopener noreferrer";
+        sourceLink.textContent = "Open original story";
+        sourceLink.className = "muted";
+
+        const actions = document.createElement("div");
+        actions.className = "actions";
+        actions.appendChild(sourceLink);
+
+        if (category.key === "ready_for_editorial_review") {
+          const useButton = document.createElement("button");
+          useButton.type = "button";
+          useButton.className = "small";
+          useButton.textContent = "Use in Article Editor";
+          useButton.addEventListener("click", () => {
+            $("articleId").value = "";
+            $("title").value = candidate.title || "";
+            $("summary").value = candidate.description || "";
+            $("content").value = "";
+            $("source").value = candidate.source_name + " — " + candidate.url;
+            $("status").value = "draft";
+            $("author").value = $("author").value.trim() || "WF Pundit";
+            $("formHeading").textContent = "Review Collected Story";
+            $("saveButton").textContent = "SAVE AS DRAFT";
+            $("cancelButton").classList.remove("hidden");
+            $("content").focus();
+            $("collectedNewsStatus").textContent =
+              "Story added as a draft. Verify the source and write the article before saving.";
+            $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+          actions.appendChild(useButton);
+        }
+
+        const flags = Array.isArray(candidate.editorial_flags?.flags)
+          ? candidate.editorial_flags.flags
+          : [];
+        if (flags.length) {
+          const flagText = document.createElement("p");
+          flagText.className = "muted";
+          flagText.textContent = "Checks: " + flags.join(", ");
+          card.appendChild(title);
+          card.append(meta, description, flagText, actions);
+        } else {
+          card.append(title, meta, description, actions);
+        }
+        section.appendChild(card);
       });
 
-      const actions = document.createElement("div");
-      actions.className = "actions";
-      actions.append(sourceLink, useButton);
-      card.append(title, meta, description, actions);
-      list.appendChild(card);
+      list.appendChild(section);
     });
+
+    const unrecognised = candidates.filter(candidate =>
+      !categories.some(category => category.key === candidate.editorial_status)
+    );
+    if (unrecognised.length) {
+      const other = document.createElement("section");
+      other.className = "collected-news-category";
+      const heading = document.createElement("h3");
+      heading.textContent = "Other editorial statuses (" + unrecognised.length + ")";
+      other.appendChild(heading);
+      unrecognised.forEach(candidate => {
+        const row = document.createElement("p");
+        row.className = "muted";
+        row.textContent = (candidate.editorial_status || "Unknown") + " — " +
+          (candidate.title || "Untitled story");
+        other.appendChild(row);
+      });
+      list.appendChild(other);
+    }
   } catch (error) {
     status.textContent = error.message;
   }

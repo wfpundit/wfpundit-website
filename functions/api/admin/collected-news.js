@@ -52,9 +52,9 @@ export async function onRequestGet({ request, env }) {
 
   endpoint.pathname = "/candidates";
   endpoint.search = new URLSearchParams({
-    limit: "50",
-    status: "new",
-    editorial_status: "ready_for_editorial_review"
+    limit: "100",
+    status: "all",
+    editorial_status: "all"
   }).toString();
 
   try {
@@ -95,13 +95,36 @@ export async function onRequestGet({ request, env }) {
         source_region: String(item.source_region || "").slice(0, 100),
         published_at: item.published_at || null,
         discovered_at: item.discovered_at || null,
+        editorial_status: String(item.editorial_status || "pending_triage"),
         editorial_flags: item.editorial_flags || []
       }));
+
+    const diagnosticsUrl = new URL(env.NEWS_AUTOMATION_URL);
+    diagnosticsUrl.pathname = "/diagnostics";
+    diagnosticsUrl.search = "";
+    let diagnostics = null;
+    try {
+      const diagnosticsResponse = await fetch(diagnosticsUrl.toString(), {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${env.NEWS_AUTOMATION_TOKEN}`,
+          "Accept": "application/json"
+        },
+        signal: AbortSignal.timeout(15000)
+      });
+      const diagnosticsResult = await diagnosticsResponse.json().catch(() => null);
+      if (diagnosticsResponse.ok && diagnosticsResult?.success) {
+        diagnostics = diagnosticsResult;
+      }
+    } catch (diagnosticsError) {
+      console.error("Test news collector diagnostics unavailable.");
+    }
 
     return json({
       success: true,
       count: candidates.length,
-      candidates
+      candidates,
+      diagnostics
     });
   } catch (error) {
     console.error("Test news collector bridge error:", error);
