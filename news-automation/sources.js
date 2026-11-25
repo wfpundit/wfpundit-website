@@ -200,14 +200,14 @@ export const DISCOVERY_TOPICS = [
 
 export const ARTICLE_KEYWORDS = [
   "women's football", "women’s football", "women's soccer", "women’s soccer",
-  "women's super league", "barclays wsl", "wsl 2", "nwsl",
+  "women's super league", "barclays wsl", "wsl", "wsl 2", "nwsl",
   "uefa women's champions league", "women's champions league", "uwcl",
   "wafcon", "afc women's champions league", "liga mx femenil",
   "copa libertadores femenina", "liga f", "serie a femminile",
   "serie a women", "frauen-bundesliga", "bundesliga women",
   "a-league women", "we league", "damallsvenskan", "toppserien",
   "women's world cup", "women's euros", "uswnt", "matildas",
-  "lionesses", "female football", "women's national team"
+  "lionesses", "female football", "female soccer", "women's national team", "football ferns"
 ];
 
 export const SOURCE_REGISTRY_VERSION = 9;
