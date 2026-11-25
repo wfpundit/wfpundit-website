@@ -235,7 +235,7 @@ body.light .theme-toggle {
 #photo{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 #previewWrap{display:none;position:relative;width:min(100%,720px);margin:12px 0}
 #preview{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:12px}
-#wfWatermarkPreview{display:none;position:absolute;right:14px;bottom:14px;align-items:center;gap:6px;padding:7px 10px;border-radius:7px;background:rgba(5,15,35,.72);color:#fff;font:800 13px/1 Arial,sans-serif;letter-spacing:.2px;text-shadow:0 1px 2px #000}
+#wfWatermarkPreview{display:none;position:absolute;left:14px;top:14px;align-items:center;gap:6px;padding:7px 10px;border-radius:7px;background:rgba(5,15,35,.72);color:#fff;font:800 13px/1 Arial,sans-serif;letter-spacing:.2px;text-shadow:0 1px 2px #000}
 #wfWatermarkPreview .verified{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#168cff;color:#fff;font-size:11px}
 .watermark-option{display:flex;align-items:center;gap:9px;margin:12px 0;color:var(--text);font-size:13px}
 .watermark-option input{width:17px;height:17px;accent-color:#168cff}
@@ -642,6 +642,7 @@ label{font-size:12px;letter-spacing:.015em}
   <p class="muted">
     Review recent stories gathered by the test news collector. Choosing a story
     fills the article editor as a draft; nothing is published automatically.
+    BBC articles may be used as reporting sources, but BBC-hosted photographs are excluded from photo lookup. Only use separately licensed or authorised images.
   </p>
   <div class="actions">
     <button type="button" id="loadCollectedNewsButton">Load Collected News</button>
@@ -717,7 +718,7 @@ Official Club Website — https://example.com"></textarea>
       <input id="applyWfWatermark" type="checkbox">
       Add WF Pundit watermark to this photo
     </label>
-    <p class="watermark-note">Optional. The watermark is permanently applied only to a photo you upload after selecting this option. The original file remains unchanged.</p>
+    <p class="watermark-note">Optional. Adds the WF Pundit wordmark and blue verified tick in the upper-left corner of an authorised photo you upload. The original file remains unchanged.</p>
     <div id="previewWrap">
       <img id="preview" alt="Article image preview">
       <div id="wfWatermarkPreview" aria-hidden="true">
@@ -919,9 +920,15 @@ async function loadCollectedNews() {
 
       const useButton = document.createElement("button");
       useButton.type = "button";
-      useButton.className = "small secondary";
-      useButton.textContent = "Use in Article Editor";
-      useButton.addEventListener("click", () => {
+      useButton.className = "small";
+      useButton.textContent = "USE IN EDITOR · AUTO PREPARE";
+      useButton.addEventListener("click", async () => {
+        if (!adminSessionReady) return;
+
+        useButton.disabled = true;
+        useButton.textContent = "PREPARING ARTICLE...";
+        status.textContent = "Preparing your article and checking the original source for a featured photo. This may take a moment...";
+
         $("articleId").value = "";
         $("title").value = candidate.title || "";
         $("summary").value = candidate.description || "";
@@ -929,117 +936,105 @@ async function loadCollectedNews() {
         $("source").value = candidate.source_name + " — " + candidate.url;
         $("status").value = "draft";
         $("author").value = $("author").value.trim() || "WF Pundit";
-        $("formHeading").textContent = "Review Collected Story";
+        $("imageUrl").value = "";
+        setPreview("");
+        $("formHeading").textContent = "Preparing Collected Story...";
         $("saveButton").textContent = "SAVE AS DRAFT";
         $("cancelButton").classList.remove("hidden");
-        $("content").focus();
-        $("collectedNewsStatus").textContent =
-          "Story added to the editor. Use AI Write Full Article to prepare a complete draft.";
         $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
-      });
 
-      const generateButton = document.createElement("button");
-      generateButton.type = "button";
-      generateButton.className = "small";
-      generateButton.textContent = "AI WRITE FULL ARTICLE";
-      generateButton.addEventListener("click", async () => {
-        if (!adminSessionReady) return;
-        generateButton.disabled = true;
-        generateButton.textContent = "WRITING ARTICLE...";
-        $("collectedNewsStatus").textContent = "AI is preparing an original article draft. Please wait...";
         try {
-          const response = await fetch("/api/admin/generate-article", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(candidate)
-          });
-          const result = await response.json();
-          if (!response.ok || !result.success) {
-            throw new Error(result.error || "AI article generation failed.");
+          const [articleResult, imageResult] = await Promise.allSettled([
+            fetch("/api/admin/generate-article", {
+              method: "POST",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(candidate)
+            }).then(async response => {
+              const result = await response.json();
+              if (!response.ok || !result.success) {
+                throw new Error(result.error || "AI article generation failed.");
+              }
+              return result.article;
+            }),
+            fetch("/api/admin/find-original-image", {
+              method: "POST",
+              credentials: "same-origin",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ url: candidate.url })
+            }).then(async response => {
+              const result = await response.json();
+              if (!response.ok || !result.success || !result.image_url) {
+                throw new Error(result.error || "No original article photo was found.");
+              }
+              return result.image_url;
+            })
+          ]);
+
+          if (articleResult.status !== "fulfilled") {
+            throw articleResult.reason || new Error("AI article generation failed.");
           }
 
-          const article = result.article;
-          $("articleId").value = "";
+          const article = articleResult.value;
           $("title").value = article.title || candidate.title || "";
           $("summary").value = article.summary || candidate.description || "";
-          $("content").value = article.content || "";
-          $("source").value = article.source || (candidate.source_name + " — " + candidate.url);
+          const sourceName = candidate.source_name || "Original source";
+          const sourceUrl = candidate.url;
+          const generatedBody = String(article.content || "").trim();
+          const safeSourceLabel = sourceName.replace(/[\[\]]/g, "");
+          const sourceLinkLine = "Source: [" + safeSourceLabel + " — original report](" + sourceUrl + ")";
+          const bodyHasSourceLink = /\[[^\]]+\]\(https:\/\//.test(generatedBody);
+          $("content").value = generatedBody +
+            (bodyHasSourceLink ? "" : "\n\n" + sourceLinkLine);
+          $("source").value = article.source || (sourceName + " — " + sourceUrl);
           $("category").value = article.category || "Latest News";
-          updateSubcategories();
+          updateSubcategories(article.subcategory || "");
           $("status").value = "draft";
           $("author").value = "WF Pundit";
-          $("imageUrl").value = "";
-
-          setPreview("");
-          $("formHeading").textContent = "AI-Generated Article · Review Before Saving";
+          $("formHeading").textContent = "AI-Prepared Article · Review Before Saving";
           $("saveButton").textContent = "SAVE AS DRAFT";
-          $("cancelButton").classList.remove("hidden");
+
+          let photoMessage = "No usable featured photo was found automatically. You can add an authorised photo manually.";
+          if (imageResult.status === "fulfilled") {
+            const imageUrl = imageResult.value;
+            const approved = confirm(
+              "WF Pundit found a featured image on the original article.\n\n" +
+              "Finding an image does not grant permission to reuse it. Only select it if WF Pundit has a licence or permission to reproduce it.\n\n" +
+              "Are you authorised to use this photograph?"
+            );
+            if (approved) {
+              $("imageUrl").value = imageUrl;
+              setPreview(imageUrl);
+              photoMessage = "The original photo is selected for your review. Check any licence and attribution requirements before publication.";
+            } else {
+              photoMessage = "The original photo was found but left unused because reuse permission was not confirmed.";
+            }
+          }
+
           $("collectedNewsStatus").textContent =
-            "AI article prepared as a draft. Fact-check the notes and source before saving.";
+            "Your article draft is ready. " + photoMessage +
+            " Please check the facts and source, then save it as a draft.";
           if (article.fact_check_notes) {
             $("message").textContent = "EDITORIAL FACT-CHECK NOTES: " + article.fact_check_notes;
             $("message").style.color = "#d9ad61";
+          } else {
+            $("message").textContent = "";
           }
-          $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
+          $("content").focus();
         } catch (error) {
-          $("collectedNewsStatus").textContent = error.message;
-        } finally {
-          generateButton.disabled = false;
-          generateButton.textContent = "AI WRITE FULL ARTICLE";
-        }
-      });
-
-      const photoButton = document.createElement("button");
-      photoButton.type = "button";
-      photoButton.className = "small secondary";
-      photoButton.textContent = "FIND ORIGINAL PHOTO";
-      photoButton.title = "Look for the original article's featured photograph";
-      photoButton.addEventListener("click", async () => {
-        if (!adminSessionReady) return;
-        photoButton.disabled = true;
-        photoButton.textContent = "SEARCHING...";
-        status.textContent = "Checking the original article for its featured photograph...";
-        try {
-          const response = await fetch("/api/admin/find-original-image", {
-            method: "POST",
-            credentials: "same-origin",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ url: candidate.url })
-          });
-          const result = await response.json();
-          if (!response.ok || !result.success || !result.image_url) {
-            throw new Error(result.error || "No original article photograph was found.");
-          }
-          const approved = confirm(
-            "An image was found on the original article.\n\n" +
-            "Finding an image does not grant reuse rights. Confirm that WF Pundit has permission or a licence to reproduce it.\n\n" +
-            "Have you confirmed permission to use this photograph?"
-          );
-          if (!approved) {
-            status.textContent = "Image found but not selected. Confirm reuse rights before using it.";
-            return;
-          }
-          if (!$("title").value.trim()) $("title").value = candidate.title || "";
-          if (!$("summary").value.trim()) $("summary").value = candidate.description || "";
-          if (!$("source").value.trim()) $("source").value = candidate.source_name + " — " + candidate.url;
-          $("status").value = "draft";
-          $("imageUrl").value = result.image_url;
-          setPreview(result.image_url);
+          $("formHeading").textContent = "Collected Story · Complete the Draft";
           $("collectedNewsStatus").textContent =
-            "Original image selected for editorial review. Check its licence and attribution requirements again before publication.";
-          $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
-        } catch (error) {
-          status.textContent = error.message;
+            (error.message || "AI article generation failed.") +
+            " The source details remain in the editor so you can retry or continue manually.";
         } finally {
-          photoButton.disabled = false;
-          photoButton.textContent = "FIND ORIGINAL PHOTO";
+          useButton.disabled = false;
+          useButton.textContent = "USE IN EDITOR · AUTO PREPARE";
         }
       });
 
       const actions = document.createElement("div");
       actions.className = "actions";
-      actions.append(sourceLink, useButton, generateButton, photoButton);
+      actions.append(sourceLink, useButton);
       card.append(title, meta, description, actions);
       list.appendChild(card);
     });
@@ -1098,30 +1093,45 @@ themeButton.addEventListener("click", () => {
 
 /* ARTICLE CATEGORIES */
 
-const subcategories = {
-  "Women's Leagues": [
-    "Women's Super League (WSL)",
-    "Women's Championship",
-    "NWSL",
-    "Liga F",
-    "Première Ligue",
-    "Serie A Femminile",
-    "Bundesliga Women",
-    "A-League Women",
-    "Liga MX Femenil",
-    "WE League",
-    "Damallsvenskan",
-    "Toppserien"
-  ],
+const leagueSubcategories = [
+  "Women's Super League (WSL)",
+  "Women's Championship",
+  "NWSL",
+  "Liga F",
+  "Première Ligue",
+  "Serie A Femminile",
+  "Bundesliga Women",
+  "A-League Women",
+  "Liga MX Femenil",
+  "WE League",
+  "Damallsvenskan",
+  "Toppserien"
+];
 
-  "International Football": [
-    "FIFA Women's World Cup",
-    "UEFA Women's Euros",
-    "Women's Africa Cup of Nations (WAFCON)",
-    "Olympic Women's Football",
-    "AFC Women's Asian Cup",
-    "Copa América Femenina",
-    "UEFA Women's Nations League"
+const internationalSubcategories = [
+  "FIFA Women's World Cup",
+  "UEFA Women's Euros",
+  "Women's Africa Cup of Nations (WAFCON)",
+  "Olympic Women's Football",
+  "AFC Women's Asian Cup",
+  "Copa América Femenina",
+  "UEFA Women's Nations League"
+];
+
+const subcategories = {
+  "Women's Leagues": leagueSubcategories,
+  "International Football": internationalSubcategories,
+  "Women's Champions League (UWCL)": ["UEFA Women's Champions League"],
+  "Transfers": [...leagueSubcategories, "Multiple leagues / unspecified"],
+  "Match Reports & Analysis": [
+    ...leagueSubcategories,
+    "UEFA Women's Champions League",
+    ...internationalSubcategories
+  ],
+  "Interviews & Features": [
+    ...leagueSubcategories,
+    "UEFA Women's Champions League",
+    ...internationalSubcategories
   ]
 };
 
@@ -1280,7 +1290,7 @@ async function makeWatermarkedPhoto(file) {
   ctx.font = "800 " + fontSize + "px Arial, sans-serif";
   const word = "wf_pundit", wordWidth = ctx.measureText(word).width;
   const pillW = pad * 2 + wordWidth + gap + badge, pillH = pad * 2 + badge;
-  const margin = Math.round(bitmap.width * 0.018), x = bitmap.width - pillW - margin, y = bitmap.height - pillH - margin;
+  const margin = Math.round(bitmap.width * 0.018), x = margin, y = margin;
   ctx.fillStyle = "rgba(5,15,35,0.72)";
   const radius = Math.round(pillH * 0.22); ctx.beginPath(); ctx.roundRect(x, y, pillW, pillH, radius); ctx.fill();
   ctx.fillStyle = "#ffffff"; ctx.textBaseline = "middle"; ctx.fillText(word, x + pad, y + pillH / 2);

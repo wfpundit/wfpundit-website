@@ -10,10 +10,18 @@ function json(data, status = 200) {
   });
 }
 
+const BBC_HOSTS = ["bbc.com", "bbc.co.uk", "bbci.co.uk", "bbc.net.uk", "bbcmedia.co.uk"];
+
+function isBbcHost(hostname) {
+  const host = String(hostname || "").toLowerCase().replace(/\.$/, "");
+  return BBC_HOSTS.some(domain => host === domain || host.endsWith("." + domain));
+}
+
 function isPublicWebUrl(value) {
   let url;
   try { url = new URL(value); } catch { return null; }
   const host = url.hostname.toLowerCase();
+  if (isBbcHost(host)) return null;
   if (url.protocol !== "https:" || url.username || url.password ||
       (url.port && url.port !== "443") || !host || host === "localhost" ||
       host.endsWith(".localhost") || host.endsWith(".local") ||
@@ -42,7 +50,7 @@ function findImage(html, pageUrl) {
       try {
         const image = new URL(attrs.content || attrs.value || "", pageUrl);
         if ((image.protocol === "https:" || image.protocol === "http:") &&
-            !image.username && !image.password) return image.href;
+            !image.username && !image.password && !isBbcHost(image.hostname)) return image.href;
       } catch { /* Ignore malformed metadata. */ }
     }
   }
@@ -61,7 +69,12 @@ export async function onRequestPost({ request, env }) {
 
   const pageUrl = isPublicWebUrl(String(data.url || ""));
   if (!pageUrl) {
-    return json({ success: false, error: "Only valid public HTTPS article URLs can be checked." }, 400);
+    let submittedUrl;
+    try { submittedUrl = new URL(String(data.url || "")); } catch { submittedUrl = null; }
+    if (submittedUrl && isBbcHost(submittedUrl.hostname)) {
+      return json({ success: false, error: "BBC photographs are excluded from WF Pundit photo lookup. Please use a different source and confirm its reuse permission." }, 403);
+    }
+    return json({ success: false, error: "Only valid public HTTPS article URLs from non-BBC sources can be checked." }, 400);
   }
 
   try {
