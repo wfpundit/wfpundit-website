@@ -1252,17 +1252,19 @@ function showMessage(text, isError = false) {
   message.style.color = isError ? "#ff6677" : "#35c98a";
 }
 
+let previewCanBeWatermarked = false;
+
 function setPreview(url) {
   const preview = $("preview");
   const wrap = $("previewWrap");
   const mark = $("wfWatermarkPreview");
   if (url) { preview.src = url; wrap.style.display = "block"; }
   else { preview.removeAttribute("src"); wrap.style.display = "none"; }
-  mark.style.display = $("applyWfWatermark").checked && url ? "flex" : "none";
+  mark.style.display = $("applyWfWatermark").checked && url && previewCanBeWatermarked ? "flex" : "none";
 }
 
 $("applyWfWatermark").addEventListener("change", () => {
-  $("wfWatermarkPreview").style.display = $("applyWfWatermark").checked && $("preview").src ? "flex" : "none";
+  $("wfWatermarkPreview").style.display = $("applyWfWatermark").checked && $("preview").src && previewCanBeWatermarked ? "flex" : "none";
 });
 
 async function makeWatermarkedPhoto(file) {
@@ -1294,6 +1296,7 @@ async function makeWatermarkedPhoto(file) {
 }
 
 $("imageUrl").addEventListener("input", () => {
+  previewCanBeWatermarked = false;
   setPreview($("imageUrl").value.trim());
 });
 
@@ -1301,6 +1304,7 @@ $("photo").addEventListener("change", () => {
   const file = $("photo").files[0];
 
   if (file) {
+    previewCanBeWatermarked = true;
     setPreview(URL.createObjectURL(file));
     uploadSelectedPhoto();
   }
@@ -1354,6 +1358,7 @@ async function uploadSelectedPhoto() {
     }
 
     $("imageUrl").value = uploadedUrl;
+    previewCanBeWatermarked = false;
     setPreview(uploadedUrl);
     showMessage($("applyWfWatermark").checked ? "Watermarked photo uploaded. The original file was not changed." : "Photo uploaded successfully.");
 
