@@ -51,6 +51,86 @@ function cleanText(value = "") {
     .replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 5000);
 }
 
+
+function safePublicArticleUrl(value) {
+  try {
+    const url = new URL(value);
+    const host = url.hostname.toLowerCase();
+    if (url.protocol !== "https:" || url.username || url.password) return null;
+    if (!host || host === "localhost" || host.endsWith(".localhost") ||
+        host.endsWith(".local") || host.endsWith(".internal") ||
+        host.includes(":") || /^\d{1,3}(?:\.\d{1,3}){3}$/.test(host)) return null;
+    return url;
+  } catch {
+    return null;
+  }
+}
+
+async function readLimitedText(response, maxBytes = 1200000) {
+  if (!response.body) return (await response.text()).slice(0, maxBytes);
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let text = "", bytes = 0;
+  while (bytes < maxBytes) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    const remaining = maxBytes - bytes;
+    const chunk = value.byteLength > remaining ? value.slice(0, remaining) : value;
+    bytes += chunk.byteLength;
+    text += decoder.decode(chunk, { stream: true });
+    if (chunk.byteLength < value.byteLength) break;
+  }
+  text += decoder.decode();
+  try { await reader.cancel(); } catch {}
+  return text;
+}
+
+async function fetchArticleExcerpt(articleUrl) {
+  let current = safePublicArticleUrl(articleUrl);
+  if (!current) return "";
+  for (let redirects = 0; redirects <= 3; redirects++) {
+    let response;
+    try {
+      response = await fetch(current.toString(), {
+        redirect: "manual",
+        headers: {
+          "Accept": "text/html,application/xhtml+xml",
+          "User-Agent": "WF-Pundit-NewsMonitor/2.1"
+        },
+        signal: AbortSignal.timeout(8000)
+      });
+    } catch {
+      return "";
+    }
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get("Location");
+      if (!location || redirects === 3) return "";
+      current = safePublicArticleUrl(new URL(location, current).toString());
+      if (!current) return "";
+      continue;
+    }
+    if (!response.ok || !(response.headers.get("content-type") || "").toLowerCase().includes("html")) return "";
+    const contentLength = Number(response.headers.get("content-length") || 0);
+    if (contentLength > 1200000) return "";
+    const finalUrl = safePublicArticleUrl(response.url || current.toString());
+    if (!finalUrl) return "";
+    const html = await readLimitedText(response);
+    const articleMatch = html.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i);
+    const mainMatch = html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i);
+    let body = articleMatch?.[1] || mainMatch?.[1] || html;
+    body = body.replace(/<!--[\s\S]*?-->/g, " ")
+      .replace(/<(script|style|svg|nav|footer|header|aside|form|noscript)\b[\s\S]*?<\/\1>/gi, " ");
+    const paragraphs = [...body.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/gi)]
+      .map(match => cleanText(match[1]))
+      .filter(paragraph => paragraph.length > 45);
+    const excerpt = paragraphs.join(" ").slice(0, 1800);
+    if (excerpt) return excerpt;
+    const meta = html.match(/<meta\b[^>]*(?:name|property)=["'](?:description|og:description)["'][^>]*content=["']([^"']+)["'][^>]*>/i);
+    return meta ? cleanText(meta[1]).slice(0, 700) : "";
+  }
+  return "";
+}
+
 function normaliseUrl(value) {
   try {
     const url = new URL(value);
@@ -89,6 +169,9 @@ function parseFeed(xml, feed) {
     const title = cleanText(tagValue(block, "title"));
     const description = cleanText(tagValue(block, "description") ||
       tagValue(block, "summary") || tagValue(block, "content"));
+    const articleFeedContent = tagValue(block, "content:encoded") ||
+      (isAtom ? tagValue(block, "content") : "");
+    const articleExcerpt = cleanText(articleFeedContent).slice(0, 1800);
     // Google News RSS includes the actual publisher in its <source> element.
     // Preserve that attribution rather than displaying "Google News".
     const publisher = cleanText(tagValue(block, "source"));
@@ -101,7 +184,7 @@ function parseFeed(xml, feed) {
 
     if (!title || !link || (!feed.preFiltered && !matchesTopic(title, description))) return null;
     return {
-      title, description, link, publishedAt,
+      title, description, articleExcerpt, link, publishedAt,
       sourceName, sourceRegion: feed.region,
       discoveredAt: new Date().toISOString()
     };
@@ -247,7 +330,8 @@ async function ensureDatabase(env) {
       description TEXT DEFAULT '', url TEXT NOT NULL UNIQUE,
       source_name TEXT NOT NULL, source_region TEXT DEFAULT '',
       published_at TEXT, discovered_at TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'new', created_at TEXT NOT NULL
+      status TEXT NOT NULL DEFAULT 'new', created_at TEXT NOT NULL,
+      article_excerpt TEXT DEFAULT ''
     )
   `).run();
 
@@ -259,43 +343,58 @@ async function ensureDatabase(env) {
   if (!names.has("editorial_flags")) {
     await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN editorial_flags TEXT NOT NULL DEFAULT '[]'").run();
   }
+  if (!names.has("article_excerpt")) {
+    await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN article_excerpt TEXT DEFAULT ''").run();
+  }
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_status ON wf_news_candidates(status)").run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_editorial_status ON wf_news_candidates(editorial_status)").run();
   await backfillPendingEditorial(env);
 }
 
-async function saveCandidate(env, item) {
+async function saveCandidate(env, item, contentBudget) {
   let editorial = editorialTriage(item);
   editorial = await markPossibleDuplicates(env, item, editorial);
   const flags = JSON.stringify({
     flags: editorial.flags,
     relatedCandidates: editorial.relatedCandidates || []
   });
-  const existing = await env.DB.prepare("SELECT id FROM wf_news_candidates WHERE url = ?").bind(item.link).first();
+  const existing = await env.DB.prepare(
+    "SELECT id, article_excerpt FROM wf_news_candidates WHERE url = ?"
+  ).bind(item.link).first();
+  let articleExcerpt = item.articleExcerpt || existing?.article_excerpt || "";
+  if (!articleExcerpt && contentBudget.remaining > 0) {
+    contentBudget.remaining--;
+    articleExcerpt = await fetchArticleExcerpt(item.link);
+  }
 
   if (existing) {
     await env.DB.prepare(`
       UPDATE wf_news_candidates
       SET title = ?, description = ?, source_name = ?, source_region = ?,
-          published_at = ?, editorial_status = ?, editorial_flags = ?
+          published_at = ?, editorial_status = ?, editorial_flags = ?,
+          article_excerpt = CASE WHEN ? <> '' THEN ? ELSE article_excerpt END
       WHERE id = ?
     `).bind(item.title, item.description, item.sourceName, item.sourceRegion,
-      item.publishedAt, editorial.status, flags, existing.id).run();
-    return { inserted: false, editorialStatus: editorial.status };
+      item.publishedAt, editorial.status, flags, articleExcerpt, articleExcerpt, existing.id).run();
+    return { inserted: false, editorialStatus: editorial.status, contentLoaded: Boolean(articleExcerpt) };
   }
 
   const result = await env.DB.prepare(`
     INSERT INTO wf_news_candidates (
       title, description, url, source_name, source_region, published_at,
-      discovered_at, status, created_at, editorial_status, editorial_flags
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?)
+      discovered_at, status, created_at, editorial_status, editorial_flags, article_excerpt
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?)
   `).bind(item.title, item.description, item.link, item.sourceName, item.sourceRegion,
-    item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags).run();
+    item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags, articleExcerpt).run();
 
-  return { inserted: result.meta.changes > 0, editorialStatus: editorial.status };
+  return {
+    inserted: result.meta.changes > 0,
+    editorialStatus: editorial.status,
+    contentLoaded: Boolean(articleExcerpt)
+  };
 }
 
-async function scanFeed(env, feed) {
+async function scanFeed(env, feed, contentBudget) {
   const response = await fetch(feed.url, {
     headers: {
       "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml",
@@ -310,17 +409,18 @@ async function scanFeed(env, feed) {
   }
 
   const candidates = parseFeed(xml, feed);
-  let inserted = 0, updated = 0, excluded = 0, flagged = 0;
+  let inserted = 0, updated = 0, excluded = 0, flagged = 0, contentLoaded = 0;
   for (const item of candidates) {
-    const saved = await saveCandidate(env, item);
+    const saved = await saveCandidate(env, item, contentBudget);
     if (saved.inserted) inserted++; else updated++;
     if (saved.editorialStatus === "excluded") excluded++;
     if (saved.editorialStatus === "needs_editorial_check") flagged++;
+    if (saved.contentLoaded) contentLoaded++;
   }
   return {
     source: feed.name,
     format: /<entry(?:\s|>)/i.test(xml) ? "Atom" : "RSS",
-    fetched: candidates.length, inserted, updated, excluded, flagged,
+    fetched: candidates.length, inserted, updated, excluded, flagged, contentLoaded,
     success: true
   };
 }
@@ -328,8 +428,9 @@ async function scanFeed(env, feed) {
 async function scanAllFeeds(env) {
   await ensureDatabase(env);
   const results = [];
+  const contentBudget = { remaining: 10 };
   for (const feed of RSS_FEEDS.filter(item => item.enabled)) {
-    try { results.push(await scanFeed(env, feed)); }
+    try { results.push(await scanFeed(env, feed, contentBudget)); }
     catch (error) {
       console.error("Feed error: " + feed.name, error);
       results.push({ source: feed.name, success: false, error: error.message });
@@ -347,6 +448,9 @@ async function scanAllFeeds(env) {
     updated: results.reduce((sum, item) => sum + (item.updated || 0), 0),
     excluded: results.reduce((sum, item) => sum + (item.excluded || 0), 0),
     flagged: results.reduce((sum, item) => sum + (item.flagged || 0), 0),
+    articleExcerptsLoaded: results.reduce((sum, item) => sum + (item.contentLoaded || 0), 0),
+    publisherPagesFetched: 10 - contentBudget.remaining,
+    publisherPageFetchLimit: 10,
     automaticPublishing: AUTO_PUBLISH,
     results
   };
@@ -428,7 +532,7 @@ export default {
         databaseConfigured: Boolean(env.DB),
         adminTokenConfigured: Boolean(env.ADMIN_TOKEN),
         automaticPublishing: AUTO_PUBLISH,
-        stage: "RSS and Atom collection with editorial triage"
+        stage: "RSS and Atom collection with short publisher excerpts and editorial triage"
       });
     }
     if (path === "/sources") return json({ success: true, feeds: RSS_FEEDS, officialClubFeeds: OFFICIAL_CLUB_FEEDS });
