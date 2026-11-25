@@ -44,6 +44,78 @@ export const RSS_FEEDS = [
     language: "en",
     url: "https://fawslfulltime.co.uk/feed/",
     enabled: true
+  },
+  {
+    id: "google-news-global-womens-football",
+    name: "Google News — Global Women's Football",
+    region: "International",
+    language: "en",
+    url: "https://news.google.com/rss/search?q=%28%22women%27s+football%22+OR+%22women%27s+soccer%22%29&hl=en-GB&gl=GB&ceid=GB%3Aen",
+    enabled: true,
+    preFiltered: true
+  },
+  {
+    id: "google-news-wsl",
+    name: "Google News — WSL and England",
+    region: "United Kingdom",
+    language: "en",
+    url: "https://news.google.com/rss/search?q=%28%22Women%27s+Super+League%22+OR+WSL%29+women%27s+football&hl=en-GB&gl=GB&ceid=GB%3Aen",
+    enabled: true,
+    preFiltered: true
+  },
+  {
+    id: "google-news-uwcl",
+    name: "Google News — UEFA Women's Champions League",
+    region: "Europe",
+    language: "en",
+    url: "https://news.google.com/rss/search?q=%28%22UEFA+Women%27s+Champions+League%22+OR+UWCL%29&hl=en-GB&gl=GB&ceid=GB%3Aen",
+    enabled: true,
+    preFiltered: true
+  },
+  {
+    id: "google-news-nwsl",
+    name: "Google News — NWSL",
+    region: "North America",
+    language: "en",
+    url: "https://news.google.com/rss/search?q=NWSL+women%27s+soccer&hl=en-US&gl=US&ceid=US%3Aen",
+    enabled: true,
+    preFiltered: true
+  },
+  {
+    id: "google-news-liga-f",
+    name: "Google News — Liga F",
+    region: "Spain",
+    language: "en",
+    url: "https://news.google.com/rss/search?q=%22Liga+F%22+women%27s+football&hl=en-GB&gl=GB&ceid=GB%3Aen",
+    enabled: true,
+    preFiltered: true
+  },
+  {
+    id: "google-news-frauen-bundesliga",
+    name: "Google News — Frauen-Bundesliga",
+    region: "Germany",
+    language: "en",
+    url: "https://news.google.com/rss/search?q=%22Frauen-Bundesliga%22&hl=en-GB&gl=GB&ceid=GB%3Aen",
+    enabled: true,
+    preFiltered: true
+  },
+  {
+    id: "google-news-serie-a-women",
+    name: "Google News — Serie A Women",
+    region: "Italy",
+    language: "en",
+    url: "https://news.google.com/rss/search?q=%22Serie+A+Women%22+OR+%22Serie+A+femminile%22&hl=en-GB&gl=GB&ceid=GB%3Aen",
+    enabled: true,
+    preFiltered: true
+  },
+  {
+    id: "google-news-african-womens-football",
+    name: "Google News — African Women's Football",
+    region: "Africa",
+    language: "en",
+    url: "https://news.google.com/rss/search?q=%28WAFCON+OR+%22African+women%27s+football%22+OR+%22CAF+women%27s%22%29&hl=en-GB&gl=GB&ceid=GB%3Aen",
+    enabled: true,
+    preFiltered: true
   }
 ];
 
@@ -184,4 +256,4 @@ export const ARTICLE_KEYWORDS = [
   "manager", "coach", "match report", "national team", "qualifier", "tournament"
 ];
 
-export const SOURCE_REGISTRY_VERSION = 7;
+export const SOURCE_REGISTRY_VERSION = 8;
