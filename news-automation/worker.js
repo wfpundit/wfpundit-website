@@ -97,7 +97,7 @@ async function fetchArticleExcerpt(articleUrl) {
           "Accept": "text/html,application/xhtml+xml",
           "User-Agent": "WF-Pundit-NewsMonitor/2.1"
         },
-        signal: AbortSignal.timeout(8000)
+        signal: AbortSignal.timeout(5000)
       });
     } catch {
       return "";
@@ -105,7 +105,8 @@ async function fetchArticleExcerpt(articleUrl) {
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get("Location");
       if (!location || redirects === 3) return "";
-      current = safePublicArticleUrl(new URL(location, current).toString());
+      try { current = safePublicArticleUrl(new URL(location, current).toString()); }
+      catch { return ""; }
       if (!current) return "";
       continue;
     }
@@ -364,7 +365,8 @@ async function saveCandidate(env, item, contentBudget) {
   let articleExcerpt = item.articleExcerpt || existing?.article_excerpt || "";
   if (!articleExcerpt && contentBudget.remaining > 0) {
     contentBudget.remaining--;
-    articleExcerpt = await fetchArticleExcerpt(item.link);
+    try { articleExcerpt = await fetchArticleExcerpt(item.link); }
+    catch { articleExcerpt = ""; }
   }
 
   if (existing) {
@@ -376,7 +378,7 @@ async function saveCandidate(env, item, contentBudget) {
       WHERE id = ?
     `).bind(item.title, item.description, item.sourceName, item.sourceRegion,
       item.publishedAt, editorial.status, flags, articleExcerpt, articleExcerpt, existing.id).run();
-    return { inserted: false, editorialStatus: editorial.status, contentLoaded: Boolean(articleExcerpt) };
+    return { inserted: false, editorialStatus: editorial.status, excerptAvailable: Boolean(articleExcerpt) };
   }
 
   const result = await env.DB.prepare(`
@@ -390,7 +392,7 @@ async function saveCandidate(env, item, contentBudget) {
   return {
     inserted: result.meta.changes > 0,
     editorialStatus: editorial.status,
-    contentLoaded: Boolean(articleExcerpt)
+    excerptAvailable: Boolean(articleExcerpt)
   };
 }
 
@@ -409,18 +411,18 @@ async function scanFeed(env, feed, contentBudget) {
   }
 
   const candidates = parseFeed(xml, feed);
-  let inserted = 0, updated = 0, excluded = 0, flagged = 0, contentLoaded = 0;
+  let inserted = 0, updated = 0, excluded = 0, flagged = 0, excerptAvailable = 0;
   for (const item of candidates) {
     const saved = await saveCandidate(env, item, contentBudget);
     if (saved.inserted) inserted++; else updated++;
     if (saved.editorialStatus === "excluded") excluded++;
     if (saved.editorialStatus === "needs_editorial_check") flagged++;
-    if (saved.contentLoaded) contentLoaded++;
+    if (saved.excerptAvailable) excerptAvailable++;
   }
   return {
     source: feed.name,
     format: /<entry(?:\s|>)/i.test(xml) ? "Atom" : "RSS",
-    fetched: candidates.length, inserted, updated, excluded, flagged, contentLoaded,
+    fetched: candidates.length, inserted, updated, excluded, flagged, excerptAvailable,
     success: true
   };
 }
@@ -428,7 +430,7 @@ async function scanFeed(env, feed, contentBudget) {
 async function scanAllFeeds(env) {
   await ensureDatabase(env);
   const results = [];
-  const contentBudget = { remaining: 10 };
+  const contentBudget = { remaining: 6 };
   for (const feed of RSS_FEEDS.filter(item => item.enabled)) {
     try { results.push(await scanFeed(env, feed, contentBudget)); }
     catch (error) {
@@ -448,9 +450,9 @@ async function scanAllFeeds(env) {
     updated: results.reduce((sum, item) => sum + (item.updated || 0), 0),
     excluded: results.reduce((sum, item) => sum + (item.excluded || 0), 0),
     flagged: results.reduce((sum, item) => sum + (item.flagged || 0), 0),
-    articleExcerptsLoaded: results.reduce((sum, item) => sum + (item.contentLoaded || 0), 0),
-    publisherPagesFetched: 10 - contentBudget.remaining,
-    publisherPageFetchLimit: 10,
+    articleExcerptsLoaded: results.reduce((sum, item) => sum + (item.excerptAvailable || 0), 0),
+    publisherPageFetchAttempts: 6 - contentBudget.remaining,
+    publisherPageFetchLimit: 6,
     automaticPublishing: AUTO_PUBLISH,
     results
   };
