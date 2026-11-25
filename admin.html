@@ -235,7 +235,7 @@ body.light .theme-toggle {
 #photo{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 #previewWrap{display:none;position:relative;width:min(100%,720px);margin:12px 0}
 #preview{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:12px}
-#wfWatermarkPreview{display:none;position:absolute;right:14px;bottom:14px;align-items:center;gap:6px;padding:7px 10px;border-radius:7px;background:rgba(5,15,35,.72);color:#fff;font:800 13px/1 Arial,sans-serif;letter-spacing:.2px;text-shadow:0 1px 2px #000}
+#wfWatermarkPreview{display:none;position:absolute;left:14px;top:14px;align-items:center;gap:6px;padding:7px 10px;border-radius:7px;background:rgba(5,15,35,.72);color:#fff;font:800 13px/1 Arial,sans-serif;letter-spacing:.2px;text-shadow:0 1px 2px #000}
 #wfWatermarkPreview .verified{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#168cff;color:#fff;font-size:11px}
 .watermark-option{display:flex;align-items:center;gap:9px;margin:12px 0;color:var(--text);font-size:13px}
 .watermark-option input{width:17px;height:17px;accent-color:#168cff}
@@ -717,7 +717,7 @@ Official Club Website — https://example.com"></textarea>
       <input id="applyWfWatermark" type="checkbox">
       Add WF Pundit watermark to this photo
     </label>
-    <p class="watermark-note">Optional. The watermark is permanently applied only to a photo you upload after selecting this option. The original file remains unchanged.</p>
+    <p class="watermark-note">Optional. Adds the WF Pundit wordmark and blue verified tick in the upper-left corner of an authorised photo you upload. The original file remains unchanged.</p>
     <div id="previewWrap">
       <img id="preview" alt="Article image preview">
       <div id="wfWatermarkPreview" aria-hidden="true">
@@ -1267,7 +1267,7 @@ async function makeWatermarkedPhoto(file) {
   ctx.font = "800 " + fontSize + "px Arial, sans-serif";
   const word = "wf_pundit", wordWidth = ctx.measureText(word).width;
   const pillW = pad * 2 + wordWidth + gap + badge, pillH = pad * 2 + badge;
-  const margin = Math.round(bitmap.width * 0.018), x = bitmap.width - pillW - margin, y = bitmap.height - pillH - margin;
+  const margin = Math.round(bitmap.width * 0.018), x = margin, y = margin;
   ctx.fillStyle = "rgba(5,15,35,0.72)";
   const radius = Math.round(pillH * 0.22); ctx.beginPath(); ctx.roundRect(x, y, pillW, pillH, radius); ctx.fill();
   ctx.fillStyle = "#ffffff"; ctx.textBaseline = "middle"; ctx.fillText(word, x + pad, y + pillH / 2);
