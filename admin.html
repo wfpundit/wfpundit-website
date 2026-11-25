@@ -220,7 +220,7 @@ body.light .theme-toggle {
   border-radius:8px;
 }
 
-#title{font-weight:900;letter-spacing:.02em}
+#title{font-weight:900;letter-spacing:.02em;text-transform:uppercase}
 #summary{font-style:italic;line-height:1.65}
 .editor-toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:9px 0}
 .editor-toolbar button{background:linear-gradient(135deg,#2878dc,#1554a6);border:1px solid #5595e8;border-radius:9px;padding:10px 14px;font-size:12px;font-weight:900;box-shadow:0 5px 14px #0002}
@@ -389,6 +389,7 @@ body.light .theme-toggle {
   </p>
   <div id="collectedNewsDiagnostics" class="article-meta" aria-live="polite"></div>
   <div id="collectedNewsList"></div>
+  <div class="actions"><button type="button" class="secondary hidden" id="loadMoreCollectedNewsButton">LOAD MORE STORIES</button></div>
 </section>
 
 <section class="panel">
@@ -409,6 +410,13 @@ body.light .theme-toggle {
     </div>
     <p class="editor-help">Highlight the words you want to link, then tap Insert Link. You can add unlimited links anywhere in the article.</p>
     <textarea id="content" rows="9"></textarea>
+
+    <label for="sourceExcerpt">Publisher Article Excerpt (Reference Only)</label>
+    <textarea id="sourceExcerpt" rows="7" readonly
+      placeholder="A short source excerpt will appear here when the publisher makes content available. Rewrite facts in your own words before publishing."></textarea>
+    <p class="editor-help">
+      This is a short reference excerpt, not copy for republication. Write your own original WF Pundit article in the Article Content field above.
+    </p>
 
     <label for="source">News Sources (Maximum 4)</label>
     <textarea id="source" rows="5" maxlength="12000" placeholder="BBC Sport — https://www.bbc.com/sport
@@ -587,14 +595,60 @@ const subcategory = $("subcategory");
 const form = $("articleForm");
 const message = $("message");
 
+/* FREE, RULE-BASED DRAFT BUILDER — NO EXTERNAL AI API */
+function buildAutomaticDraft(story) {
+  const title = String(story.title || "").trim();
+  const summary = String(story.summary || "").replace(/\\s+/g, " ").trim().slice(0, 900);
+  const sourceName = String(story.sourceName || "the original publisher").trim();
+  const sourceUrl = String(story.sourceUrl || "").trim();
+  const date = story.publishedAt && !Number.isNaN(Date.parse(story.publishedAt))
+    ? new Date(story.publishedAt).toLocaleDateString()
+    : "";
+
+  const paragraphs = [];
+  if (title) {
+    paragraphs.push(title.toLocaleUpperCase() + ".");
+  }
+  if (summary) {
+    paragraphs.push("The available report from " + sourceName + " states: " + summary);
+  } else {
+    paragraphs.push("The collected headline indicates a developing women's-football story, but the feed did not provide enough supporting detail for a complete report.");
+  }
+  if (date) {
+    paragraphs.push("The source lists " + date + " as the publication or discovery date. Confirm the original publication date before this report is published.");
+  }
+  paragraphs.push("WF Pundit is treating this as an initial report. Confirm the key details against the original source and, where possible, an official club, league or player statement. Add independently verified context, relevant reactions and any confirmed updates before publication.");
+  paragraphs.push("EDITORIAL CHECK REQUIRED: This automatically assembled draft is a starting point, not a fully researched or independently written report. Do not add unverified scores, quotes, dates, injuries, transfer details or other claims. Keep the article as a draft until an editor has checked every detail.");
+  if (sourceUrl) paragraphs.push("Source for verification: " + sourceUrl);
+  return paragraphs.join("\\n\\n");
+}
+
 /* COLLECTED NEWS: LOAD TEST CANDIDATES INTO THE EXISTING EDITOR */
 
 $("loadCollectedNewsButton").addEventListener("click", loadCollectedNews);
+
+let collectedNewsVisibleLimit = 6;
+function refreshCollectedNewsPagination() {
+  const cards = [...$("collectedNewsList").querySelectorAll(".article[data-candidate-id]")];
+  cards.forEach((card, index) => {
+    card.classList.toggle("hidden", index >= collectedNewsVisibleLimit);
+  });
+  const more = $("loadMoreCollectedNewsButton");
+  const remaining = Math.max(0, cards.length - collectedNewsVisibleLimit);
+  more.classList.toggle("hidden", remaining === 0);
+  more.textContent = remaining ? "LOAD MORE STORIES (" + remaining + " LEFT)" : "LOAD MORE STORIES";
+}
+$("loadMoreCollectedNewsButton").addEventListener("click", () => {
+  collectedNewsVisibleLimit += 6;
+  refreshCollectedNewsPagination();
+});
 
 async function loadCollectedNews() {
   const status = $("collectedNewsStatus");
   const list = $("collectedNewsList");
   const diagnosticsBox = $("collectedNewsDiagnostics");
+  const moreButton = $("loadMoreCollectedNewsButton");
+  moreButton.classList.add("hidden");
 
   if (!getToken()) {
     status.textContent = "Enter your admin token first.";
@@ -677,9 +731,10 @@ async function loadCollectedNews() {
       matching.forEach(candidate => {
         const card = document.createElement("article");
         card.className = "article";
+        card.dataset.candidateId = String(candidate.id || "");
 
         const title = document.createElement("h3");
-        title.textContent = candidate.title || "Untitled story";
+        title.textContent = (candidate.title || "Untitled story").toLocaleUpperCase();
 
         const meta = document.createElement("div");
         meta.className = "article-meta";
@@ -710,29 +765,67 @@ async function loadCollectedNews() {
         actions.className = "actions";
         actions.appendChild(sourceLink);
 
+        const excerptStatus = document.createElement("p");
+        excerptStatus.className = "muted";
+        excerptStatus.textContent = candidate.article_excerpt
+          ? "Source content excerpt loaded automatically."
+          : "No readable publisher excerpt was available; use the RSS summary and original link.";
+
         if (category.key === "ready_for_editorial_review") {
           const useButton = document.createElement("button");
           useButton.type = "button";
           useButton.className = "small";
-          useButton.textContent = "Use in Article Editor";
+          useButton.textContent = "LOAD STORY INTO EDITOR";
           useButton.addEventListener("click", () => {
             $("articleId").value = "";
-            $("title").value = candidate.title || "";
+            $("title").value = String(candidate.title || "").toLocaleUpperCase();
             $("summary").value = candidate.description || "";
-            $("content").value = "";
-            $("source").value = candidate.source_name + " — " + candidate.url;
+            $("content").value = buildAutomaticDraft({
+              title: candidate.title || "",
+              summary: candidate.description || "",
+              sourceName: candidate.source_name || "Original publisher",
+              sourceUrl: candidate.url || "",
+              publishedAt: candidate.published_at || candidate.discovered_at || "",
+              excerptAvailable: Boolean(candidate.article_excerpt)
+            });
+            $("sourceExcerpt").value = candidate.article_excerpt
+              ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + candidate.article_excerpt
+              : "No readable publisher excerpt was retrieved. The draft uses only the RSS summary and headline. Open the original story and verify the details.";
+            $("source").value = (candidate.source_name || "Original publisher") + " — " + candidate.url;
+            applySuggestedCategory(candidate.title || "", candidate.description || "");
             $("status").value = "draft";
             $("author").value = $("author").value.trim() || "WF Pundit";
-            $("formHeading").textContent = "Review Collected Story";
+            $("formHeading").textContent = "Collected Story — Write Original Article";
             $("saveButton").textContent = "SAVE AS DRAFT";
             $("cancelButton").classList.remove("hidden");
-            $("content").focus();
-            $("collectedNewsStatus").textContent =
-              "Story added as a draft. Verify the source and write the article before saving.";
+            $("collectedNewsStatus").textContent = "Story details loaded. Use the source excerpt only for reference and write an original WF Pundit article.";
             $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
           });
           actions.appendChild(useButton);
         }
+
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "small danger";
+        deleteButton.textContent = "DELETE STORY";
+        deleteButton.addEventListener("click", async () => {
+          if (!confirm("Delete this collected story from the review queue? This will not delete any published article.")) return;
+          deleteButton.disabled = true;
+          try {
+            const response = await fetch("/api/admin/collected-news?id=" + encodeURIComponent(candidate.id), {
+              method: "DELETE", headers: authHeaders(), cache: "no-store"
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error(result.error || "Could not delete story.");
+            card.remove();
+            $("collectedNewsStatus").textContent = "Collected story deleted. Published articles are unaffected.";
+            refreshCollectedNewsPagination();
+          } catch (error) {
+            $("collectedNewsStatus").textContent = error.message;
+            deleteButton.disabled = false;
+          }
+        });
+        actions.appendChild(deleteButton);
 
         const flags = Array.isArray(candidate.editorial_flags?.flags)
           ? candidate.editorial_flags.flags
@@ -742,15 +835,17 @@ async function loadCollectedNews() {
           flagText.className = "muted";
           flagText.textContent = "Checks: " + flags.join(", ");
           card.appendChild(title);
-          card.append(meta, description, flagText, actions);
+          card.append(meta, description, excerptStatus, flagText, actions);
         } else {
-          card.append(title, meta, description, actions);
+          card.append(title, meta, description, excerptStatus, actions);
         }
         section.appendChild(card);
       });
 
       list.appendChild(section);
     });
+
+    refreshCollectedNewsPagination();
 
     const unrecognised = candidates.filter(candidate =>
       !categories.some(category => category.key === candidate.editorial_status)
@@ -851,6 +946,49 @@ const subcategories = {
     "UEFA Women's Nations League"
   ]
 };
+
+function applySuggestedCategory(titleText = "", descriptionText = "") {
+  const text = (titleText + " " + descriptionText).toLowerCase();
+
+  if (/\b(uwcl|uefa women's champions league|women's champions league)\b/.test(text)) {
+    category.value = "Women's Champions League (UWCL)";
+    updateSubcategories();
+    return;
+  }
+
+  if (/\b(wafcon|women's africa cup of nations|fifa women's world cup|women's world cup|women's euros|uefa women's euros|women's nations league|afc women's asian cup|copa américa femenina|olympic women's football)\b/.test(text)) {
+    category.value = "International Football";
+    updateSubcategories();
+    return;
+  }
+
+  const leagues = [
+    ["Women's Super League (WSL)", /\b(wsl|women's super league|barclays wsl)\b/],
+    ["Women's Championship", /\b(women's championship|women's championship england)\b/],
+    ["NWSL", /\b(nwsl|national women's soccer league)\b/],
+    ["Liga F", /\b(liga f|liga femenina)\b/],
+    ["Première Ligue", /\b(première ligue|arkema)\b/],
+    ["Serie A Femminile", /\b(serie a femminile|serie a women)\b/],
+    ["Bundesliga Women", /\b(frauen-bundesliga|frauen bundesliga|bundesliga women)\b/],
+    ["A-League Women", /\b(a-league women|a league women)\b/],
+    ["Liga MX Femenil", /\b(liga mx femenil)\b/],
+    ["WE League", /\b(we league)\b/],
+    ["Damallsvenskan", /\b(damallsvenskan)\b/],
+    ["Toppserien", /\b(toppserien)\b/]
+  ];
+
+  const league = leagues.find(([, pattern]) => pattern.test(text));
+  if (league) {
+    category.value = "Women's Leagues";
+    updateSubcategories(league[0]);
+    return;
+  }
+
+  category.value = /\b(transfer|signs for|signing|joins|loan move|contract extension)\b/.test(text)
+    ? "Transfers"
+    : "Latest News";
+  updateSubcategories();
+}
 
 function updateSubcategories(selected = "") {
   subcategory.innerHTML = '<option value="">No subcategory</option>';
@@ -1034,6 +1172,7 @@ function resetForm() {
   $("formHeading").textContent = "Create New Article";
   $("saveButton").textContent = "PUBLISH ARTICLE";
   $("source").value = "";
+  $("sourceExcerpt").value = "";
   $("cancelButton").classList.add("hidden");
   setPreview("");
   updateSubcategories();
@@ -1068,7 +1207,7 @@ form.addEventListener("submit", async event => {
   }
 
   const article = {
-    title: $("title").value.trim(),
+    title: $("title").value.trim().toLocaleUpperCase(),
     summary: $("summary").value,
     content: $("content").value,
     source: sourceText,
@@ -1171,7 +1310,7 @@ function displayArticles(articles) {
     card.className = "article";
 
     const title = document.createElement("h3");
-    title.textContent = article.title || "Untitled article";
+    title.textContent = (article.title || "Untitled article").toLocaleUpperCase();
 
     const meta = document.createElement("div");
     meta.className = "article-meta";
@@ -1217,9 +1356,10 @@ function displayArticles(articles) {
 
 function editArticle(article) {
   $("articleId").value = article.id;
-  $("title").value = article.title || "";
+  $("title").value = (article.title || "").toLocaleUpperCase();
   $("summary").value = article.summary || "";
   $("content").value = article.content || "";
+  $("sourceExcerpt").value = "";
 
   $("source").value = article.source_url
     ? (article.source || "") + " — " + article.source_url
