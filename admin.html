@@ -885,7 +885,7 @@ $("loadCollectedNewsButton").addEventListener("click", loadCollectedNews);
 /* FREE, RULE-BASED DRAFT BUILDER — NO PAID AI API */
 function buildAutomaticDraft(story) {
   const title = String(story.title || "").trim();
-  const summary = String(story.summary || "").replace(/\s+/g, " ").trim().slice(0, 900);
+  const summary = String(story.summary || "").replace(/\s+/g, " ").trim().slice(0, 3000);
   const sourceName = String(story.sourceName || "the original publisher").trim();
   const sourceUrl = String(story.sourceUrl || "").trim();
   const date = story.publishedAt && !Number.isNaN(Date.parse(story.publishedAt))
