@@ -13,7 +13,7 @@ function json(data, status = 200) {
 const BBC_HOSTS = ["bbc.com", "bbc.co.uk", "bbci.co.uk", "bbc.net.uk", "bbcmedia.co.uk"];
 
 function isBbcHost(hostname) {
-  const host = String(hostname || "").toLowerCase().replace(/\\.$/, "");
+  const host = String(hostname || "").toLowerCase().replace(/\.$/, "");
   return BBC_HOSTS.some(domain => host === domain || host.endsWith("." + domain));
 }
 
