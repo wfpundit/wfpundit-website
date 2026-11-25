@@ -709,6 +709,29 @@ async function getDiagnostics(env) {
   });
 }
 
+async function deleteNonRssCandidates(env) {
+  await ensureDatabase(env);
+  const approvedRssNames = RSS_FEEDS
+    .filter(feed => feed.enabled !== false)
+    .map(feed => feed.name)
+    .filter(Boolean);
+  if (!approvedRssNames.length) {
+    return json({ success: false, error: "No approved RSS feeds are configured; no records were deleted." }, 409);
+  }
+  const placeholders = approvedRssNames.map(() => "?").join(", ");
+  const result = await env.DB.prepare(
+    `DELETE FROM wf_news_candidates
+     WHERE source_name IS NULL
+        OR TRIM(source_name) = ''
+        OR source_name NOT IN (${placeholders})`
+  ).bind(...approvedRssNames).run();
+  return json({
+    success: true,
+    deletedCount: Number(result.meta?.changes || 0),
+    preservedRssSources: approvedRssNames
+  });
+}
+
 async function deleteCandidate(env, request) {
   await ensureDatabase(env);
   const url = new URL(request.url);
@@ -799,7 +822,7 @@ export default {
     }
     if (path === "/diagnostics" && request.method === "GET") return await getDiagnostics(env);
     if (path === "/candidates" && request.method === "GET") return await getCandidates(env, request);
-    if (path === "/candidates" && request.method === "DELETE") return await deleteCandidate(env, request);
+    if (path === "/candidates" && request.method === "DELETE" && new URL(request.url).searchParams.get("scope") === "non-rss") return await deleteNonRssCandidates(env);\n    if (path === "/candidates" && request.method === "DELETE") return await deleteCandidate(env, request);
     if (path === "/candidates" && request.method === "PATCH") return await markCandidateReviewed(env, request);
     return json({ error: "Route not found" }, 404);
   },
