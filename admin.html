@@ -233,6 +233,13 @@ body.light .theme-toggle {
 #uploadButton{background:linear-gradient(135deg,#13a6c7,#1769e8);border:1px solid #55c5e5}
 #saveButton{background:linear-gradient(135deg,#2679e8,#124aa0);border:1px solid #68a5f5}
 #photo{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+#previewWrap{display:none;position:relative;width:min(100%,720px);margin:12px 0}
+#preview{display:block;width:100%;max-height:420px;object-fit:contain;border-radius:12px}
+#wfWatermarkPreview{display:none;position:absolute;right:14px;bottom:14px;align-items:center;gap:6px;padding:7px 10px;border-radius:7px;background:rgba(5,15,35,.72);color:#fff;font:800 13px/1 Arial,sans-serif;letter-spacing:.2px;text-shadow:0 1px 2px #000}
+#wfWatermarkPreview .verified{display:inline-grid;place-items:center;width:16px;height:16px;border-radius:50%;background:#168cff;color:#fff;font-size:11px}
+.watermark-option{display:flex;align-items:center;gap:9px;margin:12px 0;color:var(--text);font-size:13px}
+.watermark-option input{width:17px;height:17px;accent-color:#168cff}
+.watermark-note{margin:-4px 0 12px;color:var(--muted);font-size:11px;line-height:1.5}
 
 .hidden {display:none!important}
 
@@ -706,7 +713,17 @@ Official Club Website — https://example.com"></textarea>
       <button type="button" id="uploadButton">CHOOSE &amp; UPLOAD PHOTO</button>
     </div>
 
-    <img id="preview" alt="Article image preview">
+    <label class="watermark-option" for="applyWfWatermark">
+      <input id="applyWfWatermark" type="checkbox">
+      Add WF Pundit watermark to this photo
+    </label>
+    <p class="watermark-note">Optional. The watermark is permanently applied only to a photo you upload after selecting this option. The original file remains unchanged.</p>
+    <div id="previewWrap">
+      <img id="preview" alt="Article image preview">
+      <div id="wfWatermarkPreview" aria-hidden="true">
+        <span>wf_pundit</span><span class="verified">✓</span>
+      </div>
+    </div>
 
     <label for="imageUrl">Featured Image URL</label>
     <input id="imageUrl" type="url" placeholder="Uploaded image URL">
@@ -900,8 +917,6 @@ async function loadCollectedNews() {
       sourceLink.textContent = "Open original story";
       sourceLink.className = "muted";
 
-      let generatedImagePrompt = "";
-
       const useButton = document.createElement("button");
       useButton.type = "button";
       useButton.className = "small secondary";
@@ -945,11 +960,6 @@ async function loadCollectedNews() {
           }
 
           const article = result.article;
-          generatedImagePrompt = article.image_prompt || "";
-          photoButton.disabled = !generatedImagePrompt;
-          photoButton.title = generatedImagePrompt
-            ? "Generate a matching editorial image"
-            : "No image prompt was returned";
           $("articleId").value = "";
           $("title").value = article.title || candidate.title || "";
           $("summary").value = article.summary || candidate.description || "";
@@ -960,7 +970,7 @@ async function loadCollectedNews() {
           $("status").value = "draft";
           $("author").value = "WF Pundit";
           $("imageUrl").value = "";
-          generatedImageDataUrl = "";
+
           setPreview("");
           $("formHeading").textContent = "AI-Generated Article · Review Before Saving";
           $("saveButton").textContent = "SAVE AS DRAFT";
@@ -983,35 +993,47 @@ async function loadCollectedNews() {
       const photoButton = document.createElement("button");
       photoButton.type = "button";
       photoButton.className = "small secondary";
-      photoButton.textContent = "GENERATE AI PHOTO";
-      photoButton.disabled = true;
-      photoButton.title = "Generate the article first";
+      photoButton.textContent = "FIND ORIGINAL PHOTO";
+      photoButton.title = "Look for the original article's featured photograph";
       photoButton.addEventListener("click", async () => {
-        if (!generatedImagePrompt || !adminSessionReady) return;
+        if (!adminSessionReady) return;
         photoButton.disabled = true;
-        photoButton.textContent = "GENERATING PHOTO...";
-        $("collectedNewsStatus").textContent = "Creating an editorial image. This may take a little while...";
+        photoButton.textContent = "SEARCHING...";
+        status.textContent = "Checking the original article for its featured photograph...";
         try {
-          const response = await fetch("/api/admin/generate-image", {
+          const response = await fetch("/api/admin/find-original-image", {
             method: "POST",
             credentials: "same-origin",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ prompt: generatedImagePrompt })
+            body: JSON.stringify({ url: candidate.url })
           });
           const result = await response.json();
-          if (!response.ok || !result.success || !result.image_data) {
-            throw new Error(result.error || "AI photo generation failed.");
+          if (!response.ok || !result.success || !result.image_url) {
+            throw new Error(result.error || "No original article photograph was found.");
           }
-          generatedImageDataUrl = "data:" + (result.mime_type || "image/png") + ";base64," + result.image_data;
-          setPreview(generatedImageDataUrl);
+          const approved = confirm(
+            "An image was found on the original article.\n\n" +
+            "Finding an image does not grant reuse rights. Confirm that WF Pundit has permission or a licence to reproduce it.\n\n" +
+            "Have you confirmed permission to use this photograph?"
+          );
+          if (!approved) {
+            status.textContent = "Image found but not selected. Confirm reuse rights before using it.";
+            return;
+          }
+          if (!$("title").value.trim()) $("title").value = candidate.title || "";
+          if (!$("summary").value.trim()) $("summary").value = candidate.description || "";
+          if (!$("source").value.trim()) $("source").value = candidate.source_name + " — " + candidate.url;
+          $("status").value = "draft";
+          $("imageUrl").value = result.image_url;
+          setPreview(result.image_url);
           $("collectedNewsStatus").textContent =
-            "AI photo generated and attached to the editor preview. It will be uploaded when you save the article.";
+            "Original image selected for editorial review. Check its licence and attribution requirements again before publication.";
           $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
         } catch (error) {
-          $("collectedNewsStatus").textContent = error.message;
+          status.textContent = error.message;
         } finally {
           photoButton.disabled = false;
-          photoButton.textContent = "GENERATE AI PHOTO";
+          photoButton.textContent = "FIND ORIGINAL PHOTO";
         }
       });
 
@@ -1230,19 +1252,51 @@ function showMessage(text, isError = false) {
   message.style.color = isError ? "#ff6677" : "#35c98a";
 }
 
+let previewCanBeWatermarked = false;
+
 function setPreview(url) {
   const preview = $("preview");
+  const wrap = $("previewWrap");
+  const mark = $("wfWatermarkPreview");
+  if (url) { preview.src = url; wrap.style.display = "block"; }
+  else { preview.removeAttribute("src"); wrap.style.display = "none"; }
+  mark.style.display = $("applyWfWatermark").checked && url && previewCanBeWatermarked ? "flex" : "none";
+}
 
-  if (url) {
-    preview.src = url;
-    preview.style.display = "block";
-  } else {
-    preview.removeAttribute("src");
-    preview.style.display = "none";
-  }
+$("applyWfWatermark").addEventListener("change", () => {
+  $("wfWatermarkPreview").style.display = $("applyWfWatermark").checked && $("preview").src && previewCanBeWatermarked ? "flex" : "none";
+});
+
+async function makeWatermarkedPhoto(file) {
+  if (!$("applyWfWatermark").checked) return file;
+  const bitmap = await createImageBitmap(file);
+  const canvas = document.createElement("canvas");
+  canvas.width = bitmap.width; canvas.height = bitmap.height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Could not prepare the watermark.");
+  ctx.drawImage(bitmap, 0, 0);
+  const fontSize = Math.max(16, Math.round(bitmap.width * 0.022));
+  const pad = Math.round(fontSize * 0.55), badge = Math.round(fontSize * 1.12), gap = Math.round(fontSize * 0.35);
+  ctx.font = "800 " + fontSize + "px Arial, sans-serif";
+  const word = "wf_pundit", wordWidth = ctx.measureText(word).width;
+  const pillW = pad * 2 + wordWidth + gap + badge, pillH = pad * 2 + badge;
+  const margin = Math.round(bitmap.width * 0.018), x = bitmap.width - pillW - margin, y = bitmap.height - pillH - margin;
+  ctx.fillStyle = "rgba(5,15,35,0.72)";
+  const radius = Math.round(pillH * 0.22); ctx.beginPath(); ctx.roundRect(x, y, pillW, pillH, radius); ctx.fill();
+  ctx.fillStyle = "#ffffff"; ctx.textBaseline = "middle"; ctx.fillText(word, x + pad, y + pillH / 2);
+  const cx = x + pad + wordWidth + gap + badge / 2, cy = y + pillH / 2;
+  ctx.beginPath(); ctx.arc(cx, cy, badge / 2, 0, Math.PI * 2); ctx.fillStyle = "#168cff"; ctx.fill();
+  ctx.strokeStyle = "#ffffff"; ctx.lineWidth = Math.max(2, badge * 0.12); ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.beginPath(); ctx.moveTo(cx - badge * 0.22, cy); ctx.lineTo(cx - badge * 0.05, cy + badge * 0.18); ctx.lineTo(cx + badge * 0.25, cy - badge * 0.2); ctx.stroke();
+  bitmap.close();
+  const type = file.type === "image/png" ? "image/png" : file.type === "image/webp" ? "image/webp" : "image/jpeg";
+  const blob = await new Promise((resolve, reject) => canvas.toBlob(result => result ? resolve(result) : reject(new Error("Could not export the watermarked photo.")), type, 0.94));
+  const extension = type === "image/png" ? "png" : type === "image/webp" ? "webp" : "jpg";
+  return new File([blob], file.name.replace(/\.[^.]+$/, "") + "-wf-pundit." + extension, { type });
 }
 
 $("imageUrl").addEventListener("input", () => {
+  previewCanBeWatermarked = false;
   setPreview($("imageUrl").value.trim());
 });
 
@@ -1250,6 +1304,7 @@ $("photo").addEventListener("change", () => {
   const file = $("photo").files[0];
 
   if (file) {
+    previewCanBeWatermarked = true;
     setPreview(URL.createObjectURL(file));
     uploadSelectedPhoto();
   }
@@ -1278,7 +1333,9 @@ async function uploadSelectedPhoto() {
 
   try {
     const data = new FormData();
-    data.append("photo", file);
+    showMessage($("applyWfWatermark").checked ? "Applying WF Pundit watermark and uploading photo..." : "Uploading photo...");
+    const uploadFile = await makeWatermarkedPhoto(file);
+    data.append("photo", uploadFile, uploadFile.name);
 
     const response = await fetch("/api/upload-image", {
       method: "POST",
@@ -1301,8 +1358,9 @@ async function uploadSelectedPhoto() {
     }
 
     $("imageUrl").value = uploadedUrl;
+    previewCanBeWatermarked = false;
     setPreview(uploadedUrl);
-    showMessage("Photo uploaded successfully.");
+    showMessage($("applyWfWatermark").checked ? "Watermarked photo uploaded. The original file was not changed." : "Photo uploaded successfully.");
 
   } catch (error) {
     showMessage(error.message, true);
@@ -1315,13 +1373,12 @@ async function uploadSelectedPhoto() {
 
 /* FORM RESET */
 
-let generatedImageDataUrl = "";
-
 function resetForm() {
-  generatedImageDataUrl = "";
   form.reset();
   $("articleId").value = "";
   $("author").value = "WF Pundit";
+  $("applyWfWatermark").checked = false;
+  $("wfWatermarkPreview").style.display = "none";
   $("formHeading").textContent = "Create New Article";
   $("saveButton").textContent = "PUBLISH ARTICLE";
   $("source").value = "";
@@ -1381,23 +1438,6 @@ form.addEventListener("submit", async event => {
   showMessage(id ? "Updating article..." : "Creating article...");
 
   try {
-    if (generatedImageDataUrl) {
-      const imageBlob = await fetch(generatedImageDataUrl).then(response => response.blob());
-      const imageForm = new FormData();
-      imageForm.append("photo", imageBlob, "wf-pundit-ai-editorial.png");
-      const uploadResponse = await fetch("/api/upload-image", {
-        method: "POST",
-        credentials: "same-origin",
-        body: imageForm
-      });
-      const uploadResult = await uploadResponse.json();
-      if (!uploadResponse.ok || !uploadResult.success || !uploadResult.image_url) {
-        throw new Error(uploadResult.error || "The generated photo could not be uploaded.");
-      }
-      article.image_url = uploadResult.image_url;
-      $("imageUrl").value = uploadResult.image_url;
-      generatedImageDataUrl = "";
-    }
 
     const response = await fetch("/api/admin/articles", {
       method: id ? "PUT" : "POST",
