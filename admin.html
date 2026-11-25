@@ -411,6 +411,13 @@ body.light .theme-toggle {
     <p class="editor-help">Highlight the words you want to link, then tap Insert Link. You can add unlimited links anywhere in the article.</p>
     <textarea id="content" rows="9"></textarea>
 
+    <label for="sourceExcerpt">Publisher Article Excerpt (Reference Only)</label>
+    <textarea id="sourceExcerpt" rows="7" readonly
+      placeholder="A short source excerpt will appear here when the publisher makes content available. Rewrite facts in your own words before publishing."></textarea>
+    <p class="editor-help">
+      This is a short reference excerpt, not copy for republication. Write your own original WF Pundit article in the Article Content field above.
+    </p>
+
     <label for="source">News Sources (Maximum 4)</label>
     <textarea id="source" rows="5" maxlength="12000" placeholder="BBC Sport — https://www.bbc.com/sport
 The Guardian — https://www.theguardian.com
@@ -730,48 +737,34 @@ async function loadCollectedNews() {
         actions.className = "actions";
         actions.appendChild(sourceLink);
 
+        const excerptStatus = document.createElement("p");
+        excerptStatus.className = "muted";
+        excerptStatus.textContent = candidate.article_excerpt
+          ? "Publisher content excerpt loaded automatically."
+          : "No readable publisher excerpt was available; use the RSS summary and original link.";
+
         if (category.key === "ready_for_editorial_review") {
           const useButton = document.createElement("button");
           useButton.type = "button";
           useButton.className = "small";
-          useButton.textContent = "GENERATE AI ARTICLE";
-          useButton.addEventListener("click", async () => {
-            useButton.disabled = true;
-            useButton.textContent = "WRITING ARTICLE...";
-            $("collectedNewsStatus").textContent = "AI is preparing an original draft. Please wait...";
-            try {
-              const response = await fetch("/api/admin/generate-article", {
-                method: "POST",
-                headers: { ...authHeaders(), "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  title: candidate.title || "",
-                  description: candidate.description || "",
-                  source_name: candidate.source_name || "",
-                  source_url: candidate.url || "",
-                  published_at: candidate.published_at || ""
-                })
-              });
-              const result = await response.json();
-              if (!response.ok || !result.success) throw new Error(result.error || "AI article generation failed.");
-              $("articleId").value = "";
-              $("title").value = String(result.article.title || candidate.title || "").toLocaleUpperCase();
-              $("summary").value = result.article.summary || candidate.description || "";
-              $("content").value = result.article.content || "";
-              $("source").value = (candidate.source_name || "Original publisher") + " — " + candidate.url;
-              applySuggestedCategory(candidate.title || "", candidate.description || "");
-              $("status").value = "draft";
-              $("author").value = $("author").value.trim() || "WF Pundit";
-              $("formHeading").textContent = "AI-Generated Draft — Review Before Publishing";
-              $("saveButton").textContent = "SAVE AS DRAFT";
-              $("cancelButton").classList.remove("hidden");
-              $("collectedNewsStatus").textContent = "AI draft created. Check every detail against the original source before saving or publishing.";
-              $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
-            } catch (error) {
-              $("collectedNewsStatus").textContent = error.message;
-            } finally {
-              useButton.disabled = false;
-              useButton.textContent = "GENERATE AI ARTICLE";
-            }
+          useButton.textContent = "LOAD STORY INTO EDITOR";
+          useButton.addEventListener("click", () => {
+            $("articleId").value = "";
+            $("title").value = String(candidate.title || "").toLocaleUpperCase();
+            $("summary").value = candidate.description || "";
+            $("content").value = "";
+            $("sourceExcerpt").value = candidate.article_excerpt
+              ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + candidate.article_excerpt
+              : "No readable publisher excerpt was retrieved. Open the original story and verify the details before writing.";
+            $("source").value = (candidate.source_name || "Original publisher") + " — " + candidate.url;
+            applySuggestedCategory(candidate.title || "", candidate.description || "");
+            $("status").value = "draft";
+            $("author").value = $("author").value.trim() || "WF Pundit";
+            $("formHeading").textContent = "Collected Story — Write Original Article";
+            $("saveButton").textContent = "SAVE AS DRAFT";
+            $("cancelButton").classList.remove("hidden");
+            $("collectedNewsStatus").textContent = "Story details loaded. Use the source excerpt only for reference and write an original WF Pundit article.";
+            $("articleForm").scrollIntoView({ behavior: "smooth", block: "start" });
           });
           actions.appendChild(useButton);
         }
@@ -807,9 +800,9 @@ async function loadCollectedNews() {
           flagText.className = "muted";
           flagText.textContent = "Checks: " + flags.join(", ");
           card.appendChild(title);
-          card.append(meta, description, flagText, actions);
+          card.append(meta, description, excerptStatus, flagText, actions);
         } else {
-          card.append(title, meta, description, actions);
+          card.append(title, meta, description, excerptStatus, actions);
         }
         section.appendChild(card);
       });
@@ -1144,6 +1137,7 @@ function resetForm() {
   $("formHeading").textContent = "Create New Article";
   $("saveButton").textContent = "PUBLISH ARTICLE";
   $("source").value = "";
+  $("sourceExcerpt").value = "";
   $("cancelButton").classList.add("hidden");
   setPreview("");
   updateSubcategories();
@@ -1330,6 +1324,7 @@ function editArticle(article) {
   $("title").value = (article.title || "").toLocaleUpperCase();
   $("summary").value = article.summary || "";
   $("content").value = article.content || "";
+  $("sourceExcerpt").value = "";
 
   $("source").value = article.source_url
     ? (article.source || "") + " — " + article.source_url
