@@ -981,11 +981,11 @@ async function loadCollectedNews() {
           const sourceName = candidate.source_name || "Original source";
           const sourceUrl = candidate.url;
           const generatedBody = String(article.content || "").trim();
-          const sourceLinkLine = "Source: [" + sourceName.replace(/[\\[\\]]/g, "") +
-            " — original report] (" + sourceUrl + ")";
-          const bodyHasSourceLink = /\\[[^\\]]+\\]\\(https:\\/\\//.test(generatedBody);
+          const safeSourceLabel = sourceName.replace(/[\[\]]/g, "");
+          const sourceLinkLine = "Source: [" + safeSourceLabel + " — original report](" + sourceUrl + ")";
+          const bodyHasSourceLink = /\[[^\]]+\]\(https:\/\//.test(generatedBody);
           $("content").value = generatedBody +
-            (bodyHasSourceLink ? "" : "\\n\\n" + sourceLinkLine.replace("] (", "](" ));
+            (bodyHasSourceLink ? "" : "\n\n" + sourceLinkLine);
           $("source").value = article.source || (sourceName + " — " + sourceUrl);
           $("category").value = article.category || "Latest News";
           updateSubcategories(article.subcategory || "");
