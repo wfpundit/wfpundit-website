@@ -975,6 +975,7 @@ async function loadCollectedNews() {
         photo.alt = "Source photo for " + (candidate.title || "collected story");
         photo.loading = "lazy";
         photo.referrerPolicy = "no-referrer";
+        photo.addEventListener("error", () => photo.remove(), { once: true });
         card.appendChild(photo);
       }
 
@@ -992,12 +993,6 @@ async function loadCollectedNews() {
       const description = document.createElement("p");
       description.className = "muted";
       description.textContent = candidate.description || "No summary supplied by the source.";
-
-      const excerptStatus = document.createElement("p");
-      excerptStatus.className = "muted";
-      excerptStatus.textContent = candidate.article_excerpt
-        ? "Publisher reference excerpt available."
-        : "No additional publisher excerpt was available; the draft will use the RSS summary.";
 
       const sourceLink = document.createElement("a");
       sourceLink.href = candidate.url;
@@ -1025,7 +1020,7 @@ async function loadCollectedNews() {
         });
         $("sourceExcerpt").value = candidate.article_excerpt
           ? "REFERENCE ONLY — DO NOT REPUBLISH VERBATIM\n\n" + candidate.article_excerpt
-          : "No readable publisher excerpt was retrieved. The draft uses only the RSS summary and headline. Open the original story and verify the details.";
+          : "";
         $("source").value = (candidate.source_name || "Original publisher") + " — " + candidate.url;
         $("category").value = suggestCollectedStoryCategory(candidate.title, candidate.description);
         updateSubcategories("");
@@ -1071,13 +1066,7 @@ async function loadCollectedNews() {
       const actions = document.createElement("div");
       actions.className = "actions";
       actions.append(sourceLink, useButton, deleteButton);
-      const photoRights = document.createElement("p");
-      photoRights.className = "muted";
-      photoRights.textContent = candidate.image_url
-        ? "Source photo loaded automatically. Confirm WF Pundit has permission to publish it before using it."
-        : "No usable photo was supplied in this feed item.";
-
-      card.append(title, meta, description, excerptStatus, photoRights, actions);
+      card.append(title, meta, description, actions);
       list.appendChild(card);
     });
     refreshCollectedNewsPagination();
