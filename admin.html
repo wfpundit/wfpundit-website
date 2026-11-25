@@ -1332,7 +1332,7 @@ function setPreview(url) {
   const mark = $("wfWatermarkPreview");
   if (url) { preview.src = url; wrap.style.display = "block"; }
   else { preview.removeAttribute("src"); wrap.style.display = "none"; }
-  mark.style.display = $("applyWfWatermark").checked && url && previewCanBeWatermarked ? "flex" : "none";
+  mark.style.display = $("applyWfWatermark").checked && $("photoRightsConfirmed").checked && url && previewCanBeWatermarked ? "flex" : "none";
 }
 
 function updateWatermarkPreview() {
