@@ -190,6 +190,57 @@ function matchesTopic(title, description) {
   return ARTICLE_KEYWORDS.some(keyword => text.includes(keyword.toLowerCase()));
 }
 
+const LEAGUE_SUBCATEGORIES = [
+  ["Women's Super League (WSL)", /\b(wsl|women's super league|barclays women's super league)\b/i],
+  ["Women's Championship", /\b(women's championship|wsl 2)\b/i],
+  ["NWSL", /\b(nwsl|national women's soccer league)\b/i],
+  ["Liga F", /\bliga f\b/i],
+  ["Première Ligue", /\b(première ligue|premiere ligue|arkema)\b/i],
+  ["Serie A Femminile", /\bserie a femminile|serie a women\b/i],
+  ["Bundesliga Women", /\b(frauen[- ]bundesliga|bundesliga women|google pixel frauen)\b/i],
+  ["A-League Women", /\ba[- ]league women\b/i],
+  ["Liga MX Femenil", /\bliga mx femenil\b/i],
+  ["WE League", /\bwe league\b/i],
+  ["Damallsvenskan", /\bdamallsvenskan\b/i],
+  ["Toppserien", /\btoppserien\b/i]
+];
+const INTERNATIONAL_SUBCATEGORIES = [
+  ["FIFA Women's World Cup", /\b(world cup|fifa women's world cup)\b/i],
+  ["UEFA Women's Euros", /\b(women's euros|uefa women's euro|euro 202[0-9])\b/i],
+  ["Women's Africa Cup of Nations (WAFCON)", /\b(wafcon|afcon women|women's africa cup of nations)\b/i],
+  ["Olympic Women's Football", /\b(olympic women's football|women's olympic)\b/i],
+  ["AFC Women's Asian Cup", /\b(afc women's asian cup|women's asian cup)\b/i],
+  ["Copa América Femenina", /\b(copa am[eé]rica femenina)\b/i],
+  ["UEFA Women's Nations League", /\b(women's nations league|uefa women's nations league)\b/i]
+];
+function classifyCandidate(title = "", description = "") {
+  const text = (title + " " + description).toLowerCase();
+  let category = "Latest News";
+  let subcategory = "";
+  const league = LEAGUE_SUBCATEGORIES.find(([, pattern]) => pattern.test(text));
+  const international = INTERNATIONAL_SUBCATEGORIES.find(([, pattern]) => pattern.test(text));
+  if (/\b(transfer|signs? for|joins?|loan deal|contract extension|in talks|linked with)\b/i.test(text)) {
+    category = "Transfers";
+    subcategory = league?.[0] || "Multiple leagues / unspecified";
+  } else if (/\b(uefa women's champions league|women's champions league|uwcl)\b/i.test(text)) {
+    category = "Women's Champions League (UWCL)";
+    subcategory = "UEFA Women's Champions League";
+  } else if (international || /\b(national team|international break|qualifier|qualifying)\b/i.test(text)) {
+    category = "International Football";
+    subcategory = international?.[0] || "";
+  } else if (league) {
+    category = "Women's Leagues";
+    subcategory = league[0];
+  } else if (/\b(match report|full[- ]?time|defeats?|beats?|draw|victory|match reaction|post[- ]match analysis|analysis)\b/i.test(text)) {
+    category = "Match Reports & Analysis";
+    subcategory = league?.[0] || (international?.[0] || "");
+  } else if (/\b(interview|exclusive|sits down|speaks to| Q&A|profile|feature)\b/i.test(text)) {
+    category = "Interviews & Features";
+    subcategory = league?.[0] || (international?.[0] || "");
+  }
+  return { mainCategory: category, subcategory };
+}
+
 function getAtomLink(entry) {
   const links = entry.match(/<link\b[^>]*\/?>/gi) || [];
   const preferred = links.find(link => {
@@ -240,6 +291,7 @@ function parseFeed(xml, feed) {
     return {
       title, description, articleExcerpt, imageUrl, link, publishedAt,
       sourceName, sourceRegion: feed.region,
+      ...classifyCandidate(title, description),
       discoveredAt: new Date().toISOString()
     };
   }).filter(Boolean);
@@ -386,7 +438,9 @@ async function ensureDatabase(env) {
       published_at TEXT, discovered_at TEXT NOT NULL,
       status TEXT NOT NULL DEFAULT 'new', created_at TEXT NOT NULL,
       article_excerpt TEXT DEFAULT '',
-      image_url TEXT DEFAULT ''
+      image_url TEXT DEFAULT '',
+      main_category TEXT NOT NULL DEFAULT 'Latest News',
+      subcategory TEXT NOT NULL DEFAULT ''
     )
   `).run();
 
@@ -403,6 +457,12 @@ async function ensureDatabase(env) {
   }
   if (!names.has("image_url")) {
     await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN image_url TEXT DEFAULT ''").run();
+  }
+  if (!names.has("main_category")) {
+    await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN main_category TEXT NOT NULL DEFAULT 'Latest News'").run();
+  }
+  if (!names.has("subcategory")) {
+    await env.DB.prepare("ALTER TABLE wf_news_candidates ADD COLUMN subcategory TEXT NOT NULL DEFAULT ''").run();
   }
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_status ON wf_news_candidates(status)").run();
   await env.DB.prepare("CREATE INDEX IF NOT EXISTS idx_wf_news_candidates_editorial_status ON wf_news_candidates(editorial_status)").run();
@@ -442,11 +502,12 @@ async function saveCandidate(env, item, contentBudget) {
       UPDATE wf_news_candidates
       SET title = ?, description = ?, source_name = ?, source_region = ?,
           published_at = ?, editorial_status = ?, editorial_flags = ?,
+          main_category = ?, subcategory = ?,
           article_excerpt = CASE WHEN ? <> '' THEN ? ELSE article_excerpt END,
           image_url = CASE WHEN ? <> '' THEN ? ELSE image_url END
       WHERE id = ?
     `).bind(item.title, item.description, item.sourceName, item.sourceRegion,
-      item.publishedAt, editorial.status, flags, articleExcerpt, articleExcerpt,
+      item.publishedAt, editorial.status, flags, item.mainCategory || "Latest News", item.subcategory || "", articleExcerpt, articleExcerpt,
       imageUrl, imageUrl, existing.id).run();
     return {
       inserted: false, editorialStatus: editorial.status,
@@ -458,10 +519,12 @@ async function saveCandidate(env, item, contentBudget) {
   const result = await env.DB.prepare(`
     INSERT INTO wf_news_candidates (
       title, description, url, source_name, source_region, published_at,
-      discovered_at, status, created_at, editorial_status, editorial_flags, article_excerpt, image_url
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?)
+      discovered_at, status, created_at, editorial_status, editorial_flags, article_excerpt, image_url,
+      main_category, subcategory
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, 'new', ?, ?, ?, ?, ?, ?, ?)
   `).bind(item.title, item.description, item.link, item.sourceName, item.sourceRegion,
-    item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags, articleExcerpt, imageUrl).run();
+    item.publishedAt, item.discoveredAt, item.discoveredAt, editorial.status, flags, articleExcerpt, imageUrl,
+    item.mainCategory || "Latest News", item.subcategory || "").run();
 
   return {
     inserted: result.meta.changes > 0,
