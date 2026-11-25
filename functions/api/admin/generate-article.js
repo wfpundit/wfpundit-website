@@ -1,6 +1,6 @@
 import { adminAuthorised } from "../_auth.js";
 
-const MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast";
+const MODEL = "gpt-6-luna";
 const CATEGORY_SUBCATEGORIES = {
   "Latest News": [],
   "Women's Leagues": [
@@ -192,10 +192,10 @@ export async function onRequestPost({ request, env }) {
     return json({ success: false, error: "Unauthorised" }, 401);
   }
 
-  if (!env.AI || typeof env.AI.run !== "function") {
+  if (!env.OPENAI_API_KEY) {
     return json({
       success: false,
-      error: "Workers AI is not available. Check that the Pages AI binding is named AI, then redeploy."
+      error: "OpenAI GPT is not connected yet. Add OPENAI_API_KEY as a Cloudflare Pages secret, then redeploy."
     }, 503);
   }
 
@@ -275,13 +275,70 @@ export async function onRequestPost({ request, env }) {
       }
     ];
 
-    const result = await env.AI.run(MODEL, {
-      messages,
-      max_tokens: 2300,
-      temperature: 0.25
+    const openAiResponse = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + env.OPENAI_API_KEY,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        reasoning: { effort: "none" },
+        instructions: messages[0].content,
+        input: messages[1].content,
+        max_output_tokens: 2300,
+        store: false,
+        text: {
+          format: {
+            type: "json_schema",
+            name: "wf_pundit_editorial_draft",
+            strict: true,
+            schema: {
+              type: "object",
+              properties: {
+                title: { type: "string" },
+                summary: { type: "string" },
+                content: { type: "string" },
+                category: { type: "string", enum: ALLOWED_CATEGORIES },
+                subcategory: {
+                  type: "string",
+                  enum: ["", ...new Set(Object.values(CATEGORY_SUBCATEGORIES).flat())]
+                },
+                image_prompt: { type: "string" },
+                fact_check_notes: { type: "string" }
+              },
+              required: ["title", "summary", "content", "category", "subcategory", "image_prompt", "fact_check_notes"],
+              additionalProperties: false
+            }
+          }
+        }
+      }),
+      signal: AbortSignal.timeout(45000)
     });
 
-    const generated = parseModelJson(result);
+    const result = await openAiResponse.json().catch(() => null);
+    if (!openAiResponse.ok || !result) {
+      console.error("WF Pundit OpenAI request failed:", openAiResponse.status);
+      return json({
+        success: false,
+        error: openAiResponse.status === 401
+          ? "The OpenAI API key was rejected. Check the OPENAI_API_KEY Cloudflare secret."
+          : openAiResponse.status === 429
+            ? "OpenAI is busy or the API usage limit has been reached. Please try again later."
+            : "GPT could not generate this article. Please try again."
+      }, openAiResponse.status === 429 ? 429 : 502);
+    }
+
+    let responseText = typeof result.output_text === "string" ? result.output_text : "";
+    if (!responseText) {
+      responseText = (result.output || [])
+        .filter(item => item.type === "message" && Array.isArray(item.content))
+        .flatMap(item => item.content)
+        .filter(part => part.type === "output_text" && typeof part.text === "string")
+        .map(part => part.text)
+        .join("\\n");
+    }
+    const generated = parseModelJson(responseText);
     const articleTitle = String(generated.title || title).trim().toLocaleUpperCase("en-GB").slice(0, 220);
     const summary = String(generated.summary || description).trim().slice(0, 700);
     const content = String(generated.content || "").trim().slice(0, 18000);
