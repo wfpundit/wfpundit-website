@@ -740,7 +740,7 @@ async function loadCollectedNews() {
         const excerptStatus = document.createElement("p");
         excerptStatus.className = "muted";
         excerptStatus.textContent = candidate.article_excerpt
-          ? "Publisher content excerpt loaded automatically."
+          ? "Source content excerpt loaded automatically."
           : "No readable publisher excerpt was available; use the RSS summary and original link.";
 
         if (category.key === "ready_for_editorial_review") {
