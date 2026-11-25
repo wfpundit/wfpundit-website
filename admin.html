@@ -1430,7 +1430,7 @@ $("watermarkRemoteButton").addEventListener("click", async () => {
     showMessage("Confirm that you own this photo or have permission to modify it.", true);
     return;
   }
-  if (!/^https:\\/\\//i.test(url)) {
+  if (!url.toLowerCase().startsWith("https://")) {
     showMessage("Load a secure HTTPS image URL first.", true);
     return;
   }
