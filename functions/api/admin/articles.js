@@ -1,6 +1,43 @@
-
 import { notifyPublishedArticle } from "../_notifications.js";
 import { adminAuthorised } from "../_auth.js";
+
+const INDEXNOW_KEY = "7d4c9a2e6f1b8d305a7c9e2f4b6d8130";
+
+async function submitIndexNow(articleId) {
+  const articleUrl =
+    "https://www.wfpundit.uk/article.html?id=" +
+    encodeURIComponent(articleId);
+
+  try {
+    const response = await fetch("https://api.indexnow.org/indexnow", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8"
+      },
+      body: JSON.stringify({
+        host: "www.wfpundit.uk",
+        key: INDEXNOW_KEY,
+        keyLocation:
+          "https://www.wfpundit.uk/" + INDEXNOW_KEY + ".txt",
+        urlList: [articleUrl]
+      })
+    });
+
+    if (!response.ok) {
+      console.error(
+        "WF Pundit IndexNow submission failed:",
+        response.status,
+        await response.text()
+      );
+      return;
+    }
+
+    console.log("WF Pundit IndexNow notification accepted:", articleUrl);
+  } catch (error) {
+    // Search-engine notification must never prevent an article from publishing.
+    console.error("WF Pundit IndexNow request failed:", error);
+  }
+}
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -219,13 +256,14 @@ export async function onRequestPost({ request, env }) {
 
     const articleId = result.meta.last_row_id;
 
-    // Notify readers only when the article is published.
+    // Notify readers and search engines only after publication.
     if (status === "published") {
       await notifyPublishedArticle(env, {
         id: articleId,
         title,
         summary: data.summary || ""
       });
+      await submitIndexNow(articleId);
     }
 
     return json({
@@ -333,16 +371,18 @@ export async function onRequestPut({ request, env }) {
       }, 404);
     }
 
-    // Notify only when an existing draft becomes published.
-    if (
-      existing.status !== "published" &&
-      status === "published"
-    ) {
-      await notifyPublishedArticle(env, {
-        id,
-        title,
-        summary: data.summary || ""
-      });
+    if (status === "published") {
+      // Notify readers only when an existing draft becomes published.
+      if (existing.status !== "published") {
+        await notifyPublishedArticle(env, {
+          id,
+          title,
+          summary: data.summary || ""
+        });
+      }
+
+      // Notify search engines when a published article is new or updated.
+      await submitIndexNow(id);
     }
 
     return json({
