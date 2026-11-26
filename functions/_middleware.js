@@ -34,7 +34,7 @@ export async function onRequest({ request, env, next }) {
             const image = /^https:\/\//i.test(String(article.image_url || "")) ? String(article.image_url).trim() : "";
             const rawPublished = String(article.created_at || "").trim().replace(" ", "T");
             const published = rawPublished
-              ? new Date(/(?:Z|[+-]\\d{2}:\\d{2})$/i.test(rawPublished) ? rawPublished : rawPublished + "Z")
+              ? new Date(/(?:Z|[+-]\d{2}:\d{2})$/i.test(rawPublished) ? rawPublished : rawPublished + "Z")
               : null;
             const datePublished = published && !Number.isNaN(published.getTime()) ? published.toISOString() : undefined;
 
