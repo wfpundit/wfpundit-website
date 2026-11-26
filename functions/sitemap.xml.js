@@ -17,7 +17,7 @@ export async function onRequestGet({ env }) {
         const rawDate = String(article.created_at || "").trim();
         const normalizedDate = rawDate.replace(" ", "T");
         const date = normalizedDate
-          ? new Date(/(?:Z|[+-]\\d{2}:\\d{2})$/i.test(normalizedDate) ? normalizedDate : normalizedDate + "Z")
+          ? new Date(/(?:Z|[+-]\d{2}:\d{2})$/i.test(normalizedDate) ? normalizedDate : normalizedDate + "Z")
           : null;
         const lastmod = date && !Number.isNaN(date.getTime())
           ? `<lastmod>${date.toISOString().slice(0, 10)}</lastmod>`
