@@ -31,8 +31,11 @@ export async function onRequest({ request, env, next }) {
             const canonical = `https://www.wfpundit.uk/article.html?id=${article.id}`;
             const title = String(article.title || "Women's Football News").trim();
             const description = String(article.summary || article.title || "Read the latest women's football news, reports and analysis from WF Pundit.").trim().slice(0, 300);
-            const image = /^https:\/\//i.test(String(article.image_url || "")) ? String(article.image_url).trim() : "https://www.wfpundit.uk/og-image.jpg";
-            const published = article.created_at ? new Date(String(article.created_at).replace(" ", "T") + (String(article.created_at).endsWith("Z") ? "" : "Z")) : null;
+            const image = /^https:\/\//i.test(String(article.image_url || "")) ? String(article.image_url).trim() : "";
+            const rawPublished = String(article.created_at || "").trim().replace(" ", "T");
+            const published = rawPublished
+              ? new Date(/(?:Z|[+-]\\d{2}:\\d{2})$/i.test(rawPublished) ? rawPublished : rawPublished + "Z")
+              : null;
             const datePublished = published && !Number.isNaN(published.getTime()) ? published.toISOString() : undefined;
 
             const escapeHtml = value => String(value).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -52,7 +55,7 @@ export async function onRequest({ request, env, next }) {
               "description": description,
               "mainEntityOfPage": canonical,
               "url": canonical,
-              "image": [image],
+              ...(image ? { "image": [image] } : {}),
               "publisher": { "@type": "Organization", "name": "WF Pundit", "url": "https://www.wfpundit.uk/" },
               ...(article.author ? { "author": { "@type": "Person", "name": String(article.author) } } : {}),
               ...(datePublished ? { "datePublished": datePublished } : {})
@@ -67,11 +70,9 @@ export async function onRequest({ request, env, next }) {
 <meta property="og:title" content="${safeTitle}">
 <meta property="og:description" content="${safeDescription}">
 <meta property="og:url" content="${safeCanonical}">
-<meta property="og:image" content="${safeImage}">
-<meta name="twitter:card" content="summary_large_image">
+${image ? `<meta property="og:image" content="${safeImage}">\n<meta name="twitter:card" content="summary_large_image">\n<meta name="twitter:image" content="${safeImage}">` : `<meta name="twitter:card" content="summary">`}
 <meta name="twitter:title" content="${safeTitle}">
 <meta name="twitter:description" content="${safeDescription}">
-<meta name="twitter:image" content="${safeImage}">
 <script type="application/ld+json">${jsonLd}</script>`;
 
             document = document.replace(/<\/head>/i, seoTags + "\n</head>");
