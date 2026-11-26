@@ -15,7 +15,10 @@ export async function onRequestGet({ env }) {
       ...results.map(article => {
         const loc = `${SITE}/article.html?id=${encodeURIComponent(article.id)}`;
         const rawDate = String(article.created_at || "").trim();
-        const date = rawDate ? new Date(rawDate.replace(" ", "T") + (rawDate.endsWith("Z") ? "" : "Z")) : null;
+        const normalizedDate = rawDate.replace(" ", "T");
+        const date = normalizedDate
+          ? new Date(/(?:Z|[+-]\\d{2}:\\d{2})$/i.test(normalizedDate) ? normalizedDate : normalizedDate + "Z")
+          : null;
         const lastmod = date && !Number.isNaN(date.getTime())
           ? `<lastmod>${date.toISOString().slice(0, 10)}</lastmod>`
           : "";
