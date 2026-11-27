@@ -44,6 +44,7 @@ input:focus{border-color:var(--cyan)}
 body.light-mode{--bg:#f1f4f8;--panel:#fff;--line:#dce3ec;--text:#1c2939;--muted:#66758a}
 body.light-mode .tabs button,body.light-mode input,body.light-mode .saved-item{background:#fff;color:#1c2939;border-color:#cbd5e1}
 body.light-mode label{color:#34445c}
+.policy-consent{display:flex;align-items:flex-start;gap:10px;margin:17px 0 19px;font-size:12px;line-height:1.65;color:var(--muted);font-weight:600}.policy-consent input{width:17px;height:17px;flex:0 0 17px;margin:2px 0 0;accent-color:#3978c8}.policy-consent a{color:var(--cyan);text-decoration:underline;text-underline-offset:3px}.policy-consent a:hover{color:#fff}
 [hidden]{display:none!important}
 @media(max-width:600px){.card{padding:20px}}
 </style>
@@ -98,6 +99,11 @@ body.light-mode label{color:#34445c}
 
         <label for="confirmPassword">Confirm password</label>
         <input id="confirmPassword" type="password" autocomplete="new-password" required minlength="12" maxlength="128">
+
+        <label class="policy-consent" for="accountPolicyConsent">
+          <input id="accountPolicyConsent" type="checkbox" required>
+          <span>I agree to the <a href="/terms-of-service.html" target="_blank" rel="noopener">Terms of Service</a> and acknowledge that I have read the <a href="/privacy-policy.html" target="_blank" rel="noopener">Privacy Policy</a>.</span>
+        </label>
 
         <button class="submit" type="submit">CREATE ACCOUNT</button>
       </form>
@@ -243,11 +249,19 @@ async function sendRequest(url, data) {
 
 async function handleGoogleCredential(response) {
   message.className = "message";
+  const mode = registerForm.hidden ? "login" : "register";
+  const policyConsent = document.getElementById("accountPolicyConsent");
+
+  if (mode === "register" && !policyConsent.checked) {
+    showMessage("Please agree to the Terms of Service and acknowledge the Privacy Policy before creating your account.");
+    return;
+  }
 
   try {
     const result = await sendRequest("/api/google-auth", {
       credential: response.credential,
-      mode: registerForm.hidden ? "login" : "register"
+      mode,
+      policyConsent: mode === "register" && policyConsent.checked
     });
     displayUser(result.user);
   } catch (error) {
@@ -446,7 +460,8 @@ registerForm.addEventListener("submit", async event => {
     const result = await sendRequest("/api/register", {
       displayName:document.getElementById("displayName").value,
       email:document.getElementById("registerEmail").value,
-      password
+      password,
+      policyConsent: document.getElementById("accountPolicyConsent").checked
     });
     displayUser(result.user);
   } catch (error) {
