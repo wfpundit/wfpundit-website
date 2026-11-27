@@ -2115,10 +2115,10 @@ $("newsletterTemplate").addEventListener("change", () => {
   if ($("newsletterTemplate").value === "christmas") {
     newsletterSubject.value = "Merry Christmas from WF Pundit!";
     newsletterMessage.value =
-      "Merry Christmas from all of us at WF Pundit! 🎄\\n\\n" +
-      "As the year draws to a close, thank you for reading, sharing and supporting our coverage of women's football. Your support means a great deal to us.\\n\\n" +
-      "We wish you and your loved ones a joyful Christmas and a wonderful festive season. We look forward to bringing you more of the stories, moments and people shaping the women's game.\\n\\n" +
-      "Warm wishes,\\nThe WF Pundit Team";
+      "Merry Christmas from all of us at WF Pundit! 🎄\n\n" +
+      "As the year draws to a close, thank you for reading, sharing and supporting our coverage of women's football. Your support means a great deal to us.\n\n" +
+      "We wish you and your loved ones a joyful Christmas and a wonderful festive season. We look forward to bringing you more of the stories, moments and people shaping the women's game.\n\n" +
+      "Warm wishes,\nThe WF Pundit Team";
     $("newsletterCharCount").textContent = newsletterMessage.value.length;
     updateNewsletterPreview();
     setNewsletterStatus("Christmas greeting template loaded. Personalise it before sending.");
