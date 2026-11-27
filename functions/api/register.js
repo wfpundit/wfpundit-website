@@ -2,6 +2,26 @@
 import { createSession, hashPassword, json, readJson, validOrigin } from "./_auth.js";
 import { sendWelcomeEmail } from "./_welcome-email.js";
 
+async function ensurePolicyConsentColumns(env) {
+  const columns = [
+    ["terms_accepted_at", "TEXT"],
+    ["privacy_acknowledged_at", "TEXT"],
+    ["policy_version", "TEXT"],
+    ["policy_consent_method", "TEXT"]
+  ];
+
+  for (const [column, definition] of columns) {
+    try {
+      await env.DB.prepare(`ALTER TABLE reader_accounts ADD COLUMN ${column} ${definition}`).run();
+    } catch (error) {
+      if (!String(error.message || error).toLowerCase().includes("duplicate column")) {
+        throw error;
+      }
+    }
+  }
+}
+
+
 export async function onRequestPost({ request, env }) {
   if (!validOrigin(request)) {
     return json({ success: false, error: "Request could not be verified." }, 403);
@@ -18,6 +38,10 @@ export async function onRequestPost({ request, env }) {
   const email = String(data.email || "").trim().toLowerCase();
   const password = typeof data.password === "string" ? data.password : "";
 
+  if (data.policyConsent !== true) {
+    return json({ success: false, error: "Please agree to the Terms of Service and acknowledge the Privacy Policy before creating your account." }, 400);
+  }
+
   if (displayName.length < 2 || displayName.length > 50) {
     return json({ success: false, error: "Enter a name between 2 and 50 characters." }, 400);
   }
@@ -31,6 +55,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   try {
+    await ensurePolicyConsentColumns(env);
     const existingAccount = await env.DB.prepare(
       "SELECT id FROM reader_accounts WHERE lower(email) = ? LIMIT 1"
     ).bind(email).first();
@@ -44,10 +69,18 @@ export async function onRequestPost({ request, env }) {
 
     const passwordHash = await hashPassword(password);
 
+    const acceptedAt = new Date().toISOString();
     const result = await env.DB.prepare(`
-      INSERT INTO reader_accounts (email, password_hash, display_name)
-      VALUES (?, ?, ?)
-    `).bind(email, passwordHash, displayName).run();
+      INSERT INTO reader_accounts (
+        email, password_hash, display_name,
+        terms_accepted_at, privacy_acknowledged_at,
+        policy_version, policy_consent_method
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `).bind(
+      email, passwordHash, displayName,
+      acceptedAt, acceptedAt, "1.0", "email"
+    ).run();
 
     const session = await createSession(result.meta.last_row_id, env);
 
