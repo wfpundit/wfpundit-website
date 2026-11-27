@@ -63,9 +63,9 @@ export async function ensureNotificationTables(env) {
 }
 
 async function sendArticleEmail(env, user, article, articleUrl) {
-  if (!env.RESEND_API_KEY || !env.RESEND_FROM_EMAIL) {
+  if (!env.RESEND_API_KEY) {
     console.warn(
-      "Article email not sent: configure RESEND_API_KEY and RESEND_FROM_EMAIL."
+      "Article email not sent: configure RESEND_API_KEY."
     );
     return false;
   }
@@ -83,7 +83,8 @@ async function sendArticleEmail(env, user, article, articleUrl) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      from: env.RESEND_FROM_EMAIL,
+      from: env.RESEND_NEWSLETTER_FROM_EMAIL ||
+        "WF Pundit Newsletter <newsletter@wfpundit.uk>",
       to: [user.email],
       subject: "New story on WF Pundit: " + article.title,
       html: `
