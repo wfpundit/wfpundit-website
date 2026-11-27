@@ -1,4 +1,4 @@
-const SITE_URL = "https://wfpundit.pages.dev";
+const SITE_URL = "https://wfpundit.uk";
 
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, character => ({
