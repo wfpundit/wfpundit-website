@@ -775,6 +775,13 @@ Official Club Website — https://example.com"></textarea>
     Every campaign includes an unsubscribe link.
   </div>
 
+  <label for="newsletterTemplate">Newsletter template</label>
+  <select id="newsletterTemplate">
+    <option value="standard">Standard WF Pundit newsletter</option>
+    <option value="christmas">Christmas greeting · 25 December</option>
+  </select>
+  <p class="editor-help">Choose a starting layout. You can edit the subject and message freely before previewing and sending.</p>
+
   <label for="newsletterSubject">Email subject</label>
   <input id="newsletterSubject" type="text" maxlength="150"
     placeholder="e.g. This week's women's football headlines"
@@ -856,6 +863,12 @@ Official Club Website — https://example.com"></textarea>
     <h3 id="newsletterPreviewSubject" class="newsletter-preview-subject"></h3>
     <div id="newsletterPreviewBody" class="newsletter-preview-body"></div>
     <div id="newsletterPreviewButtons" class="newsletter-preview-ctas"></div>
+    <div class="newsletter-feedback-preview" style="margin-top:22px;padding:17px;border-top:1px solid var(--border);background:rgba(40,120,220,.06);border-radius:9px">
+      <strong>Help us make WF Pundit better.</strong>
+      <p style="margin:8px 0;line-height:1.6">Have a suggestion, spotted something we could improve, or have an idea for a story you'd like us to cover? We'd love to hear from you.</p>
+      <p style="margin:0;line-height:1.6">Share your thoughts with us at <a href="mailto:support@wfpundit.uk" style="color:#2878dc;font-weight:700">support@wfpundit.uk</a>.</p>
+      <p style="margin:8px 0 0;font-size:12px;color:var(--muted)">Your feedback helps us deliver better women's football coverage.</p>
+    </div>
     <p class="muted" style="margin:16px 0 0">
       WF Pundit · You are receiving this because you subscribed to our newsletter.
     </p>
@@ -2097,6 +2110,20 @@ function updateNewsletterPreview() {
 
   return true;
 }
+
+$("newsletterTemplate").addEventListener("change", () => {
+  if ($("newsletterTemplate").value === "christmas") {
+    newsletterSubject.value = "Merry Christmas from WF Pundit!";
+    newsletterMessage.value =
+      "Merry Christmas from all of us at WF Pundit! 🎄\\n\\n" +
+      "As the year draws to a close, thank you for reading, sharing and supporting our coverage of women's football. Your support means a great deal to us.\\n\\n" +
+      "We wish you and your loved ones a joyful Christmas and a wonderful festive season. We look forward to bringing you more of the stories, moments and people shaping the women's game.\\n\\n" +
+      "Warm wishes,\\nThe WF Pundit Team";
+    $("newsletterCharCount").textContent = newsletterMessage.value.length;
+    updateNewsletterPreview();
+    setNewsletterStatus("Christmas greeting template loaded. Personalise it before sending.");
+  }
+});
 
 newsletterMessage.addEventListener("input", () => {
   $("newsletterCharCount").textContent =
