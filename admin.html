@@ -584,6 +584,37 @@ label{font-size:12px;letter-spacing:.015em}
   .panel,.admin-shortcuts a,button{transition:none}
 }
 
+
+/* CHRISTMAS EMAIL PREVIEW — NATIVITY BACKDROP, BOKEH & GOLDEN SPARKLE */
+.wf-christmas-preview{position:relative;isolation:isolate;overflow:hidden;border:1px solid rgba(238,202,125,.55);border-radius:16px;background:radial-gradient(circle at 12% 15%,rgba(255,220,142,.25),transparent 20%),radial-gradient(circle at 90% 22%,rgba(255,255,255,.16),transparent 18%),linear-gradient(145deg,#07172b,#102d49 58%,#411e2d);color:#fff;box-shadow:0 18px 38px rgba(7,18,36,.28)}
+.wf-christmas-heading{position:relative;z-index:2;padding:25px 18px 19px;text-align:center;background:linear-gradient(180deg,rgba(4,15,31,.34),rgba(4,15,31,.05))}
+.wf-christmas-kicker{color:#f6d994;font-size:10px;font-weight:950;letter-spacing:3px}
+.wf-christmas-title{margin:12px 0 7px;font-family:Georgia,serif;font-size:clamp(25px,5vw,34px);font-weight:bold;line-height:1.12;text-shadow:0 3px 16px #0008}
+.wf-christmas-subtitle{font-size:12px;color:#f7e9d1}
+.wf-christmas-nativity{position:relative;min-height:250px;display:flex;align-items:center;justify-content:center;overflow:hidden;background-image:linear-gradient(180deg,rgba(3,12,26,.48),rgba(3,12,26,.72)),url("https://commons.wikimedia.org/wiki/Special:FilePath/Nativity_display_of_Joseph,_Mary,_and_Jesus.jpg");background-position:center;background-size:cover}
+.wf-nativity-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 44%,rgba(248,201,107,.12),transparent 42%),linear-gradient(90deg,rgba(4,13,27,.18),rgba(4,13,27,.48),rgba(4,13,27,.18))}
+.wf-nativity-copy{position:relative;z-index:2;max-width:440px;padding:30px 22px;text-align:center;text-shadow:0 2px 12px #000}
+.wf-nativity-label{margin-bottom:12px;color:#f6d994;font-size:10px;font-weight:950;letter-spacing:3px}
+.wf-nativity-message{font-family:Georgia,serif;font-size:clamp(20px,4vw,27px);line-height:1.3;color:#fff}
+.wf-gold-dust{position:absolute;z-index:3;bottom:13px;left:0;width:100%;color:#f7d887;text-align:center;font-size:17px;letter-spacing:3px;text-shadow:0 0 12px #ffd66d;animation:wfGoldTwinkle 2.8s ease-in-out infinite}
+.wf-santa-photo{position:relative;margin:12px 12px 0;overflow:hidden;border:1px solid rgba(246,217,148,.5);border-radius:11px}
+.wf-santa-photo img{display:block;width:100%;height:170px;object-fit:cover;object-position:center 38%}
+.wf-santa-photo span{position:absolute;left:0;right:0;bottom:0;padding:11px;text-align:center;color:#ffe8ad;font-size:10px;font-weight:950;letter-spacing:3px;background:linear-gradient(transparent,rgba(4,12,24,.82))}
+.wf-christmas-footer{padding:17px 12px 19px;text-align:center;color:#f8e9c8;font-size:12px}
+.wf-christmas-sparkles{position:absolute;z-index:4;inset:0;pointer-events:none;color:#ffe6a1}
+.wf-christmas-sparkles i{position:absolute;font-style:normal;text-shadow:0 0 9px #ffdf83,0 0 18px #e9b84e;animation:wfSparkle 2.2s ease-in-out infinite}
+.wf-christmas-sparkles i:nth-child(1){top:12%;left:9%;font-size:18px}
+.wf-christmas-sparkles i:nth-child(2){top:25%;right:8%;font-size:22px;animation-delay:.6s}
+.wf-christmas-sparkles i:nth-child(3){top:58%;left:6%;font-size:15px;animation-delay:1.1s}
+.wf-christmas-sparkles i:nth-child(4){top:72%;right:13%;font-size:24px;animation-delay:.3s}
+.wf-christmas-sparkles i:nth-child(5){top:44%;right:5%;font-size:14px;animation-delay:1.4s}
+.wf-christmas-sparkles i:nth-child(6){top:86%;left:18%;font-size:17px;animation-delay:.8s}
+.wf-christmas-sparkles i:nth-child(7){top:8%;right:35%;font-size:13px;animation-delay:1.7s}
+.wf-christmas-sparkles i:nth-child(8){top:64%;left:45%;font-size:12px;animation-delay:1s}
+@keyframes wfSparkle{0%,100%{opacity:.28;transform:scale(.65) rotate(0)}50%{opacity:1;transform:scale(1.25) rotate(24deg)}}
+@keyframes wfGoldTwinkle{0%,100%{opacity:.5;filter:brightness(.9)}50%{opacity:1;filter:brightness(1.5)}}
+@media(prefers-reduced-motion:reduce){.wf-christmas-sparkles i,.wf-gold-dust{animation:none}}
+
 </style>
 </head>
 
@@ -804,7 +835,7 @@ Official Club Website — https://example.com"></textarea>
     <p class="newsletter-button-title">Christmas media (optional)</p>
     <p class="editor-help">Music and video open through separate links. Email apps generally block autoplay and embedded video.</p>
     <label for="newsletterMusicUrl">Music link — Hark! The Herald Angels Sing</label>
-    <input id="newsletterMusicUrl" type="url" maxlength="2048" value="https://commons.wikimedia.org/wiki/Special:Redirect/file/U.S._Army_Band_-_Hark!_The_Herald_Angels_Sing.ogg" placeholder="https://...">
+    <input id="newsletterMusicUrl" type="url" maxlength="2048" value="https://music.apple.com/us/album/joy-to-the-world-single/1858863739" placeholder="https://...">
     <label for="newsletterVideoUrl">Christmas video link</label>
     <input id="newsletterVideoUrl" type="url" maxlength="2048" value="https://www.youtube.com/watch?v=rOFrCuydQHM" placeholder="Paste a video link (YouTube or another HTTPS page)">
   </div>
@@ -2078,17 +2109,12 @@ function updateNewsletterPreview() {
   const body = newsletterMessage.value.trim();
 
   if (!subject || !body) {
-    setNewsletterStatus(
-      "Enter both a subject and a message before previewing.",
-      true
-    );
-
+    setNewsletterStatus("Enter both a subject and a message before previewing.", true);
     newsletterPreview.classList.add("hidden");
     return false;
   }
 
   let buttons;
-
   try {
     buttons = collectNewsletterButtons();
   } catch (error) {
@@ -2098,7 +2124,6 @@ function updateNewsletterPreview() {
   }
 
   $("newsletterPreviewSubject").textContent = subject;
-
   const selectedTemplate = $("newsletterTemplate").value;
   const mediaBox = $("newsletterPreviewDesign");
   const safeMediaUrl = value => {
@@ -2111,19 +2136,22 @@ function updateNewsletterPreview() {
 
   if (selectedTemplate === "christmas") {
     const hero = document.createElement("div");
-    hero.style.cssText = "overflow:hidden;border-radius:14px;background:linear-gradient(135deg,#07182e,#173c59 58%,#6b2635);color:#fff;box-shadow:0 12px 28px #07182e33";
+    hero.className = "wf-christmas-preview";
     hero.innerHTML =
-      '<div style="padding:22px 18px 12px;text-align:center"><div style="font-size:11px;font-weight:900;letter-spacing:3px;color:#f5d98b">WF PUNDIT · CHRISTMAS 2026</div><div style="font-family:Georgia,serif;font-size:29px;font-weight:bold;line-height:1.15;margin:12px 0 7px">A season of joy<br>and togetherness</div><div style="font-size:13px;color:#f4e9d4">Warm wishes from our newsroom to you</div></div>' +
-      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 12px 16px"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Claus_for_Christmas.jpg" alt="Father Christmas" style="width:100%;height:145px;object-fit:cover;border-radius:9px"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Nativity_display_of_Joseph,_Mary,_and_Jesus.jpg" alt="Mary, Joseph and baby Jesus in the manger" style="width:100%;height:145px;object-fit:cover;border-radius:9px"></div>' +
-      '<div style="padding:0 12px 18px;text-align:center;color:#f7e8c5;font-size:12px">May your Christmas be filled with peace, hope and joy ✨</div>';
+      '<div class="wf-christmas-sparkles" aria-hidden="true"><i>✦</i><i>✧</i><i>✦</i><i>·</i><i>✧</i><i>✦</i><i>·</i><i>✧</i></div>' +
+      '<div class="wf-christmas-heading"><div class="wf-christmas-kicker">WF PUNDIT · CHRISTMAS 2026</div><div class="wf-christmas-title">A season of joy<br>and togetherness</div><div class="wf-christmas-subtitle">Warm wishes from our newsroom to you</div></div>' +
+      '<div class="wf-christmas-nativity"><div class="wf-nativity-overlay"></div><div class="wf-nativity-copy"><div class="wf-nativity-label">THE HEART OF CHRISTMAS</div><div class="wf-nativity-message">May the peace, hope and joy of Christ fill your home this Christmas.</div></div><div class="wf-gold-dust" aria-hidden="true">✦　·　✧　　✦　·　✧　✦</div></div>' +
+      '<div class="wf-santa-photo"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Claus_for_Christmas.jpg" alt="Father Christmas"><span>SEASON’S GREETINGS</span></div>' +
+      '<div class="wf-christmas-footer">May your Christmas be filled with peace, hope and joy ✨</div>';
     mediaBox.appendChild(hero);
+
     const links = document.createElement("div");
-    links.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px";
-    [[safeMusic,"♫ Listen to the Christmas carol","#a77a24"],[safeVideo,"▶ Watch the Christmas video","#9d3445"]].forEach(([url,label,color]) => {
+    links.style.cssText = "display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:13px";
+    [[safeMusic,"♫ Listen to Joy to the World","#a77a24"],[safeVideo,"▶ Watch the Christmas video","#9d3445"]].forEach(([url,label,color]) => {
       if (!url) return;
-      const link=document.createElement("a");
+      const link = document.createElement("a");
       link.href=url; link.target="_blank"; link.rel="noopener noreferrer"; link.textContent=label;
-      link.style.cssText="display:inline-block;padding:10px 13px;border-radius:8px;background:"+color+";color:#fff;text-decoration:none;font-weight:800;font-size:12px";
+      link.style.cssText="display:inline-block;padding:11px 15px;border-radius:9px;background:"+color+";color:#fff;text-decoration:none;font-weight:850;font-size:12px";
       links.appendChild(link);
     });
     mediaBox.appendChild(links);
@@ -2134,32 +2162,21 @@ function updateNewsletterPreview() {
     mediaBox.appendChild(hero);
   }
 
-  renderLinkedText(
-    $("newsletterPreviewBody"),
-    body
-  );
-
+  renderLinkedText($("newsletterPreviewBody"), body);
   const previewButtons = $("newsletterPreviewButtons");
   previewButtons.replaceChildren();
-
   buttons.forEach(item => {
     const link = document.createElement("a");
-
     link.className = "newsletter-preview-cta";
     link.textContent = item.text;
     link.href = item.url;
     link.target = "_blank";
     link.rel = "noopener noreferrer";
-
     previewButtons.appendChild(link);
   });
 
   newsletterPreview.classList.remove("hidden");
-
-  setNewsletterStatus(
-    "Preview updated. Check the message and buttons before sending."
-  );
-
+  setNewsletterStatus("Preview updated. Check the message and buttons before sending.");
   return true;
 }
 
@@ -2175,7 +2192,7 @@ $("newsletterTemplate").addEventListener("change", () => {
       "We wish you and your loved ones a joyful Christmas and a wonderful festive season. We look forward to bringing you more of the stories, moments and people shaping the women's game.\n\n" +
       "Warm wishes,\nThe WF Pundit Team";
     scheduleInput.value = "2026-12-24T20:00";
-    $("newsletterMusicUrl").value = "https://commons.wikimedia.org/wiki/Special:Redirect/file/U.S._Army_Band_-_Hark!_The_Herald_Angels_Sing.ogg";
+    $("newsletterMusicUrl").value = "https://music.apple.com/us/album/joy-to-the-world-single/1858863739";
     $("newsletterVideoUrl").value = "https://www.youtube.com/watch?v=rOFrCuydQHM";
     setNewsletterStatus("Christmas greeting loaded for 24 December at 8:00 PM WAT. Review and edit before scheduling.");
   } else if (selected === "newyear") {
