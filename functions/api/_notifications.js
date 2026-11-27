@@ -79,7 +79,7 @@ async function sendArticleEmail(env, user, article, articleUrl) {
   const safeArticleUrl = escapeHtml(articleUrl);
   const supportUrl = "mailto:support@wfpundit.uk";
   const siteUrl = escapeHtml(
-    (env.SITE_URL || "https://wfpundit.uk").replace(/\\/+$/, "")
+    (env.SITE_URL || "https://wfpundit.uk").replace(/\/+$/, "")
   );
 
   const response = await fetch("https://api.resend.com/emails", {
