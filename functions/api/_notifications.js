@@ -135,8 +135,10 @@ async function sendArticleEmail(env, user, article, articleUrl) {
                     </tr>
                     <tr>
                       <td style="padding:22px 30px;background:#f7f9fc;border-top:1px solid #e8edf4;">
-                        <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#172033;">We’d love to hear from you.</p>
-                        <p style="margin:0;font-size:13px;line-height:1.7;color:#64748b;">Questions, feedback or suggestions? Contact our team at <a href="${supportUrl}" style="color:#1769e8;text-decoration:none;font-weight:700;">support@wfpundit.uk</a>.</p>
+                        <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#172033;">Help us make WF Pundit better.</p>
+                        <p style="margin:0 0 7px;font-size:13px;line-height:1.7;color:#64748b;">Have a suggestion, spotted something we could improve, or have an idea for a story you’d like us to cover? We’d love to hear from you.</p>
+                        <p style="margin:0 0 7px;font-size:13px;line-height:1.7;color:#64748b;">Share your thoughts with us at <a href="${supportUrl}" style="color:#1769e8;text-decoration:none;font-weight:700;">support@wfpundit.uk</a>.</p>
+                        <p style="margin:0;font-size:11px;line-height:1.6;color:#8291a5;">Your feedback helps us deliver better women’s football coverage.</p>
                       </td>
                     </tr>
                     <tr>
