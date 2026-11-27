@@ -167,6 +167,23 @@ export async function onRequestPost({ request, env }) {
 
   const subject = String(data.subject || "").trim();
   const message = String(data.message || "").trim();
+  const rawScheduledAt = data.scheduledAt == null ? "" : String(data.scheduledAt).trim();
+  let scheduledAt = null;
+
+  if (rawScheduledAt) {
+    const hasTimezone = /T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,3})?(?:Z|[+-]\\d{2}:\\d{2})$/.test(rawScheduledAt);
+    const parsedSchedule = new Date(rawScheduledAt);
+
+    if (!hasTimezone || Number.isNaN(parsedSchedule.getTime()) || parsedSchedule.getTime() <= Date.now()) {
+      return json({
+        success: false,
+        error: "Choose a valid future schedule date and time, including its timezone."
+      }, 400);
+    }
+
+    scheduledAt = parsedSchedule.toISOString();
+  }
+
   const rawButtons = data.buttons === undefined ? [] : data.buttons;
 
   if (!Array.isArray(rawButtons) || rawButtons.length > 3) {
@@ -253,7 +270,8 @@ export async function onRequestPost({ request, env }) {
           htmlContent: buildEmailHtml(message, buttons),
           header: "[DEFAULT_HEADER]",
           footer: "[DEFAULT_FOOTER]",
-          tag: "WF Pundit Newsletter"
+          tag: "WF Pundit Newsletter",
+          ...(scheduledAt ? { scheduledAt } : {})
         })
       }
     );
@@ -280,6 +298,16 @@ export async function onRequestPost({ request, env }) {
       }, 502);
     }
 
+    if (scheduledAt) {
+      return json({
+        success: true,
+        scheduled: true,
+        scheduledAt,
+        campaignId,
+        message: "Newsletter campaign scheduled in Brevo."
+      });
+    }
+
     const sendResponse = await fetch(
       "https://api.brevo.com/v3/emailCampaigns/" + campaignId + "/sendNow",
       {
@@ -302,6 +330,7 @@ export async function onRequestPost({ request, env }) {
 
     return json({
       success: true,
+      scheduled: false,
       campaignId,
       message: "Newsletter submitted to Brevo."
     });
