@@ -171,7 +171,7 @@ export async function onRequestPost({ request, env }) {
   let scheduledAt = null;
 
   if (rawScheduledAt) {
-    const hasTimezone = /T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d{1,3})?(?:Z|[+-]\\d{2}:\\d{2})$/.test(rawScheduledAt);
+    const hasTimezone = /T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/.test(rawScheduledAt);
     const parsedSchedule = new Date(rawScheduledAt);
 
     if (!hasTimezone || Number.isNaN(parsedSchedule.getTime()) || parsedSchedule.getTime() <= Date.now()) {
