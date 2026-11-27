@@ -800,6 +800,15 @@ Official Club Website — https://example.com"></textarea>
     placeholder="Write your newsletter message here..."
     style="min-height:220px"></textarea>
 
+  <div id="newsletterMediaFields" style="margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:12px;background:rgba(40,120,220,.045)">
+    <p class="newsletter-button-title">Christmas media (optional)</p>
+    <p class="editor-help">Music and video open through separate links. Email apps generally block autoplay and embedded video.</p>
+    <label for="newsletterMusicUrl">Music link — Hark! The Herald Angels Sing</label>
+    <input id="newsletterMusicUrl" type="url" maxlength="2048" value="https://commons.wikimedia.org/wiki/Special:Redirect/file/U.S._Army_Band_-_Hark!_The_Herald_Angels_Sing.ogg" placeholder="https://...">
+    <label for="newsletterVideoUrl">Christmas video link</label>
+    <input id="newsletterVideoUrl" type="url" maxlength="2048" value="https://www.youtube.com/watch?v=rOFrCuydQHM" placeholder="Paste a video link (YouTube or another HTTPS page)">
+  </div>
+
   <div class="newsletter-buttons">
     <div>
       <p class="newsletter-button-title">Optional email buttons (maximum 3)</p>
@@ -867,6 +876,7 @@ Official Club Website — https://example.com"></textarea>
 
   <div id="newsletterPreview" class="newsletter-preview hidden" aria-live="polite">
     <p class="newsletter-preview-label">Email preview</p>
+    <div id="newsletterPreviewDesign" style="margin:12px 0 18px"></div>
     <h3 id="newsletterPreviewSubject" class="newsletter-preview-subject"></h3>
     <div id="newsletterPreviewBody" class="newsletter-preview-body"></div>
     <div id="newsletterPreviewButtons" class="newsletter-preview-ctas"></div>
@@ -2089,6 +2099,41 @@ function updateNewsletterPreview() {
 
   $("newsletterPreviewSubject").textContent = subject;
 
+  const selectedTemplate = $("newsletterTemplate").value;
+  const mediaBox = $("newsletterPreviewDesign");
+  const safeMediaUrl = value => {
+    try { const parsed = new URL(value); return parsed.protocol === "https:" ? parsed.href : ""; }
+    catch { return ""; }
+  };
+  const safeMusic = safeMediaUrl($("newsletterMusicUrl").value.trim());
+  const safeVideo = safeMediaUrl($("newsletterVideoUrl").value.trim());
+  mediaBox.replaceChildren();
+
+  if (selectedTemplate === "christmas") {
+    const hero = document.createElement("div");
+    hero.style.cssText = "overflow:hidden;border-radius:14px;background:linear-gradient(135deg,#07182e,#173c59 58%,#6b2635);color:#fff;box-shadow:0 12px 28px #07182e33";
+    hero.innerHTML =
+      '<div style="padding:22px 18px 12px;text-align:center"><div style="font-size:11px;font-weight:900;letter-spacing:3px;color:#f5d98b">WF PUNDIT · CHRISTMAS 2026</div><div style="font-family:Georgia,serif;font-size:29px;font-weight:bold;line-height:1.15;margin:12px 0 7px">A season of joy<br>and togetherness</div><div style="font-size:13px;color:#f4e9d4">Warm wishes from our newsroom to you</div></div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 12px 16px"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Claus_for_Christmas.jpg" alt="Father Christmas" style="width:100%;height:145px;object-fit:cover;border-radius:9px"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Nativity_display_of_Joseph,_Mary,_and_Jesus.jpg" alt="Mary, Joseph and baby Jesus in the manger" style="width:100%;height:145px;object-fit:cover;border-radius:9px"></div>' +
+      '<div style="padding:0 12px 18px;text-align:center;color:#f7e8c5;font-size:12px">May your Christmas be filled with peace, hope and joy ✨</div>';
+    mediaBox.appendChild(hero);
+    const links = document.createElement("div");
+    links.style.cssText = "display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px";
+    [[safeMusic,"♫ Listen to the Christmas carol","#a77a24"],[safeVideo,"▶ Watch the Christmas video","#9d3445"]].forEach(([url,label,color]) => {
+      if (!url) return;
+      const link=document.createElement("a");
+      link.href=url; link.target="_blank"; link.rel="noopener noreferrer"; link.textContent=label;
+      link.style.cssText="display:inline-block;padding:10px 13px;border-radius:8px;background:"+color+";color:#fff;text-decoration:none;font-weight:800;font-size:12px";
+      links.appendChild(link);
+    });
+    mediaBox.appendChild(links);
+  } else if (selectedTemplate === "newyear") {
+    const hero = document.createElement("div");
+    hero.style.cssText = "padding:30px 18px;border-radius:14px;text-align:center;color:#fff;background:radial-gradient(circle at 18% 18%,#e5bd66 0 2px,transparent 3px),radial-gradient(circle at 82% 22%,#f8e3a0 0 2px,transparent 3px),radial-gradient(circle at 70% 75%,#e5bd66 0 2px,transparent 3px),linear-gradient(135deg,#07152d,#18385f 55%,#4a2d58);box-shadow:0 12px 28px #07182e33";
+    hero.innerHTML = '<div style="font-size:12px;letter-spacing:3px;font-weight:900;color:#f5d98b">WF PUNDIT PRESENTS</div><div style="font-family:Georgia,serif;font-size:34px;font-weight:bold;margin:16px 0 5px">HELLO, 2027!</div><div style="font-size:38px;margin:4px 0 12px">✨ 🎆 ✨</div><div style="font-size:14px;color:#f7e8c5">A new year. New stories. More women’s football.</div><div style="font-size:12px;color:#d9e4f5;margin-top:17px">Thank you for being part of our community.</div>';
+    mediaBox.appendChild(hero);
+  }
+
   renderLinkedText(
     $("newsletterPreviewBody"),
     body
@@ -2130,6 +2175,8 @@ $("newsletterTemplate").addEventListener("change", () => {
       "We wish you and your loved ones a joyful Christmas and a wonderful festive season. We look forward to bringing you more of the stories, moments and people shaping the women's game.\n\n" +
       "Warm wishes,\nThe WF Pundit Team";
     scheduleInput.value = "2026-12-24T20:00";
+    $("newsletterMusicUrl").value = "https://commons.wikimedia.org/wiki/Special:Redirect/file/U.S._Army_Band_-_Hark!_The_Herald_Angels_Sing.ogg";
+    $("newsletterVideoUrl").value = "https://www.youtube.com/watch?v=rOFrCuydQHM";
     setNewsletterStatus("Christmas greeting loaded for 24 December at 8:00 PM WAT. Review and edit before scheduling.");
   } else if (selected === "newyear") {
     newsletterSubject.value = "Happy New Year from WF Pundit!";
@@ -2140,6 +2187,8 @@ $("newsletterTemplate").addEventListener("change", () => {
       "Here is to another year of celebrating women's football together.\n\n" +
       "Warm wishes,\nThe WF Pundit Team";
     scheduleInput.value = "2026-12-31T20:00";
+    $("newsletterMusicUrl").value = "";
+    $("newsletterVideoUrl").value = "";
     setNewsletterStatus("New Year greeting loaded for 31 December at 8:00 PM WAT. Review and edit before scheduling.");
   }
 
@@ -2215,7 +2264,7 @@ async function submitNewsletter(mode) {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ subject, message: body, buttons, scheduledAt })
+      body: JSON.stringify({ subject, message: body, buttons, scheduledAt, template: $("newsletterTemplate").value, musicUrl: $("newsletterMusicUrl").value.trim(), videoUrl: $("newsletterVideoUrl").value.trim() })
     });
     const result = await response.json();
 
@@ -2240,6 +2289,8 @@ async function submitNewsletter(mode) {
     $("newsletterPreviewButtons").replaceChildren();
     newsletterPreview.classList.add("hidden");
     $("newsletterTemplate").value = "standard";
+    $("newsletterMusicUrl").value = "";
+    $("newsletterVideoUrl").value = "";
     $("newsletterScheduleAt").value = "";
 
   } catch (error) {
