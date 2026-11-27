@@ -64,9 +64,10 @@ export async function sendWelcomeEmail(env, email, displayName) {
         <tr><td style="padding:22px 36px 34px;">
           <table role="presentation" cellspacing="0" cellpadding="0" border="0">
             <tr><td align="center" bgcolor="#1e65a5" style="border-radius:7px;box-shadow:0 5px 12px rgba(30,101,165,.18);">
-              <a href="${SITE_URL}/#about" style="display:inline-block;padding:16px 24px;color:#ffffff;text-decoration:none;font-size:11px;line-height:1;font-weight:700;letter-spacing:1.3px;">EXPLORE THE NEWSLETTER&nbsp; &rarr;</a>
+              <a href="${SITE_URL}" style="display:inline-block;padding:16px 24px;color:#ffffff;text-decoration:none;font-size:11px;line-height:1;font-weight:700;letter-spacing:1.3px;">VISIT WF PUNDIT&nbsp; &rarr;</a>
             </td></tr>
           </table>
+          <p style="margin:15px 0 0;font-size:12px;line-height:1.7;color:#68798d;">Or explore our optional newsletter: <a href="${SITE_URL}/#about" style="color:#1e65a5;text-decoration:underline;font-weight:700;">discover the latest updates</a>.</p>
           <p style="margin:25px 0 0;font-size:13px;line-height:1.75;color:#68798d;">Thanks for being part of the WF Pundit community. Here's to a season full of stories worth talking about.</p>
           <p style="margin:17px 0 0;font-size:13px;line-height:1.6;font-weight:700;color:#18324e;">The WF Pundit Team</p>
         </td></tr>
@@ -80,7 +81,7 @@ export async function sendWelcomeEmail(env, email, displayName) {
   </table>
 </body>
 </html>`,
-      text: `Welcome to WF Pundit, ${firstName}. Your account is ready. We're delighted to have you in a community that follows the stories, people and moments shaping women's football. You can choose to subscribe to our newsletter at any time; account registration does not subscribe you automatically. Explore the newsletter: ${SITE_URL}/#about
+      text: `Welcome to WF Pundit, ${firstName}. Your account is ready. We're delighted to have you in a community that follows the stories, people and moments shaping women's football. You can choose to subscribe to our newsletter at any time; account registration does not subscribe you automatically. Visit WF Pundit: ${SITE_URL}\nExplore the newsletter: ${SITE_URL}/#about
 
 The WF Pundit Team
 Women's football. Every story matters.`
