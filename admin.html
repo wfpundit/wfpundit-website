@@ -591,7 +591,7 @@ label{font-size:12px;letter-spacing:.015em}
 .wf-christmas-kicker{color:#f6d994;font-size:10px;font-weight:950;letter-spacing:3px}
 .wf-christmas-title{margin:12px 0 7px;font-family:Georgia,serif;font-size:clamp(25px,5vw,34px);font-weight:bold;line-height:1.12;text-shadow:0 3px 16px #0008}
 .wf-christmas-subtitle{font-size:12px;color:#f7e9d1}
-.wf-christmas-nativity{position:relative;min-height:250px;display:flex;align-items:center;justify-content:center;overflow:hidden;background-image:linear-gradient(180deg,rgba(3,12,26,.48),rgba(3,12,26,.72)),url("https://commons.wikimedia.org/wiki/Special:FilePath/Nativity_display_of_Joseph,_Mary,_and_Jesus.jpg");background-position:center;background-size:cover}
+.wf-christmas-top-image{position:relative;z-index:1;max-height:230px;overflow:hidden;background:#111}.wf-christmas-top-image img{display:block;width:100%;max-height:230px;object-fit:cover;object-position:center 48%}.wf-christmas-nativity{position:relative;min-height:285px;display:flex;align-items:center;justify-content:center;overflow:hidden;background-image:linear-gradient(180deg,rgba(3,12,26,.22),rgba(3,12,26,.48)),url("https://upload.wikimedia.org/wikipedia/commons/8/85/Nativity_.jpg");background-position:center 48%;background-size:cover}
 .wf-nativity-overlay{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 44%,rgba(248,201,107,.12),transparent 42%),linear-gradient(90deg,rgba(4,13,27,.18),rgba(4,13,27,.48),rgba(4,13,27,.18))}
 .wf-nativity-copy{position:relative;z-index:2;max-width:440px;padding:30px 22px;text-align:center;text-shadow:0 2px 12px #000}
 .wf-nativity-label{margin-bottom:12px;color:#f6d994;font-size:10px;font-weight:950;letter-spacing:3px}
@@ -2167,15 +2167,16 @@ function updateNewsletterPreview() {
     hero.className = "wf-christmas-preview";
     hero.innerHTML =
       '<div class="wf-christmas-sparkles" aria-hidden="true"><i>✦</i><i>✧</i><i>✦</i><i>·</i><i>✧</i><i>✦</i><i>·</i><i>✧</i></div>' +
+      '<div class="wf-christmas-top-image"><img src="https://upload.wikimedia.org/wikipedia/commons/8/85/Nativity_.jpg" alt="The Nativity of Jesus"></div>' +
       '<div class="wf-christmas-heading"><div class="wf-christmas-kicker">WF PUNDIT · CHRISTMAS 2026</div><div class="wf-christmas-title">A season of joy<br>and togetherness</div><div class="wf-christmas-subtitle">Warm wishes from our newsroom to you</div></div>' +
-      '<div class="wf-christmas-nativity"><div class="wf-nativity-overlay"></div><div class="wf-nativity-copy"><div class="wf-nativity-label">THE HEART OF CHRISTMAS</div><div class="wf-nativity-message">May the peace, hope and joy of Christ fill your home this Christmas.</div></div><div class="wf-gold-dust" aria-hidden="true">✦　·　✧　　✦　·　✧　✦</div></div>' +
+      '<div class="wf-christmas-nativity"><div class="wf-nativity-overlay"></div><div class="wf-nativity-copy"><div class="wf-nativity-label">GIVING THANKS</div><div class="wf-nativity-message">With grateful hearts, we give thanks for the hope, peace and joy of Christmas. May the love of Christ fill your home.</div></div><div class="wf-gold-dust" aria-hidden="true">✦　·　✧　　✦　·　✧　✦</div></div>' +
       '<div class="wf-santa-photo"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Claus_for_Christmas.jpg" alt="Father Christmas"><span>SEASON’S GREETINGS</span></div>' +
       '<div class="wf-christmas-footer">May your Christmas be filled with peace, hope and joy ✨</div>';
     mediaBox.appendChild(hero);
 
     const links = document.createElement("div");
     links.style.cssText = "display:flex;flex-wrap:wrap;gap:9px;justify-content:center;margin-top:13px";
-    [[safeMusic,"♫ Listen to Joy to the World","#a77a24"],[safeVideo,"▶ Watch the Christmas video","#9d3445"]].forEach(([url,label,color]) => {
+    [[safeMusic,"♫ Listen to Joy to the World","#a77a24"],[safeVideo,"▶ Watch Joy to the World","#9d3445"]].forEach(([url,label,color]) => {
       if (!url) return;
       const link = document.createElement("a");
       link.href=url; link.target="_blank"; link.rel="noopener noreferrer"; link.textContent=label;
@@ -2230,7 +2231,7 @@ $("newsletterTemplate").addEventListener("change", () => {
       "Warm wishes,\nThe WF Pundit Team";
     scheduleInput.value = "2026-12-24T20:00";
     $("newsletterMusicUrl").value = "https://music.apple.com/us/album/joy-to-the-world-single/1858863739";
-    $("newsletterVideoUrl").value = "https://www.youtube.com/watch?v=rOFrCuydQHM";
+    $("newsletterVideoUrl").value = "https://www.youtube.com/watch?v=yUXaagRUluU";
     setNewsletterStatus("Christmas greeting loaded for 24 December at 8:00 PM WAT. Review and edit before scheduling.");
   } else if (selected === "newyear") {
     newsletterSubject.value = "Happy New Year from WF Pundit!";
