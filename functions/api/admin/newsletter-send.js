@@ -83,17 +83,28 @@ function buildEmailHtml(message, buttons, template, musicUrl, videoUrl) {
 
   const christmas = template === "christmas";
   const newyear = template === "newyear";
+  const nativityImage = "https://commons.wikimedia.org/wiki/Special:FilePath/Nativity_display_of_Joseph,_Mary,_and_Jesus.jpg";
+  const santaImage = "https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Claus_for_Christmas.jpg";
   const mediaHtml = christmas
-    ? '<section style="margin:0 0 24px;overflow:hidden;border-radius:14px;background:#0b1d35;color:#fff;text-align:center">' +
-      '<div style="padding:25px 18px 13px;background:#102b49"><div style="font-size:11px;font-weight:bold;letter-spacing:3px;color:#f5d98b">WF PUNDIT · CHRISTMAS 2026</div><div style="font-family:Georgia,serif;font-size:30px;line-height:1.15;font-weight:bold;margin:13px 0 7px">A season of joy<br>and togetherness</div><div style="font-size:13px;color:#f4e9d4">Warm wishes from our newsroom to you</div></div>' +
-      '<table role="presentation" width="100%" cellpadding="8" cellspacing="0" style="background:#102b49"><tr><td width="50%" align="center"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Claus_for_Christmas.jpg" alt="Father Christmas" width="250" style="display:block;width:100%;max-width:250px;height:auto;border:0;border-radius:8px"></td><td width="50%" align="center"><img src="https://commons.wikimedia.org/wiki/Special:FilePath/Nativity_display_of_Joseph,_Mary,_and_Jesus.jpg" alt="Mary, Joseph and baby Jesus in the manger" width="250" style="display:block;width:100%;max-width:250px;height:auto;border:0;border-radius:8px"></td></tr></table>' +
-      '<div style="padding:12px 12px 19px;color:#f7e8c5;font-size:12px">May your Christmas be filled with peace, hope and joy ✨</div></section>' +
+    ? '<style>@keyframes wfTwinkle{0%,100%{opacity:.35}50%{opacity:1}}.wf-star{animation:wfTwinkle 2s ease-in-out infinite;color:#ffe3a0;text-shadow:0 0 10px #f2c45d}</style>' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;border:1px solid #d8b76d;border-radius:14px;overflow:hidden;background:#091a31;color:#fff">' +
+      '<tr><td align="center" style="padding:24px 16px 17px;background:radial-gradient(circle at 12% 20%,#30466a 0,transparent 35%),linear-gradient(135deg,#07172d,#173653 60%,#3b202c)">' +
+      '<div style="font-family:Arial,sans-serif;font-size:10px;font-weight:bold;letter-spacing:3px;color:#f6d994">WF PUNDIT · CHRISTMAS 2026</div>' +
+      '<div style="font-family:Georgia,serif;font-size:30px;line-height:1.15;font-weight:bold;margin:13px 0 8px;color:#fff">A season of joy<br>and togetherness</div>' +
+      '<div style="font-family:Arial,sans-serif;font-size:12px;color:#f4e9d4">Warm wishes from our newsroom to you</div>' +
+      '<div style="margin-top:12px;color:#f6d994;font-size:16px"><span class="wf-star">✦</span>　✧　<span class="wf-star">✦</span></div></td></tr>' +
+      '<tr><td background="' + nativityImage + '" style="background-color:#101e32;background-image:linear-gradient(rgba(3,12,26,.58),rgba(3,12,26,.72)),url(' + nativityImage + ');background-position:center;background-size:cover;padding:34px 18px;text-align:center">' +
+      '<div style="font-family:Arial,sans-serif;font-size:10px;font-weight:bold;letter-spacing:3px;color:#f6d994;text-shadow:0 2px 7px #000">THE HEART OF CHRISTMAS</div>' +
+      '<div style="max-width:430px;margin:13px auto 0;font-family:Georgia,serif;font-size:23px;line-height:1.35;color:#fff;text-shadow:0 2px 9px #000">May the peace, hope and joy of Christ fill your home this Christmas.</div>' +
+      '<div style="margin-top:19px;color:#f8d98c;font-size:15px;letter-spacing:3px;text-shadow:0 0 12px #e6b94e">✦　·　✧　·　✦　·　✧　✦</div></td></tr>' +
+      '<tr><td style="padding:12px 12px 0;background:#0b1d35"><img src="' + santaImage + '" alt="Father Christmas" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:1px solid #b58a3b;border-radius:9px"></td></tr>' +
+      '<tr><td align="center" style="padding:17px 12px 20px;background:#0b1d35;color:#f7e8c5;font-family:Arial,sans-serif;font-size:12px">May your Christmas be filled with peace, hope and joy ✨<div style="margin-top:10px;color:#f5d98b;font-size:17px;text-shadow:0 0 10px #e5bd66">✦　✧　✦　✧　✦</div></td></tr></table>' +
       '<div style="text-align:center;margin:0 0 22px">' +
-      (musicUrl ? '<a href="' + escapeHtml(musicUrl) + '" style="display:inline-block;margin:5px;padding:12px 15px;border-radius:8px;background:#a77a24;color:#fff;text-decoration:none;font-weight:bold;font-size:13px">♫ Listen to the Christmas carol</a>' : '') +
-      (videoUrl ? '<a href="' + escapeHtml(videoUrl) + '" style="display:inline-block;margin:5px;padding:12px 15px;border-radius:8px;background:#9d3445;color:#fff;text-decoration:none;font-weight:bold;font-size:13px">▶ Watch the Christmas video</a>' : '') + '</div>'
+      (musicUrl ? '<a href="' + escapeHtml(musicUrl) + '" style="display:inline-block;margin:5px;padding:12px 16px;border-radius:8px;background:#a77a24;color:#fff;text-decoration:none;font-weight:bold;font-size:13px">♫ Listen to Joy to the World</a>' : '') +
+      (videoUrl ? '<a href="' + escapeHtml(videoUrl) + '" style="display:inline-block;margin:5px;padding:12px 16px;border-radius:8px;background:#9d3445;color:#fff;text-decoration:none;font-weight:bold;font-size:13px">▶ Watch the Christmas video</a>' : '') + '</div>'
     : newyear
       ? '<section style="margin:0 0 24px;padding:32px 18px;border-radius:14px;text-align:center;color:#fff;background:#102448"><div style="font-size:11px;letter-spacing:3px;font-weight:bold;color:#f5d98b">WF PUNDIT PRESENTS</div><div style="font-family:Georgia,serif;font-size:36px;font-weight:bold;margin:17px 0 6px">HELLO, 2027!</div><div style="font-size:38px;margin:4px 0 12px">✨ 🎆 ✨</div><div style="font-size:14px;color:#f7e8c5">A new year. New stories. More women’s football.</div><div style="font-size:12px;color:#d9e4f5;margin-top:17px">Thank you for being part of our community.</div></section>'
-      : '';
+      : "";
 
   return [
     '<!DOCTYPE html><html lang="en">',
