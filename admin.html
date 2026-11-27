@@ -771,16 +771,20 @@ Official Club Website — https://example.com"></textarea>
   </p>
 
   <div class="newsletter-warning">
-    Sending is immediate after confirmation. Review the subject and message carefully.
-    Every campaign includes an unsubscribe link.
+    Review every campaign before sending or scheduling. Scheduled campaigns are queued by Brevo and sent automatically at the selected time. Every campaign includes an unsubscribe link.
   </div>
 
   <label for="newsletterTemplate">Newsletter template</label>
   <select id="newsletterTemplate">
     <option value="standard">Standard WF Pundit newsletter</option>
-    <option value="christmas">Christmas greeting · 25 December</option>
+    <option value="christmas">Christmas greeting · 24 December</option>
+    <option value="newyear">New Year greeting · 31 December</option>
   </select>
   <p class="editor-help">Choose a starting layout. You can edit the subject and message freely before previewing and sending.</p>
+
+  <label for="newsletterScheduleAt">Schedule date and time (Nigeria time)</label>
+  <input id="newsletterScheduleAt" type="datetime-local">
+  <p class="editor-help">West Africa Time (WAT, UTC+1). Choose a future date and time, preview the email, then tap “Schedule campaign”. This field does not schedule anything by itself.</p>
 
   <label for="newsletterSubject">Email subject</label>
   <input id="newsletterSubject" type="text" maxlength="150"
@@ -854,7 +858,10 @@ Official Club Website — https://example.com"></textarea>
       Preview newsletter
     </button>
     <button type="button" id="newsletterSendButton">
-      Review &amp; Send
+      Review &amp; Send Now
+    </button>
+    <button type="button" id="newsletterScheduleButton" class="secondary">
+      Schedule campaign
     </button>
   </div>
 
@@ -2112,17 +2119,32 @@ function updateNewsletterPreview() {
 }
 
 $("newsletterTemplate").addEventListener("change", () => {
-  if ($("newsletterTemplate").value === "christmas") {
+  const selected = $("newsletterTemplate").value;
+  const scheduleInput = $("newsletterScheduleAt");
+
+  if (selected === "christmas") {
     newsletterSubject.value = "Merry Christmas from WF Pundit!";
     newsletterMessage.value =
-      "Merry Christmas from all of us at WF Pundit! 🎄\n\n" +
-      "As the year draws to a close, thank you for reading, sharing and supporting our coverage of women's football. Your support means a great deal to us.\n\n" +
-      "We wish you and your loved ones a joyful Christmas and a wonderful festive season. We look forward to bringing you more of the stories, moments and people shaping the women's game.\n\n" +
-      "Warm wishes,\nThe WF Pundit Team";
-    $("newsletterCharCount").textContent = newsletterMessage.value.length;
-    updateNewsletterPreview();
-    setNewsletterStatus("Christmas greeting template loaded. Personalise it before sending.");
+      "Merry Christmas from all of us at WF Pundit! 🎄\\n\\n" +
+      "As the year draws to a close, thank you for reading, sharing and supporting our coverage of women's football. Your support means a great deal to us.\\n\\n" +
+      "We wish you and your loved ones a joyful Christmas and a wonderful festive season. We look forward to bringing you more of the stories, moments and people shaping the women's game.\\n\\n" +
+      "Warm wishes,\\nThe WF Pundit Team";
+    scheduleInput.value = "2026-12-24T20:00";
+    setNewsletterStatus("Christmas greeting loaded for 24 December at 8:00 PM WAT. Review and edit before scheduling.");
+  } else if (selected === "newyear") {
+    newsletterSubject.value = "Happy New Year from WF Pundit!";
+    newsletterMessage.value =
+      "Happy New Year from all of us at WF Pundit! ✨🎉\\n\\n" +
+      "As we welcome a new year, thank you for being part of the WF Pundit community. Thank you for reading, sharing our stories and supporting independent coverage of women's football.\\n\\n" +
+      "We wish you and your loved ones a year filled with happiness, good health and unforgettable moments. We look forward to bringing you even more of the stories, players and teams shaping the women's game.\\n\\n" +
+      "Here is to another year of celebrating women's football together.\\n\\n" +
+      "Warm wishes,\\nThe WF Pundit Team";
+    scheduleInput.value = "2026-12-31T20:00";
+    setNewsletterStatus("New Year greeting loaded for 31 December at 8:00 PM WAT. Review and edit before scheduling.");
   }
+
+  $("newsletterCharCount").textContent = newsletterMessage.value.length;
+  updateNewsletterPreview();
 });
 
 newsletterMessage.addEventListener("input", () => {
@@ -2135,12 +2157,14 @@ $("newsletterPreviewButton").addEventListener(
   updateNewsletterPreview
 );
 
-newsletterSendButton.addEventListener("click", async () => {
+async function submitNewsletter(mode) {
   if (!updateNewsletterPreview()) return;
 
   const subject = newsletterSubject.value.trim();
   const body = newsletterMessage.value.trim();
-
+  const scheduleValue = $("newsletterScheduleAt").value;
+  const isScheduled = mode === "schedule";
+  let scheduledAt = null;
   let buttons;
 
   try {
@@ -2150,69 +2174,84 @@ newsletterSendButton.addEventListener("click", async () => {
     return;
   }
 
-  const confirmed = confirm(
-    "FINAL CHECK\n\nSubject: " + subject +
-    "\nButtons included: " + buttons.length +
-    "\n\nThis will send your newsletter to the WF Pundit subscriber list in Brevo. " +
-    "The send cannot be recalled. Have you checked the message and links?\n\nSend now?"
-  );
+  if (isScheduled) {
+    if (!scheduleValue) {
+      setNewsletterStatus("Choose a date and time before scheduling.", true);
+      $("newsletterScheduleAt").focus();
+      return;
+    }
 
+    // datetime-local has no timezone; interpret it explicitly as Nigeria time.
+    const nigeriaDate = new Date(scheduleValue + ":00+01:00");
+    if (Number.isNaN(nigeriaDate.getTime()) || nigeriaDate.getTime() <= Date.now()) {
+      setNewsletterStatus("Choose a valid future date and time in Nigeria time.", true);
+      $("newsletterScheduleAt").focus();
+      return;
+    }
+    scheduledAt = nigeriaDate.toISOString();
+  }
+
+  const actionLabel = isScheduled
+    ? "schedule this newsletter for " + scheduleValue.replace("T", " ") + " WAT"
+    : "send this newsletter immediately";
+
+  const confirmed = confirm(
+    "FINAL CHECK\\n\\nSubject: " + subject +
+    "\\nButtons included: " + buttons.length +
+    "\\n\\nYou are about to " + actionLabel + ". " +
+    "The campaign will go to the WF Pundit subscriber list in Brevo. " +
+    "Please check the message, links and recipient list.\\n\\nContinue?"
+  );
   if (!confirmed) return;
 
   newsletterSendButton.disabled = true;
-
-  setNewsletterStatus(
-    "Preparing and sending your newsletter. Please keep this page open..."
-  );
+  $("newsletterScheduleButton").disabled = true;
+  setNewsletterStatus(isScheduled
+    ? "Creating your scheduled campaign in Brevo..."
+    : "Preparing and sending your newsletter. Please keep this page open...");
 
   try {
     const response = await fetch("/api/admin/newsletter-send", {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        subject,
-        message: body,
-        buttons
-      })
+      body: JSON.stringify({ subject, message: body, buttons, scheduledAt })
     });
-
     const result = await response.json();
 
     if (!response.ok || !result.success) {
-      throw new Error(
-        result.error || "Newsletter could not be sent."
-      );
+      throw new Error(result.error || "Newsletter could not be processed.");
     }
 
-    setNewsletterStatus(
-      "Newsletter submitted to Brevo successfully. Campaign ID: " +
-      result.campaignId +
-      ". Brevo will now process delivery."
-    );
+    setNewsletterStatus(isScheduled
+      ? "Campaign scheduled successfully in Brevo for " +
+        scheduleValue.replace("T", " ") + " WAT. Campaign ID: " +
+        result.campaignId + ". Brevo will send it automatically at the scheduled time."
+      : "Newsletter submitted to Brevo successfully. Campaign ID: " +
+        result.campaignId + ". Brevo will now process delivery.");
 
     newsletterSubject.value = "";
     newsletterMessage.value = "";
-
     for (let i = 1; i <= 3; i++) {
       $("newsletterButton" + i + "Text").value = "";
       $("newsletterButton" + i + "Url").value = "";
     }
-
     $("newsletterCharCount").textContent = "0";
     $("newsletterPreviewButtons").replaceChildren();
     newsletterPreview.classList.add("hidden");
+    $("newsletterTemplate").value = "standard";
+    $("newsletterScheduleAt").value = "";
 
   } catch (error) {
-    setNewsletterStatus(
-      error.message || "Newsletter could not be sent.",
-      true
-    );
-
+    setNewsletterStatus(error.message || "Newsletter could not be processed.", true);
   } finally {
     newsletterSendButton.disabled = false;
+    $("newsletterScheduleButton").disabled = false;
   }
-});
+}
+
+newsletterSendButton.addEventListener("click", () => submitNewsletter("send"));
+$("newsletterScheduleButton").addEventListener("click", () => submitNewsletter("schedule"));
 
 /* BUTTON EVENTS */
 
