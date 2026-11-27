@@ -2184,6 +2184,22 @@ function updateNewsletterPreview() {
       links.appendChild(link);
     });
     mediaBox.appendChild(links);
+    if (safeVideo) {
+      const videoPreview = document.createElement("a");
+      videoPreview.href = safeVideo;
+      videoPreview.target = "_blank";
+      videoPreview.rel = "noopener noreferrer";
+      videoPreview.style.cssText = "display:block;max-width:440px;margin:14px auto 0;text-align:center;text-decoration:none;color:#fff";
+      const thumbnail = document.createElement("img");
+      thumbnail.src = "https://img.youtube.com/vi/yUXaagRUluU/hqdefault.jpg";
+      thumbnail.alt = "Joy to the World music video preview";
+      thumbnail.style.cssText = "display:block;width:100%;height:auto;border:1px solid #d8b76d;border-radius:10px";
+      const caption = document.createElement("span");
+      caption.textContent = "▶ Watch Joy to the World music video";
+      caption.style.cssText = "display:inline-block;margin-top:9px;padding:11px 16px;border-radius:8px;background:#9d3445;color:#fff;font-weight:850;font-size:12px";
+      videoPreview.append(thumbnail, caption);
+      mediaBox.appendChild(videoPreview);
+    }
   } else if (selectedTemplate === "newyear") {
     const hero = document.createElement("div");
     hero.className = "wf-newyear-preview";
