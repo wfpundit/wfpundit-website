@@ -83,22 +83,21 @@ function buildEmailHtml(message, buttons, template, musicUrl, videoUrl) {
 
   const christmas = template === "christmas";
   const newyear = template === "newyear";
-  const nativityImage = "https://upload.wikimedia.org/wikipedia/commons/8/85/Nativity_.jpg";
+  const nativityImage = "https://cdn.pixabay.com/photo/2018/12/20/10/53/living-nativity-3885689_1280.jpg";
   const santaImage = "https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Claus_for_Christmas.jpg";
   const christmasVideoThumb = "https://img.youtube.com/vi/yUXaagRUluU/hqdefault.jpg";
   const mediaHtml = christmas
     ? '<style>@keyframes wfTwinkle{0%,100%{opacity:.35}50%{opacity:1}}.wf-star{animation:wfTwinkle 2s ease-in-out infinite;color:#ffe3a0;text-shadow:0 0 10px #f2c45d}</style>' +
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;border:1px solid #d8b76d;border-radius:14px;overflow:hidden;background:#091a31;color:#fff">' +
-      '<tr><td align="center" style="padding:0;background:#091a31"><img src="' + nativityImage + '" alt="The Nativity of Jesus" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0"></td></tr>' +
       '<tr><td align="center" style="padding:22px 16px 18px;background:radial-gradient(circle at 12% 20%,#30466a 0,transparent 35%),linear-gradient(135deg,#07172d,#173653 60%,#3b202c)">' +
       '<div style="font-family:Arial,sans-serif;font-size:10px;font-weight:bold;letter-spacing:3px;color:#f6d994">WF PUNDIT · CHRISTMAS 2026</div>' +
       '<div style="font-family:Georgia,serif;font-size:30px;line-height:1.15;font-weight:bold;margin:13px 0 8px;color:#fff">A season of joy<br>and togetherness</div>' +
       '<div style="font-family:Arial,sans-serif;font-size:12px;color:#f4e9d4">Warm wishes from our newsroom to you</div>' +
       '<div style="margin-top:12px;color:#f6d994;font-size:16px"><span class="wf-star">✦</span>　✧　<span class="wf-star">✦</span></div></td></tr>' +
-      '<tr><td background="' + nativityImage + '" style="background-color:#101e32;background-image:linear-gradient(rgba(3,12,26,.38),rgba(3,12,26,.58)),url(' + nativityImage + ');background-position:center;background-size:cover;padding:38px 18px;text-align:center">' +
+      '<tr><td background="' + nativityImage + '" bgcolor="#39204f" style="background-color:#39204f;background-image:linear-gradient(rgba(54,28,78,.58),rgba(38,18,61,.76)),url(' + nativityImage + ');background-position:center;background-size:cover;padding:38px 18px;text-align:center">' +
       '<div style="font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:4px;color:#ffe3a0;text-shadow:0 2px 8px #000">GIVING THANKS</div>' +
-      '<div style="max-width:430px;margin:14px auto 0;font-family:Georgia,serif;font-size:23px;line-height:1.4;color:#fff;text-shadow:0 2px 9px #000">With grateful hearts, we give thanks for the hope, peace and joy of Christmas. May the love of Christ fill your home.</div>' +
-      '<div style="margin-top:19px;color:#f8d98c;font-size:15px;letter-spacing:3px;text-shadow:0 0 12px #e6b94e">✦　·　✧　·　✦　·　✧　✦</div></td></tr>' +
+      '<div style="max-width:430px;margin:14px auto 0;font-family:Georgia,serif;font-size:23px;line-height:1.4;color:#fff;text-shadow:0 2px 9px #000">The birth of Jesus brought joy, hope and peace to the world. May that same joy fill your home this Christmas. Wishing you and your loved ones a blessed and beautiful Christmas.</div>' +
+      '<div style="margin-top:19px;color:#f8d98c;font-size:17px;letter-spacing:4px;text-shadow:0 0 12px #e6b94e">✦　✧　✷　·　✦　✧　✷　·　✦　✧</div></td></tr>' +
       '<tr><td style="padding:12px 12px 0;background:#0b1d35"><img src="' + santaImage + '" alt="Father Christmas" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:1px solid #b58a3b;border-radius:9px"></td></tr>' +
       '<tr><td align="center" style="padding:17px 12px 20px;background:#0b1d35;color:#f7e8c5;font-family:Arial,sans-serif;font-size:12px">Thank you for being part of the WF Pundit community. We wish you a blessed Christmas. ✨<div style="margin-top:10px;color:#f5d98b;font-size:17px;text-shadow:0 0 10px #e5bd66">✦　✧　✦　✧　✦</div></td></tr></table>' +
       '<div style="text-align:center;margin:0 0 22px">' +
