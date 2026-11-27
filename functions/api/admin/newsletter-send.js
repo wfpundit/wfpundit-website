@@ -83,25 +83,27 @@ function buildEmailHtml(message, buttons, template, musicUrl, videoUrl) {
 
   const christmas = template === "christmas";
   const newyear = template === "newyear";
-  const nativityImage = "https://commons.wikimedia.org/wiki/Special:FilePath/Nativity_display_of_Joseph,_Mary,_and_Jesus.jpg";
+  const nativityImage = "https://upload.wikimedia.org/wikipedia/commons/8/85/Nativity_.jpg";
   const santaImage = "https://commons.wikimedia.org/wiki/Special:FilePath/Santa_Claus_for_Christmas.jpg";
+  const christmasVideoThumb = "https://img.youtube.com/vi/yUXaagRUluU/hqdefault.jpg";
   const mediaHtml = christmas
     ? '<style>@keyframes wfTwinkle{0%,100%{opacity:.35}50%{opacity:1}}.wf-star{animation:wfTwinkle 2s ease-in-out infinite;color:#ffe3a0;text-shadow:0 0 10px #f2c45d}</style>' +
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;border:1px solid #d8b76d;border-radius:14px;overflow:hidden;background:#091a31;color:#fff">' +
-      '<tr><td align="center" style="padding:24px 16px 17px;background:radial-gradient(circle at 12% 20%,#30466a 0,transparent 35%),linear-gradient(135deg,#07172d,#173653 60%,#3b202c)">' +
+      '<tr><td align="center" style="padding:0;background:#091a31"><img src="' + nativityImage + '" alt="The Nativity of Jesus" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0"></td></tr>' +
+      '<tr><td align="center" style="padding:22px 16px 18px;background:radial-gradient(circle at 12% 20%,#30466a 0,transparent 35%),linear-gradient(135deg,#07172d,#173653 60%,#3b202c)">' +
       '<div style="font-family:Arial,sans-serif;font-size:10px;font-weight:bold;letter-spacing:3px;color:#f6d994">WF PUNDIT · CHRISTMAS 2026</div>' +
       '<div style="font-family:Georgia,serif;font-size:30px;line-height:1.15;font-weight:bold;margin:13px 0 8px;color:#fff">A season of joy<br>and togetherness</div>' +
       '<div style="font-family:Arial,sans-serif;font-size:12px;color:#f4e9d4">Warm wishes from our newsroom to you</div>' +
       '<div style="margin-top:12px;color:#f6d994;font-size:16px"><span class="wf-star">✦</span>　✧　<span class="wf-star">✦</span></div></td></tr>' +
-      '<tr><td background="' + nativityImage + '" style="background-color:#101e32;background-image:linear-gradient(rgba(3,12,26,.58),rgba(3,12,26,.72)),url(' + nativityImage + ');background-position:center;background-size:cover;padding:34px 18px;text-align:center">' +
-      '<div style="font-family:Arial,sans-serif;font-size:10px;font-weight:bold;letter-spacing:3px;color:#f6d994;text-shadow:0 2px 7px #000">THE HEART OF CHRISTMAS</div>' +
-      '<div style="max-width:430px;margin:13px auto 0;font-family:Georgia,serif;font-size:23px;line-height:1.35;color:#fff;text-shadow:0 2px 9px #000">May the peace, hope and joy of Christ fill your home this Christmas.</div>' +
+      '<tr><td background="' + nativityImage + '" style="background-color:#101e32;background-image:linear-gradient(rgba(3,12,26,.38),rgba(3,12,26,.58)),url(' + nativityImage + ');background-position:center;background-size:cover;padding:38px 18px;text-align:center">' +
+      '<div style="font-family:Arial,sans-serif;font-size:11px;font-weight:bold;letter-spacing:4px;color:#ffe3a0;text-shadow:0 2px 8px #000">GIVING THANKS</div>' +
+      '<div style="max-width:430px;margin:14px auto 0;font-family:Georgia,serif;font-size:23px;line-height:1.4;color:#fff;text-shadow:0 2px 9px #000">With grateful hearts, we give thanks for the hope, peace and joy of Christmas. May the love of Christ fill your home.</div>' +
       '<div style="margin-top:19px;color:#f8d98c;font-size:15px;letter-spacing:3px;text-shadow:0 0 12px #e6b94e">✦　·　✧　·　✦　·　✧　✦</div></td></tr>' +
       '<tr><td style="padding:12px 12px 0;background:#0b1d35"><img src="' + santaImage + '" alt="Father Christmas" width="560" style="display:block;width:100%;max-width:560px;height:auto;border:1px solid #b58a3b;border-radius:9px"></td></tr>' +
-      '<tr><td align="center" style="padding:17px 12px 20px;background:#0b1d35;color:#f7e8c5;font-family:Arial,sans-serif;font-size:12px">May your Christmas be filled with peace, hope and joy ✨<div style="margin-top:10px;color:#f5d98b;font-size:17px;text-shadow:0 0 10px #e5bd66">✦　✧　✦　✧　✦</div></td></tr></table>' +
+      '<tr><td align="center" style="padding:17px 12px 20px;background:#0b1d35;color:#f7e8c5;font-family:Arial,sans-serif;font-size:12px">Thank you for being part of the WF Pundit community. We wish you a blessed Christmas. ✨<div style="margin-top:10px;color:#f5d98b;font-size:17px;text-shadow:0 0 10px #e5bd66">✦　✧　✦　✧　✦</div></td></tr></table>' +
       '<div style="text-align:center;margin:0 0 22px">' +
       (musicUrl ? '<a href="' + escapeHtml(musicUrl) + '" style="display:inline-block;margin:5px;padding:12px 16px;border-radius:8px;background:#a77a24;color:#fff;text-decoration:none;font-weight:bold;font-size:13px">♫ Listen to Joy to the World</a>' : '') +
-      (videoUrl ? '<a href="' + escapeHtml(videoUrl) + '" style="display:inline-block;margin:5px;padding:12px 16px;border-radius:8px;background:#9d3445;color:#fff;text-decoration:none;font-weight:bold;font-size:13px">▶ Watch the Christmas video</a>' : '') + '</div>'
+      (videoUrl ? '<a href="' + escapeHtml(videoUrl) + '" target="_blank" rel="noopener noreferrer" style="display:block;max-width:440px;margin:14px auto 5px;text-decoration:none;color:#fff"><img src="' + christmasVideoThumb + '" alt="Watch Joy to the World — One Voice Children’s Choir" width="440" style="display:block;width:100%;max-width:440px;height:auto;border:1px solid #d8b76d;border-radius:10px"><span style="display:inline-block;margin-top:9px;padding:11px 16px;border-radius:8px;background:#9d3445;color:#fff;font-weight:bold;font-size:13px">▶ Watch Joy to the World music video</span></a>' : '') + '</div>'
     : newyear
       ? '<style>@keyframes wfNewYearTwinkle{0%,100%{opacity:.3;text-shadow:0 0 4px #f8d98c}50%{opacity:1;text-shadow:0 0 10px #ffe7a8,0 0 22px #e7b94e}}.wf-ny-star{display:inline-block;color:#ffe7a8;animation:wfNewYearTwinkle 2.2s ease-in-out infinite}.wf-ny-star:nth-child(2n){animation-delay:.6s}.wf-ny-star:nth-child(3n){animation-delay:1.1s}</style>' +
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;border:1px solid #d9b96e;border-radius:14px;overflow:hidden;background:#08172f;color:#fff"><tr><td align="center" style="position:relative;padding:34px 16px 28px;background:radial-gradient(circle at 15% 18%,rgba(255,222,151,.24),transparent 22%),radial-gradient(circle at 85% 20%,rgba(255,255,255,.17),transparent 20%),radial-gradient(circle at 50% 50%,#203e70,#102448 58%,#241a3e)">' +
