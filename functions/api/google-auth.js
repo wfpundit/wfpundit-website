@@ -2,6 +2,26 @@
 import { json, validOrigin, readJson, hashPassword, createSession } from "./_auth.js";
 import { sendWelcomeEmail } from "./_welcome-email.js";
 
+async function ensurePolicyConsentColumns(env) {
+  const columns = [
+    ["terms_accepted_at", "TEXT"],
+    ["privacy_acknowledged_at", "TEXT"],
+    ["policy_version", "TEXT"],
+    ["policy_consent_method", "TEXT"]
+  ];
+
+  for (const [column, definition] of columns) {
+    try {
+      await env.DB.prepare(`ALTER TABLE reader_accounts ADD COLUMN ${column} ${definition}`).run();
+    } catch (error) {
+      if (!String(error.message || error).toLowerCase().includes("duplicate column")) {
+        throw error;
+      }
+    }
+  }
+}
+
+
 const GOOGLE_CERTS_URL = "https://www.googleapis.com/oauth2/v3/certs";
 
 function decodeBase64Url(value) {
@@ -132,6 +152,10 @@ if (!origin || origin !== new URL(request.url).origin) {
 
   const mode = body.mode === "register" ? "register" : "login";
 
+  if (mode === "register" && body.policyConsent !== true) {
+    return json({ error: "Please agree to the Terms of Service and acknowledge the Privacy Policy before creating your account." }, 400);
+  }
+
   let identity;
 
   try {
@@ -147,6 +171,7 @@ if (!origin || origin !== new URL(request.url).origin) {
 
   try {
     let newlyRegistered = false;
+    await ensurePolicyConsentColumns(env);
     let user = await env.DB.prepare(
       "SELECT id, email, display_name FROM reader_accounts WHERE google_sub = ? LIMIT 1"
     ).bind(identity.googleSub).first();
@@ -174,16 +199,24 @@ if (!origin || origin !== new URL(request.url).origin) {
 
       const passwordHash = await hashPassword(randomSecret);
 
+      const acceptedAt = new Date().toISOString();
       const result = await env.DB.prepare(`
-        INSERT INTO reader_accounts
-          (email, password_hash, display_name, email_verified_at, google_sub)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO reader_accounts (
+          email, password_hash, display_name, email_verified_at, google_sub,
+          terms_accepted_at, privacy_acknowledged_at,
+          policy_version, policy_consent_method
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
       `).bind(
         identity.email,
         passwordHash,
         identity.displayName || identity.email.split("@")[0],
-        new Date().toISOString(),
-        identity.googleSub
+        acceptedAt,
+        identity.googleSub,
+        acceptedAt,
+        acceptedAt,
+        "1.0",
+        "google"
       ).run();
 
       newlyRegistered = true;
