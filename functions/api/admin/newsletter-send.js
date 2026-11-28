@@ -22,6 +22,29 @@ function escapeHtml(value) {
   })[character]);
 }
 
+function escapeMessageText(value) {
+  const placeholders = [];
+  const protectedText = String(value || "").replace(
+    /\{\{\s*contact\.FIRSTNAME\|default:"there"\s*\}\}/g,
+    match => {
+      const marker = "WFCONTACTFIRSTNAME" + placeholders.length + "TOKEN";
+      placeholders.push(match);
+      return marker;
+    }
+  );
+
+  let escaped = escapeHtml(protectedText);
+
+  placeholders.forEach((placeholder, index) => {
+    escaped = escaped.replace(
+      "WFCONTACTFIRSTNAME" + index + "TOKEN",
+      placeholder
+    );
+  });
+
+  return escaped;
+}
+
 function getSafeHttpsUrl(value) {
   try {
     const parsed = new URL(String(value || "").trim());
@@ -50,7 +73,7 @@ function messageToHtml(message) {
     let match;
 
     while ((match = linkPattern.exec(line)) !== null) {
-      result += escapeHtml(line.slice(lastIndex, match.index));
+      result += escapeMessageText(line.slice(lastIndex, match.index));
 
       const label = match[1].trim();
       const safeUrl = getSafeHttpsUrl(match[2]);
@@ -60,16 +83,16 @@ function messageToHtml(message) {
           '<a href="' + escapeHtml(safeUrl) +
           '" target="_blank" rel="noopener noreferrer" ' +
           'style="color:#2878dc;text-decoration:underline">' +
-          escapeHtml(label) +
+          escapeMessageText(label) +
           '</a>';
       } else {
-        result += escapeHtml(match[0]);
+        result += escapeMessageText(match[0]);
       }
 
       lastIndex = linkPattern.lastIndex;
     }
 
-    result += escapeHtml(line.slice(lastIndex));
+    result += escapeMessageText(line.slice(lastIndex));
 
     return result;
   }).join("<br>");
