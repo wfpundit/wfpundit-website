@@ -1,4 +1,5 @@
 import { currentUser, json, validOrigin } from "./_auth.js";
+import { markNewsletterUnsubscribed } from "./_newsletter.js";
 
 export async function onRequestPost({ request, env }) {
   if (!validOrigin(request)) {
@@ -35,6 +36,7 @@ export async function onRequestPost({ request, env }) {
     }
 
     const email = String(user.email || "").trim().toLowerCase();
+    await markNewsletterUnsubscribed(env, email);
 
     const headers = {
       "api-key": env.BREVO_API_KEY,
