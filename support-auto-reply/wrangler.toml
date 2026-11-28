@@ -1,0 +1,7 @@
+name = "wf-pundit-support-auto-reply"
+main = "worker.js"
+compatibility_date = "2026-11-28"
+
+[[kv_namespaces]]
+binding = "REPLY_DEDUPE"
+id = "REPLACE_WITH_REPLY_DEDUPE_KV_NAMESPACE_ID"
