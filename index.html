@@ -3164,6 +3164,7 @@ async function loadNewsletterStatus() {
         showNewsletterState('subscribed');
       } else {
         showNewsletterState('signedout');
+        startNewsletterPopupObserver();
       }
       return;
     }
@@ -3217,21 +3218,26 @@ document.addEventListener('keydown',event=>{
   if(event.key==='Escape' && newsletterPopup && !newsletterPopup.hidden) closeNewsletterPopup();
 });
 
-let newsletterPopupSeen = false;
-let publicNewsletterJoined = false;
-try {
-  newsletterPopupSeen = sessionStorage.getItem('wf-newsletter-popup-seen') === 'yes';
-  publicNewsletterJoined = localStorage.getItem('wf-public-newsletter-subscribed') === 'yes';
-} catch(e) {}
-if(!newsletterPopupSeen && !publicNewsletterJoined && 'IntersectionObserver' in window){
-  const newsletterObserver = new IntersectionObserver(entries=>{
+let newsletterPopupObserver = null;
+function startNewsletterPopupObserver(){
+  if(newsletterPopupObserver || !('IntersectionObserver' in window)) return;
+  let alreadySeen = false;
+  let alreadyJoined = false;
+  try {
+    alreadySeen = sessionStorage.getItem('wf-newsletter-popup-seen') === 'yes';
+    alreadyJoined = localStorage.getItem('wf-public-newsletter-subscribed') === 'yes';
+  } catch(e) {}
+  if(alreadySeen || alreadyJoined) return;
+  const newsletterSection = $('#about');
+  if(!newsletterSection) return;
+  newsletterPopupObserver = new IntersectionObserver(entries=>{
     if(entries.some(entry=>entry.isIntersecting)){
-      newsletterObserver.disconnect();
+      newsletterPopupObserver.disconnect();
+      newsletterPopupObserver = null;
       openNewsletterPopup();
     }
   },{threshold:0.22});
-  const newsletterSection = $('#about');
-  if(newsletterSection) newsletterObserver.observe(newsletterSection);
+  newsletterPopupObserver.observe(newsletterSection);
 }
 
 newsletterPopupForm?.addEventListener('submit',async event=>{
