@@ -243,6 +243,64 @@ body.light .theme-toggle {
 
 .hidden {display:none!important}
 
+/* NEWSLETTER PREFERENCE OVERVIEW */
+.newsletter-stats-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:12px;
+  margin:16px 0;
+}
+.newsletter-stat{
+  min-width:0;
+  padding:15px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:linear-gradient(145deg,rgba(40,120,232,.10),rgba(40,120,232,.025));
+}
+.newsletter-stat strong{
+  display:block;
+  color:var(--text);
+  font-size:25px;
+  line-height:1.1;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+.newsletter-stat span{
+  display:block;
+  margin-top:7px;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.4;
+}
+.newsletter-interest-counts{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px 18px;
+  margin-top:14px;
+}
+.newsletter-interest-count{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  font-size:12px;
+}
+.newsletter-interest-count strong{font-variant-numeric:tabular-nums}
+.newsletter-stats-toolbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+#newsletterPreferenceStatsStatus{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+@media(max-width:650px){
+  .newsletter-stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .newsletter-interest-counts{grid-template-columns:1fr}
+}
 /* NEWSLETTER COMPOSER */
 
 .newsletter-help {
@@ -837,6 +895,33 @@ Official Club Website — https://example.com"></textarea>
   </form>
 
   <div id="message" role="status"></div>
+</section>
+
+<section class="panel" id="newsletterPreferencesPanel">
+  <div class="newsletter-stats-toolbar">
+    <div>
+      <h2>Newsletter audience & preferences</h2>
+      <p class="newsletter-help">A live overview of registered readers and guest subscribers who opted in to WF Pundit emails.</p>
+    </div>
+    <button type="button" class="secondary" id="refreshNewsletterPreferenceStats">REFRESH COUNTS</button>
+  </div>
+  <div class="newsletter-stats-grid">
+    <div class="newsletter-stat"><strong id="newsletterStatActive">—</strong><span>Active subscribers</span></div>
+    <div class="newsletter-stat"><strong id="newsletterStatGuests">—</strong><span>Guest subscribers</span></div>
+    <div class="newsletter-stat"><strong id="newsletterStatRegistered">—</strong><span>Registered subscribers</span></div>
+    <div class="newsletter-stat"><strong id="newsletterStatUnsubscribed">—</strong><span>Unsubscribed</span></div>
+  </div>
+  <div class="newsletter-stats-grid">
+    <div class="newsletter-stat"><strong id="newsletterStatAllNews">—</strong><span>All women's football news</span></div>
+    <div class="newsletter-stat"><strong id="newsletterStatStoryAlerts">—</strong><span>New-story alerts enabled</span></div>
+    <div class="newsletter-stat"><strong id="newsletterStatWeeklyDigest">—</strong><span>Weekly roundup enabled</span></div>
+    <div class="newsletter-stat"><strong id="newsletterStatTotal">—</strong><span>Total records</span></div>
+  </div>
+  <h3 style="margin:20px 0 8px;font-size:14px">Selected competitions & topics</h3>
+  <div class="newsletter-interest-counts" id="newsletterInterestCounts">
+    <p class="muted">Loading preference counts…</p>
+  </div>
+  <p id="newsletterPreferenceStatsStatus" role="status" aria-live="polite">Loading subscriber preferences…</p>
 </section>
 
 <section class="panel" id="newsletterPanel">
@@ -2450,6 +2535,63 @@ async function submitNewsletter(mode) {
 $("newsletterTestButton").addEventListener("click", () => submitNewsletter("test"));
 newsletterSendButton.addEventListener("click", () => submitNewsletter("send"));
 $("newsletterScheduleButton").addEventListener("click", () => submitNewsletter("schedule"));
+
+async function loadNewsletterPreferenceStats(){
+  const status=$("newsletterPreferenceStatsStatus");
+  const target=$("newsletterInterestCounts");
+  if(!status||!target)return;
+  status.textContent="Refreshing subscriber preferences…";
+  try{
+    const response=await fetch("/api/admin/newsletter-preferences",{
+      method:"GET",
+      credentials:"same-origin",
+      cache:"no-store",
+      headers:{"Accept":"application/json"}
+    });
+    const result=await response.json();
+    if(!response.ok||!result.success)throw new Error(result.error||"Unable to load counts.");
+    const stats=result.stats||{};
+    const values={
+      newsletterStatActive:stats.active,
+      newsletterStatGuests:stats.guests,
+      newsletterStatRegistered:stats.registered,
+      newsletterStatUnsubscribed:stats.unsubscribed,
+      newsletterStatAllNews:stats.allNews,
+      newsletterStatStoryAlerts:stats.storyAlerts,
+      newsletterStatWeeklyDigest:stats.weeklyDigest,
+      newsletterStatTotal:stats.total
+    };
+    Object.entries(values).forEach(([id,value])=>{
+      const node=$(id);
+      if(node)node.textContent=String(Number(value||0));
+    });
+    target.replaceChildren();
+    const interests=Array.isArray(stats.interests)?stats.interests:[];
+    if(!interests.length){
+      const empty=document.createElement("p");
+      empty.className="muted";
+      empty.textContent="No personalised interests have been selected yet.";
+      target.appendChild(empty);
+    }else{
+      interests.forEach(item=>{
+        const row=document.createElement("div");
+        row.className="newsletter-interest-count";
+        const label=document.createElement("span");
+        label.textContent=item.label;
+        const count=document.createElement("strong");
+        count.textContent=String(Number(item.count||0));
+        row.append(label,count);
+        target.appendChild(row);
+      });
+    }
+    status.textContent="Counts updated just now. Guest and registered subscribers are included.";
+  }catch(error){
+    console.error("Newsletter preference statistics:",error);
+    status.textContent=error.message||"Could not load preference counts.";
+  }
+}
+$("refreshNewsletterPreferenceStats")?.addEventListener("click",loadNewsletterPreferenceStats);
+loadNewsletterPreferenceStats();
 
 /* BUTTON EVENTS */
 
