@@ -4,4 +4,4 @@ compatibility_date = "2026-11-28"
 
 [[kv_namespaces]]
 binding = "REPLY_DEDUPE"
-id = "REPLACE_WITH_REPLY_DEDUPE_KV_NAMESPACE_ID"
+id = "785fe02e45e8435ca341d1a469b2e78e"
