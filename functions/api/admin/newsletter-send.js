@@ -222,7 +222,7 @@ export async function onRequestPost({ request, env }) {
   const testOnly = data.testOnly === true;
   const testEmail = String(data.testEmail || "").trim().toLowerCase();
 
-  if (testOnly && (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(testEmail) || testEmail.length > 254)) {
+  if (testOnly && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testEmail) || testEmail.length > 254)) {
     return json({ success: false, error: "Enter a valid email address for the test message." }, 400);
   }
 
