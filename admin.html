@@ -2315,7 +2315,7 @@ async function submitNewsletter(mode) {
   const testEmail = $("newsletterTestEmail").value.trim();
   let scheduledAt = null;
 
-  if (isTest && (!testEmail || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(testEmail))) {
+  if (isTest && (!testEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testEmail))) {
     setNewsletterStatus("Enter a valid email address to receive the test.", true);
     $("newsletterTestEmail").focus();
     return;
@@ -2353,14 +2353,14 @@ async function submitNewsletter(mode) {
       : "send this newsletter immediately";
 
   const confirmed = confirm(
-    "FINAL CHECK\\n\\nSubject: " + subject +
-    "\\nButtons included: " + buttons.length +
+    "FINAL CHECK\n\nSubject: " + subject +
+    "\nButtons included: " + buttons.length +
     (isTest
-      ? "\\n\\nOnly this test address will receive the email: " + testEmail +
+      ? "\n\nOnly this test address will receive the email: " + testEmail +
         ". Your newsletter subscribers will NOT receive it."
-      : "\\n\\nThe campaign will go to the WF Pundit subscriber list in Brevo. " +
+      : "\n\nThe campaign will go to the WF Pundit subscriber list in Brevo. " +
         "Please check the message, links and recipient list.") +
-    "\\n\\nContinue?"
+    "\n\nContinue?"
   );
   if (!confirmed) return;
 
