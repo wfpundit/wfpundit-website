@@ -881,7 +881,7 @@ Official Club Website — https://example.com"></textarea>
     <p class="newsletter-button-title">Festive media (optional)</p>
     <p class="editor-help">Christmas can include music and a video link. The New Year greeting uses a music link only. Email apps generally block autoplay.</p>
     <label for="newsletterMusicUrl">Music link — festive greeting soundtrack</label>
-    <input id="newsletterMusicUrl" type="url" maxlength="2048" value="https://music.apple.com/us/album/joy-to-the-world-single/1858863739" placeholder="https://...">
+    <input id="newsletterMusicUrl" type="url" maxlength="2048" value="https://music.youtube.com/search?q=Heavenly+Christmas+Choir+Joy+to+the+World" placeholder="https://...">
     <label for="newsletterVideoUrl">Christmas video link</label>
     <input id="newsletterVideoUrl" type="url" maxlength="2048" value="https://www.youtube.com/watch?v=rOFrCuydQHM" placeholder="Paste a video link (YouTube or another HTTPS page)">
   </div>
@@ -2264,7 +2264,7 @@ $("newsletterTemplate").addEventListener("change", () => {
       "We wish you and your loved ones a joyful Christmas and a wonderful festive season. We look forward to bringing you more of the stories, moments and people shaping the women's game.\n\n" +
       "Warm wishes,\nThe WF Pundit Team";
     scheduleInput.value = "2026-12-24T20:00";
-    $("newsletterMusicUrl").value = "https://music.apple.com/us/album/joy-to-the-world-single/1858863739";
+    $("newsletterMusicUrl").value = "https://music.youtube.com/search?q=Heavenly+Christmas+Choir+Joy+to+the+World";
     $("newsletterVideoUrl").value = "https://www.youtube.com/watch?v=yUXaagRUluU";
     setNewsletterStatus("Christmas greeting loaded for 24 December at 8:00 PM WAT. Review and edit before scheduling.");
   } else if (selected === "newyear") {
