@@ -1,4 +1,5 @@
 import { currentUser, json } from "./_auth.js";
+import { ensureNewsletterSubscribersTable } from "./_newsletter.js";
 
 export async function onRequestGet({ request, env }) {
   try {
@@ -31,6 +32,36 @@ export async function onRequestGet({ request, env }) {
     const email = String(user.email || "").trim().toLowerCase();
     const displayName = String(user.display_name || "").trim();
     const firstName = displayName.split(/\s+/)[0] || "Reader";
+
+    await ensureNewsletterSubscribersTable(env);
+    const savedPreferences = await env.DB.prepare(`
+      SELECT status, all_news, story_alerts, weekly_digest, interests_json
+      FROM newsletter_subscribers
+      WHERE email = ?
+      LIMIT 1
+    `).bind(email).first();
+
+    if (savedPreferences) {
+      let interests = [];
+      try {
+        const parsed = JSON.parse(savedPreferences.interests_json || "[]");
+        interests = Array.isArray(parsed) ? parsed : [];
+      } catch {}
+
+      return json({
+        success: true,
+        loggedIn: true,
+        firstName,
+        email,
+        subscribed: savedPreferences.status === "active",
+        preferences: {
+          allNews: Boolean(savedPreferences.all_news),
+          storyAlerts: Boolean(savedPreferences.story_alerts),
+          weeklyDigest: Boolean(savedPreferences.weekly_digest),
+          interests
+        }
+      });
+    }
 
     if (!email) {
       return json({
