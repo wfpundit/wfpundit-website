@@ -261,7 +261,8 @@ export async function onRequestPost({ request, env }) {
       await notifyPublishedArticle(env, {
         id: articleId,
         title,
-        summary: data.summary || ""
+        summary: data.summary || "",
+        image_url: data.image_url || ""
       });
       await submitIndexNow(articleId);
     }
@@ -377,7 +378,8 @@ export async function onRequestPut({ request, env }) {
         await notifyPublishedArticle(env, {
           id,
           title,
-          summary: data.summary || ""
+          summary: data.summary || "",
+          image_url: data.image_url || ""
         });
       }
 
