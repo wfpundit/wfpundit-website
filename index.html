@@ -2197,12 +2197,12 @@ body.light-mode #facebook .social-feed-heading .section-kicker{color:#286eb2}
   padding:18px;background:rgba(3,9,18,.78);backdrop-filter:blur(9px);
 }
 .newsletter-popup-card{
-  position:relative;width:min(100%,490px);max-height:min(90vh,760px);overflow:auto;
-  padding:clamp(24px,5vw,38px);border:1px solid rgba(132,184,239,.48);
-  border-radius:22px;background:
+  position:relative;width:min(100%,390px);max-height:min(82vh,620px);overflow:auto;
+  padding:22px 23px 20px;border:1px solid rgba(132,184,239,.48);
+  border-radius:19px;background:
     radial-gradient(ellipse at 100% 0%,rgba(65,139,218,.24),transparent 42%),
     linear-gradient(145deg,#142b47,#091626 78%);
-  box-shadow:0 28px 90px rgba(0,0,0,.55);color:#fff;
+  box-shadow:0 24px 70px rgba(0,0,0,.5);color:#fff;
   animation:newsletterPopupIn .28s ease-out both;
 }
 @keyframes newsletterPopupIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
@@ -2210,13 +2210,13 @@ body.light-mode #facebook .social-feed-heading .section-kicker{color:#286eb2}
   position:absolute;top:13px;right:13px;width:38px;height:38px;border:1px solid #7898bb66;
   border-radius:50%;background:#ffffff0c;color:#fff;font-size:23px;line-height:1;
 }
-.newsletter-popup-brand{font-size:12px;font-weight:950;letter-spacing:.12em;color:#a9d3ff;text-transform:uppercase}
-.newsletter-popup h2{margin:15px 35px 10px 0;font-size:clamp(27px,5vw,36px);line-height:1.1;letter-spacing:-1px}
-.newsletter-popup-copy{margin:0 0 23px;color:#c5d4e6;font-size:13px;line-height:1.75}
-.newsletter-popup-form{display:grid;gap:13px}
+.newsletter-popup-brand{font-size:10px;font-weight:950;letter-spacing:.12em;color:#a9d3ff;text-transform:uppercase}
+.newsletter-popup h2{margin:12px 32px 8px 0;font-size:clamp(23px,4vw,29px);line-height:1.1;letter-spacing:-1px}
+.newsletter-popup-copy{margin:0 0 16px;color:#c5d4e6;font-size:12px;line-height:1.6}
+.newsletter-popup-form{display:grid;gap:10px}
 .newsletter-popup-form input[type="text"],
 .newsletter-popup-form input[type="email"]{
-  box-sizing:border-box;width:100%;min-height:49px;padding:0 14px;border:1px solid #6886a7;
+  box-sizing:border-box;width:100%;min-height:44px;padding:0 12px;border:1px solid #6886a7;
   border-radius:9px;background:#081525;color:#fff;font:inherit;font-size:13px;outline:none;
 }
 .newsletter-popup-form input:focus{border-color:#8fc5ff;box-shadow:0 0 0 3px #4389d933}
@@ -2229,9 +2229,18 @@ body.light-mode #facebook .social-feed-heading .section-kicker{color:#286eb2}
 }
 .newsletter-popup-submit:disabled{opacity:.65;cursor:wait}
 .newsletter-popup-message{min-height:18px;margin:0;color:#bcd9f8;font-size:12px}
-.newsletter-popup-note{margin:12px 0 0;color:#8fa6bf;font-size:10px;line-height:1.6}
+.newsletter-popup-note{margin:8px 0 0;color:#8fa6bf;font-size:10px;line-height:1.6}
 .newsletter-popup-trigger{margin-top:8px;min-height:43px;padding:0 17px;border:1px solid #75ace4;border-radius:8px;background:#3978c8;color:#fff;font-size:10px;font-weight:950;letter-spacing:.07em}
-@media(max-width:620px){.newsletter-popup{padding:12px}.newsletter-popup-card{border-radius:18px}.newsletter-popup h2{font-size:28px}}
+@media(max-width:620px){
+  .newsletter-popup{padding:10px}
+  .newsletter-popup-card{width:min(100%,360px);max-height:78vh;padding:19px 18px 17px;border-radius:17px}
+  .newsletter-popup h2{font-size:24px}
+  .newsletter-popup-copy{font-size:11px;margin-bottom:13px}
+  .newsletter-popup-form{gap:9px}
+  .newsletter-popup-form input[type="text"],.newsletter-popup-form input[type="email"]{min-height:42px}
+  .newsletter-popup-consent{font-size:10px;line-height:1.5}
+  .newsletter-popup-note{font-size:9px}
+}
 
 </style>
 <style>
@@ -3195,11 +3204,54 @@ const newsletterPopupForm = $('#newsletterPopupForm');
 const newsletterPopupSubmit = $('#newsletterPopupSubmit');
 const newsletterPopupMessage = $('#newsletterPopupMessage');
 
+let newsletterChimeContext = null;
+let newsletterAudioUnlocked = false;
+
+function unlockNewsletterChime(){
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if(!AudioContextClass) return;
+  try{
+    if(!newsletterChimeContext) newsletterChimeContext = new AudioContextClass();
+    if(newsletterChimeContext.state === 'suspended'){
+      newsletterChimeContext.resume().then(()=>{newsletterAudioUnlocked=true;}).catch(()=>{});
+    }else{
+      newsletterAudioUnlocked = true;
+    }
+  }catch(error){}
+}
+['pointerdown','touchstart','keydown','wheel'].forEach(eventName=>{
+  window.addEventListener(eventName,unlockNewsletterChime,{once:true,passive:true});
+});
+
+function playNewsletterChime(){
+  if(!newsletterAudioUnlocked || !newsletterChimeContext) return;
+  try{
+    const ctx = newsletterChimeContext;
+    if(ctx.state !== 'running') return;
+    const now = ctx.currentTime;
+    [659.25, 880].forEach((frequency,index)=>{
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const start = now + index * 0.12;
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(frequency,start);
+      gain.gain.setValueAtTime(0.0001,start);
+      gain.gain.exponentialRampToValueAtTime(0.075,start+0.025);
+      gain.gain.exponentialRampToValueAtTime(0.0001,start+0.24);
+      oscillator.connect(gain);
+      gain.connect(ctx.destination);
+      oscillator.start(start);
+      oscillator.stop(start+0.26);
+    });
+  }catch(error){}
+}
+
 function openNewsletterPopup(){
-  if(!newsletterPopup) return;
+  if(!newsletterPopup || !newsletterPopup.hidden) return;
   newsletterPopup.hidden = false;
   newsletterPopup.setAttribute('aria-hidden','false');
   document.body.style.overflow = 'hidden';
+  playNewsletterChime();
   setTimeout(()=>$('#newsletterPopupFirstName')?.focus(),80);
 }
 function closeNewsletterPopup(){
