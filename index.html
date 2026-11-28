@@ -1494,6 +1494,88 @@ body.light-mode .newsletter-message:not(:empty){
   }
 }
 
+/* NEWSLETTER PREFERENCE CHOICES */
+.newsletter-preferences{
+  display:grid;
+  gap:13px;
+  min-width:0;
+  margin:2px 0 0;
+  padding:15px;
+  border:1px solid rgba(150,190,232,.22);
+  border-radius:12px;
+  background:rgba(255,255,255,.035);
+}
+.newsletter-preferences legend{
+  padding:0 7px;
+  color:#dcecff;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.04em;
+}
+.newsletter-mode-options{display:grid;gap:9px}
+.newsletter-choice,
+.newsletter-interest-option{
+  display:flex;
+  align-items:flex-start;
+  gap:9px;
+  color:#d3e0ef;
+  font-size:11px;
+  line-height:1.55;
+  cursor:pointer;
+}
+.newsletter-choice input,
+.newsletter-interest-option input{
+  width:16px;
+  height:16px;
+  min-height:16px;
+  flex:0 0 16px;
+  margin:1px 0 0;
+  accent-color:#4389d9;
+}
+.newsletter-interest-panel{
+  display:grid;
+  gap:10px;
+  padding-top:12px;
+  border-top:1px solid rgba(150,190,232,.18);
+}
+.newsletter-interest-panel[hidden]{display:none!important}
+.newsletter-interest-heading{
+  margin:0;
+  color:#a9d3ff;
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.09em;
+  text-transform:uppercase;
+}
+.newsletter-interest-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px 12px;
+}
+.newsletter-delivery-options{
+  display:grid;
+  gap:9px;
+  padding-top:11px;
+  border-top:1px solid rgba(150,190,232,.18);
+}
+.newsletter-preference-note{
+  margin:0!important;
+  color:#9fb2c8!important;
+  font-size:10px!important;
+  line-height:1.55!important;
+}
+body.light-mode .newsletter-preferences{
+  border-color:#dce7f2;
+  background:#f7faff;
+}
+body.light-mode .newsletter-preferences legend,
+body.light-mode .newsletter-choice,
+body.light-mode .newsletter-interest-option{color:#34445c}
+body.light-mode .newsletter-interest-heading{color:#2869a9}
+body.light-mode .newsletter-preference-note{color:#65778b!important}
+@media(max-width:420px){
+  .newsletter-interest-grid{grid-template-columns:1fr}
+}
 /* END PREMIUM WF PUNDIT NEWSLETTER */
 
 /* FOOTER */
@@ -2805,6 +2887,40 @@ Welcome to WF Pundit — your destination for women's football news, breaking st
         <input type="checkbox" id="signupConsent" name="consent" required>
         I agree to receive WF Pundit newsletter updates.
       </label>
+      <fieldset class="newsletter-preferences">
+        <legend>Personalise your updates</legend>
+        <div class="newsletter-mode-options">
+          <label class="newsletter-choice">
+            <input type="radio" name="newsletterMode" value="all" checked>
+            <span><strong>All Women's Football News</strong><br>Every competition, major story and update.</span>
+          </label>
+          <label class="newsletter-choice">
+            <input type="radio" name="newsletterMode" value="personal">
+            <span><strong>Choose My Interests</strong><br>Only the competitions and topics I select.</span>
+          </label>
+        </div>
+        <div class="newsletter-interest-panel" hidden>
+          <p class="newsletter-interest-heading">Competitions & topics</p>
+          <div class="newsletter-interest-grid">
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="wsl"><span>Women's Super League</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="uwcl"><span>Women's Champions League</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="nwsl"><span>NWSL</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="liga-f"><span>Liga F</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="bundesliga-women"><span>Frauen-Bundesliga</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="serie-a-women"><span>Serie A Women</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="women-championship"><span>Women's Championship</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="international"><span>International tournaments</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="transfers"><span>Transfers</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="match-reports"><span>Match reports</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="analysis-interviews"><span>Analysis & interviews</span></label>
+          </div>
+        </div>
+        <div class="newsletter-delivery-options">
+          <label class="newsletter-choice"><input type="checkbox" name="storyAlerts" checked><span>New-story alerts</span></label>
+          <label class="newsletter-choice"><input type="checkbox" name="weeklyDigest" checked><span>Weekly women's football roundup</span></label>
+        </div>
+        <p class="newsletter-preference-note">You can change your choices later. Unsubscribe at any time.</p>
+      </fieldset>
 
       <input
         type="text"
@@ -2862,6 +2978,40 @@ Welcome to WF Pundit — your destination for women's football news, breaking st
         <input type="checkbox" name="consent" id="newsletterPopupConsent" required>
         <span>I agree to receive WF Pundit newsletter updates. I understand I can unsubscribe at any time.</span>
       </label>
+      <fieldset class="newsletter-preferences">
+        <legend>Personalise your updates</legend>
+        <div class="newsletter-mode-options">
+          <label class="newsletter-choice">
+            <input type="radio" name="newsletterMode" value="all" checked>
+            <span><strong>All Women's Football News</strong><br>Every competition, major story and update.</span>
+          </label>
+          <label class="newsletter-choice">
+            <input type="radio" name="newsletterMode" value="personal">
+            <span><strong>Choose My Interests</strong><br>Only the competitions and topics I select.</span>
+          </label>
+        </div>
+        <div class="newsletter-interest-panel" hidden>
+          <p class="newsletter-interest-heading">Competitions & topics</p>
+          <div class="newsletter-interest-grid">
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="wsl"><span>Women's Super League</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="uwcl"><span>Women's Champions League</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="nwsl"><span>NWSL</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="liga-f"><span>Liga F</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="bundesliga-women"><span>Frauen-Bundesliga</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="serie-a-women"><span>Serie A Women</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="women-championship"><span>Women's Championship</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="international"><span>International tournaments</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="transfers"><span>Transfers</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="match-reports"><span>Match reports</span></label>
+            <label class="newsletter-interest-option"><input type="checkbox" name="newsletterInterests" value="analysis-interviews"><span>Analysis & interviews</span></label>
+          </div>
+        </div>
+        <div class="newsletter-delivery-options">
+          <label class="newsletter-choice"><input type="checkbox" name="storyAlerts" checked><span>New-story alerts</span></label>
+          <label class="newsletter-choice"><input type="checkbox" name="weeklyDigest" checked><span>Weekly women's football roundup</span></label>
+        </div>
+        <p class="newsletter-preference-note">You can change your choices later. Unsubscribe at any time.</p>
+      </fieldset>
       <button class="newsletter-popup-submit" type="submit" id="newsletterPopupSubmit">SUBSCRIBE TO WF PUNDIT</button>
       <p class="newsletter-popup-message" id="newsletterPopupMessage" role="status" aria-live="polite"></p>
     </form>
@@ -3295,6 +3445,29 @@ function startNewsletterPopupObserver(){
   newsletterPopupObserver.observe(newsletterSection);
 }
 
+function newsletterPreferencePayload(form){
+  const mode=form.querySelector('input[name="newsletterMode"]:checked')?.value||'all';
+  return {
+    allNews:mode!=='personal',
+    interests:mode==='personal'
+      ? [...form.querySelectorAll('input[name="newsletterInterests"]:checked')].map(input=>input.value)
+      : [],
+    storyAlerts:form.querySelector('input[name="storyAlerts"]')?.checked!==false,
+    weeklyDigest:form.querySelector('input[name="weeklyDigest"]')?.checked!==false
+  };
+}
+document.querySelectorAll('.signup,.newsletter-popup-form').forEach(form=>{
+  const modeInputs=form.querySelectorAll('input[name="newsletterMode"]');
+  const panel=form.querySelector('.newsletter-interest-panel');
+  const syncMode=()=>{
+    if(!panel)return;
+    const mode=form.querySelector('input[name="newsletterMode"]:checked')?.value||'all';
+    panel.hidden=mode!=='personal';
+  };
+  modeInputs.forEach(input=>input.addEventListener('change',syncMode));
+  syncMode();
+});
+
 newsletterPopupForm?.addEventListener('submit',async event=>{
   event.preventDefault();
   const formData = new FormData(newsletterPopupForm);
@@ -3315,6 +3488,7 @@ newsletterPopupForm?.addEventListener('submit',async event=>{
         firstName:String(formData.get('firstName')||'').trim(),
         email:String(formData.get('email')||'').trim(),
         consent,
+        ...newsletterPreferencePayload(newsletterPopupForm),
         website:String(formData.get('website')||'')
       })
     });
@@ -3368,6 +3542,7 @@ newsletterForm.addEventListener('submit', async event => {
       },
       body: JSON.stringify({
         consent,
+        ...newsletterPreferencePayload(newsletterForm),
         website
       })
     });
