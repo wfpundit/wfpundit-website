@@ -9,7 +9,7 @@ function escapeHtml(value) {
 }
 
 function decodeMimeWords(value) {
-  return String(value || "").replace(/=?UTF-8?([BQ])\?([^?]+)\?=/gi, (match, encoding, data) => {
+  return String(value || "").replace(/=\?UTF-8\?([BQ])\?([^?]+)\?=/gi, (match, encoding, data) => {
     try {
       if (encoding.toUpperCase() === "B") {
         const binary = atob(data);
