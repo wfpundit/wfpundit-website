@@ -36,7 +36,6 @@ export async function onRequestPost({ request, env }) {
     }
 
     const email = String(user.email || "").trim().toLowerCase();
-    await markNewsletterUnsubscribed(env, email);
 
     const headers = {
       "api-key": env.BREVO_API_KEY,
@@ -54,6 +53,7 @@ export async function onRequestPost({ request, env }) {
     });
 
     if (lookup.status === 404) {
+      await markNewsletterUnsubscribed(env, email);
       return json({
         success: true,
         subscribed: false
@@ -82,6 +82,8 @@ export async function onRequestPost({ request, env }) {
         throw new Error("Brevo unsubscribe failed: " + await update.text());
       }
     }
+
+    await markNewsletterUnsubscribed(env, email);
 
     try {
       const confirmation = await fetch(
