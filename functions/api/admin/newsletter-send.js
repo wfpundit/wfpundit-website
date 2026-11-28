@@ -312,9 +312,9 @@ export async function onRequestPost({ request, env }) {
           subject,
           sender: {
             name: "WF Pundit",
-            email: "allwomenfootballupdatespundits@gmail.com"
+            email: "newsletter@wfpundit.uk"
           },
-          replyTo: "allwomenfootballupdatespundits@gmail.com",
+          replyTo: "support@wfpundit.uk",
           recipients: {
             listIds: [listId]
           },
