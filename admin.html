@@ -2399,7 +2399,13 @@ async function submitNewsletter(mode) {
     }
 
     if (!response.ok || !result.success) {
-      throw new Error(result.error || "Newsletter could not be processed.");
+      const serverMessage = result.error || result.message || result.detail;
+      const safeMessage = typeof serverMessage === "string" && serverMessage.trim()
+        ? serverMessage.trim().slice(0, 240)
+        : "The server returned JSON but did not include an error message.";
+      throw new Error(
+        safeMessage + " (HTTP " + response.status + ")."
+      );
     }
 
     if (isTest) {
