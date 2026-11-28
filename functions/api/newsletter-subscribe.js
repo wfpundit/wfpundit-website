@@ -142,14 +142,8 @@ export async function onRequestPost({ request, env }) {
   }
 
   try {
+    // Newsletter subscriptions are public: a reader does not need a WF Pundit account.
     const user = await currentUser(request, env);
-
-    if (!user) {
-      return json({
-        success: false,
-        error: "Please log in to subscribe to the newsletter."
-      }, 401);
-    }
 
     if (!env.BREVO_API_KEY || !env.BREVO_LIST_ID) {
       return json({
@@ -189,10 +183,13 @@ export async function onRequestPost({ request, env }) {
       }, 400);
     }
 
-    // Identity comes from the authenticated account, not form inputs.
-    const displayName = String(user.display_name || "").trim();
-    const firstName = displayName.split(/\s+/)[0] || "Reader";
-    const email = String(user.email || "").trim().toLowerCase();
+    // Use verified account details when the reader is logged in.
+    // Otherwise accept the visitor's name and email from the public signup form.
+    const submittedName = String(data.firstName || data.first_name || "").trim();
+    const submittedEmail = String(data.email || "").trim().toLowerCase();
+    const displayName = String(user?.display_name || submittedName).trim();
+    const firstName = (displayName.split(/\s+/)[0] || "Reader").slice(0, 80);
+    const email = String(user?.email || submittedEmail).trim().toLowerCase();
 
     if (
       !email ||
