@@ -2377,10 +2377,26 @@ async function submitNewsletter(mode) {
     const response = await fetch("/api/admin/newsletter-send", {
       method: "POST",
       credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+      headers: { "Content-Type": "application/json", "Accept": "application/json" },
       body: JSON.stringify({ subject, message: body, buttons, scheduledAt, testOnly: isTest, testEmail: isTest ? testEmail : "", template: $("newsletterTemplate").value, musicUrl: $("newsletterMusicUrl").value.trim(), videoUrl: $("newsletterVideoUrl").value.trim() })
     });
-    const result = await response.json();
+
+    const responseText = await response.text();
+    let result;
+
+    try {
+      result = JSON.parse(responseText);
+    } catch {
+      const contentType = response.headers.get("content-type") || "unknown";
+      const preview = responseText.replace(/\\s+/g, " ").slice(0, 180);
+      throw new Error(
+        "The newsletter API returned a non-JSON page (HTTP " +
+        response.status + ", " + contentType + "). " +
+        "Response URL: " + response.url + ". " +
+        "Preview: " + preview
+      );
+    }
 
     if (!response.ok || !result.success) {
       throw new Error(result.error || "Newsletter could not be processed.");
