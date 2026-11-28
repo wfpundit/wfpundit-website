@@ -10,16 +10,24 @@ This is a separate Cloudflare Email Worker. It is not a Pages Function and must 
 - Skips common automated/bounce and mailing-list messages.
 - Uses a KV key based on the incoming Message-ID to avoid repeat acknowledgements for 30 days.
 
-## Required setup
+## Cloudflare Git deployment
 
-Do not switch the Cloudflare support route to this Worker until the current Gmail forwarding destination is known and configured below. The Worker forwards the original message itself, so this preserves delivery only when `FORWARD_TO` is set to the exact existing verified destination.
+The Git-connected Worker should deploy this configuration from the repository using:
 
-1. In Cloudflare, create a KV namespace named `REPLY_DEDUPE`.
-2. Copy its namespace ID into `wrangler.toml`, replacing `REPLACE_WITH_REPLY_DEDUPE_KV_NAMESPACE_ID`.
-3. From this directory, set the secrets:
-   - `wrangler secret put RESEND_API_KEY` — use the existing Resend API key. Never put it in GitHub.
-   - `wrangler secret put FORWARD_TO` — enter the exact Gmail destination currently used by the Cloudflare Email Routing rule for `support@wfpundit.uk`. This destination must already be verified in Cloudflare Email Routing.
-4. Deploy this Worker with `wrangler deploy`.
+```bash
+npx wrangler deploy --config support-auto-reply/wrangler.toml
+```
+
+The configuration file already contains the `REPLY_DEDUPE` KV namespace ID. The Worker still requires its Cloudflare runtime settings before email routing is switched to it.
+
+## Required runtime setup
+
+Do not switch the Cloudflare support route to this Worker until the current Gmail forwarding destination is configured below. The Worker forwards the original message itself, so this preserves delivery only when `FORWARD_TO` is set to the exact existing verified destination.
+
+1. In Cloudflare Worker settings, add the KV namespace binding `REPLY_DEDUPE` and select `wf-pundit-support-reply-dedupe`.
+2. Add the secret `RESEND_API_KEY` using the existing Resend API key. Never put it in GitHub.
+3. Add the text variable `FORWARD_TO` with the exact existing verified Gmail destination: `oscardiegortiger71@gmail.com`.
+4. Deploy the Worker after adding the binding and runtime settings.
 5. In Cloudflare Email Routing, create/change the route for `support@wfpundit.uk` to invoke this Email Worker. The Worker will forward the original message to `FORWARD_TO` and send the acknowledgement separately.
 6. Send a test message from an external email account and confirm both the original message arrives in Gmail and the acknowledgement arrives at the sender.
 
