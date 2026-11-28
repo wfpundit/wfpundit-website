@@ -5,6 +5,10 @@ import {
   readJson,
   validOrigin
 } from "./_auth.js";
+import {
+  normalizeNewsletterPreferences,
+  saveNewsletterSubscription
+} from "./_newsletter.js";
 
 function escapeHtml(value) {
   return String(value || "").replace(/[&<>"']/g, character => ({
@@ -183,6 +187,14 @@ export async function onRequestPost({ request, env }) {
       }, 400);
     }
 
+    const preferences = normalizeNewsletterPreferences(data);
+    if (!preferences.valid) {
+      return json({
+        success: false,
+        error: preferences.error
+      }, 400);
+    }
+
     // Use verified account details when the reader is logged in.
     // Otherwise accept the visitor's name and email from the public signup form.
     const submittedName = String(data.firstName || data.first_name || "").trim();
@@ -227,40 +239,39 @@ export async function onRequestPost({ request, env }) {
       );
     }
 
+    let alreadySubscribed = false;
+
     if (existingContact) {
       const currentLists = Array.isArray(existingContact.listIds)
         ? existingContact.listIds.map(Number)
         : [];
 
-      if (currentLists.includes(listId)) {
-        return json({
-          success: true,
-          alreadySubscribed: true
-        });
-      }
+      alreadySubscribed = currentLists.includes(listId);
 
-      if (existingContact.emailBlacklisted) {
+      if (!alreadySubscribed && existingContact.emailBlacklisted) {
         return json({
           success: false,
           error: "This email cannot currently be subscribed. Please contact us."
         }, 409);
       }
 
-      const update = await fetch(contactUrl, {
-        method: "PUT",
-        headers,
-        body: JSON.stringify({
-          attributes: {
-            FIRSTNAME: firstName
-          },
-          listIds: [listId]
-        })
-      });
+      if (!alreadySubscribed) {
+        const update = await fetch(contactUrl, {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({
+            attributes: {
+              FIRSTNAME: firstName
+            },
+            listIds: [listId]
+          })
+        });
 
-      if (!update.ok) {
-        throw new Error(
-          "Brevo contact update failed: " + await update.text()
-        );
+        if (!update.ok) {
+          throw new Error(
+            "Brevo contact update failed: " + await update.text()
+          );
+        }
       }
 
     } else {
@@ -286,6 +297,14 @@ export async function onRequestPost({ request, env }) {
         );
       }
     }
+
+    // D1 is the source of truth for guest and registered reader preferences.
+    await saveNewsletterSubscription(env, {
+      email,
+      firstName,
+      accountId: user?.id || null,
+      preferences
+    });
 
     const token = await createUnsubscribeToken(email, env);
 
@@ -315,7 +334,7 @@ export async function onRequestPost({ request, env }) {
 
     return json({
       success: true,
-      alreadySubscribed: false,
+      alreadySubscribed,
       welcomeEmailSent
     });
 
