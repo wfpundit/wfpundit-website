@@ -9,6 +9,16 @@ function escapeHtml(value) {
   })[character]);
 }
 
+function getSafeArticleImageUrl(value, siteUrl) {
+  try {
+    const parsed = new URL(String(value || "").trim(), siteUrl);
+    if (parsed.protocol !== "https:") return "";
+    return escapeHtml(parsed.href);
+  } catch (error) {
+    return "";
+  }
+}
+
 async function addColumnIfMissing(env, column, definition) {
   try {
     await env.DB.prepare(`
@@ -78,9 +88,16 @@ async function sendArticleEmail(env, user, article, articleUrl) {
   );
   const safeArticleUrl = escapeHtml(articleUrl);
   const supportUrl = "mailto:support@wfpundit.uk";
-  const siteUrl = escapeHtml(
-    (env.SITE_URL || "https://wfpundit.uk").replace(/\/+$/, "")
-  );
+  const rawSiteUrl = (env.SITE_URL || "https://wfpundit.uk").replace(/\/+$/, "");
+  const siteUrl = escapeHtml(rawSiteUrl);
+  const articleImageUrl = getSafeArticleImageUrl(article.image_url, rawSiteUrl);
+  const articleImageBlock = articleImageUrl ? `
+                    <tr>
+                      <td style="padding:0 30px;background:#ffffff;">
+                        <img src="${articleImageUrl}" alt="${title}" width="540" style="display:block;width:100%;max-width:540px;height:auto;max-height:330px;object-fit:cover;border:0;border-radius:10px;background:#eaf0f7;color:#526176;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;" />
+                      </td>
+                    </tr>
+  ` : "";
 
   const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -116,8 +133,9 @@ async function sendArticleEmail(env, user, article, articleUrl) {
                         <div style="margin-top:8px;color:#b9c9df;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;">The home of women’s football</div>
                       </td>
                     </tr>
+                    ${articleImageBlock}
                     <tr>
-                      <td style="padding:32px 30px 12px;">
+                      <td style="padding:27px 30px 12px;">
                         <div style="display:inline-block;background:#eaf3ff;color:#1769e8;border-radius:20px;padding:7px 11px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">New story published</div>
                         <p style="margin:22px 0 8px;font-size:15px;line-height:1.6;color:#526176;">Hello ${name},</p>
                         <h1 style="margin:0 0 16px;font-size:27px;line-height:1.25;letter-spacing:-.5px;color:#10213b;">${title}</h1>
