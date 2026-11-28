@@ -2389,7 +2389,7 @@ async function submitNewsletter(mode) {
       result = JSON.parse(responseText);
     } catch {
       const contentType = response.headers.get("content-type") || "unknown";
-      const preview = responseText.replace(/\\s+/g, " ").slice(0, 180);
+      const preview = responseText.replace(/\s+/g, " ").slice(0, 180);
       throw new Error(
         "The newsletter API returned a non-JSON page (HTTP " +
         response.status + ", " + contentType + "). " +
