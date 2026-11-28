@@ -2189,6 +2189,50 @@ body.light-mode #facebook .social-feed-heading .section-kicker{color:#286eb2}
   }
 }
 
+
+/* PUBLIC NEWSLETTER INVITATION */
+.newsletter-popup[hidden]{display:none!important}
+.newsletter-popup{
+  position:fixed;inset:0;z-index:10020;display:grid;place-items:center;
+  padding:18px;background:rgba(3,9,18,.78);backdrop-filter:blur(9px);
+}
+.newsletter-popup-card{
+  position:relative;width:min(100%,490px);max-height:min(90vh,760px);overflow:auto;
+  padding:clamp(24px,5vw,38px);border:1px solid rgba(132,184,239,.48);
+  border-radius:22px;background:
+    radial-gradient(ellipse at 100% 0%,rgba(65,139,218,.24),transparent 42%),
+    linear-gradient(145deg,#142b47,#091626 78%);
+  box-shadow:0 28px 90px rgba(0,0,0,.55);color:#fff;
+  animation:newsletterPopupIn .28s ease-out both;
+}
+@keyframes newsletterPopupIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.newsletter-popup-close{
+  position:absolute;top:13px;right:13px;width:38px;height:38px;border:1px solid #7898bb66;
+  border-radius:50%;background:#ffffff0c;color:#fff;font-size:23px;line-height:1;
+}
+.newsletter-popup-brand{font-size:12px;font-weight:950;letter-spacing:.12em;color:#a9d3ff;text-transform:uppercase}
+.newsletter-popup h2{margin:15px 35px 10px 0;font-size:clamp(27px,5vw,36px);line-height:1.1;letter-spacing:-1px}
+.newsletter-popup-copy{margin:0 0 23px;color:#c5d4e6;font-size:13px;line-height:1.75}
+.newsletter-popup-form{display:grid;gap:13px}
+.newsletter-popup-form input[type="text"],
+.newsletter-popup-form input[type="email"]{
+  box-sizing:border-box;width:100%;min-height:49px;padding:0 14px;border:1px solid #6886a7;
+  border-radius:9px;background:#081525;color:#fff;font:inherit;font-size:13px;outline:none;
+}
+.newsletter-popup-form input:focus{border-color:#8fc5ff;box-shadow:0 0 0 3px #4389d933}
+.newsletter-popup-form input::placeholder{color:#91a7bf}
+.newsletter-popup-consent{display:flex;align-items:flex-start;gap:10px;color:#cbd9e9;font-size:11px;line-height:1.65}
+.newsletter-popup-consent input{flex:0 0 17px;width:17px;height:17px;margin:2px 0 0;accent-color:#4389d9}
+.newsletter-popup-submit{
+  min-height:51px;border:1px solid #77b5f5;border-radius:10px;background:linear-gradient(110deg,#4a9be9,#245d9d);
+  color:#fff;font-size:11px;font-weight:950;letter-spacing:.12em;box-shadow:0 9px 22px #1a65b147;
+}
+.newsletter-popup-submit:disabled{opacity:.65;cursor:wait}
+.newsletter-popup-message{min-height:18px;margin:0;color:#bcd9f8;font-size:12px}
+.newsletter-popup-note{margin:12px 0 0;color:#8fa6bf;font-size:10px;line-height:1.6}
+.newsletter-popup-trigger{margin-top:8px;min-height:43px;padding:0 17px;border:1px solid #75ace4;border-radius:8px;background:#3978c8;color:#fff;font-size:10px;font-weight:950;letter-spacing:.07em}
+@media(max-width:620px){.newsletter-popup{padding:12px}.newsletter-popup-card{border-radius:18px}.newsletter-popup h2{font-size:28px}}
+
 </style>
 <style>
 /* Final spacing and matchday copy refinements */
@@ -2767,9 +2811,10 @@ Welcome to WF Pundit — your destination for women's football news, breaking st
 
   <div class="newsletter-state" id="newsletterSignedOut" hidden>
     <span class="state-kicker">Your football updates</span>
-    <h3>Join the WF Pundit community</h3>
-    <p>Log in to your account to subscribe to our newsletter.</p>
-    <a class="account-link login" href="/account.html">LOG IN TO CONTINUE</a>
+    <h3>Great stories. Straight to your inbox.</h3>
+    <p>Get women's football news, match updates and important stories by email. No account is needed.</p>
+    <button class="newsletter-popup-trigger" type="button" id="newsletterPopupOpen">JOIN THE NEWSLETTER</button>
+    <p style="margin:13px 0 0;font-size:10px">Already have a WF Pundit account? <a href="/account.html" style="color:#a9d3ff;text-decoration:underline">Log in</a>.</p>
   </div>
 
   <div class="newsletter-state newsletter-subscribed" id="newsletterSubscribed" hidden>
@@ -2788,6 +2833,28 @@ Welcome to WF Pundit — your destination for women's football news, breaking st
   </div>
 
 </section>
+</div>
+
+
+<div class="newsletter-popup" id="newsletterPopup" hidden aria-hidden="true">
+  <div class="newsletter-popup-card" role="dialog" aria-modal="true" aria-labelledby="newsletterPopupTitle">
+    <button class="newsletter-popup-close" type="button" id="newsletterPopupClose" aria-label="Close newsletter invitation">×</button>
+    <div class="newsletter-popup-brand">WF Pundit · Stay in the game</div>
+    <h2 id="newsletterPopupTitle">Women's football, delivered to you.</h2>
+    <p class="newsletter-popup-copy">Be the first to hear about the stories, results and moments shaping the women's game. Join our newsletter in seconds — no account required.</p>
+    <form class="newsletter-popup-form" id="newsletterPopupForm">
+      <input type="text" name="firstName" id="newsletterPopupFirstName" maxlength="80" placeholder="First name" autocomplete="given-name" required>
+      <input type="email" name="email" id="newsletterPopupEmail" maxlength="254" placeholder="Email address" autocomplete="email" required>
+      <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+      <label class="newsletter-popup-consent">
+        <input type="checkbox" name="consent" id="newsletterPopupConsent" required>
+        <span>I agree to receive WF Pundit newsletter updates. I understand I can unsubscribe at any time.</span>
+      </label>
+      <button class="newsletter-popup-submit" type="submit" id="newsletterPopupSubmit">SUBSCRIBE TO WF PUNDIT</button>
+      <p class="newsletter-popup-message" id="newsletterPopupMessage" role="status" aria-live="polite"></p>
+    </form>
+    <p class="newsletter-popup-note">Your email address will only be used for WF Pundit newsletter updates. You can unsubscribe whenever you wish.</p>
+  </div>
 </div>
 
 </main>
@@ -3088,7 +3155,16 @@ async function loadNewsletterStatus() {
     }
 
     if (!result.loggedIn) {
-      showNewsletterState('signedout');
+      let alreadyJoined = false;
+      try { alreadyJoined = localStorage.getItem('wf-public-newsletter-subscribed') === 'yes'; } catch (e) {}
+      if (alreadyJoined) {
+        newsletterStateMessage.textContent = "You're subscribed to WF Pundit newsletter updates.";
+        newsletterSubscribedEmail.textContent = "";
+        newsletterUnsubscribeButton.hidden = true;
+        showNewsletterState('subscribed');
+      } else {
+        showNewsletterState('signedout');
+      }
       return;
     }
 
@@ -3099,6 +3175,7 @@ async function loadNewsletterStatus() {
     newsletterAccountEmail.textContent = email;
     newsletterSubscribedEmail.textContent = email;
 
+    newsletterUnsubscribeButton.hidden = false;
     showNewsletterState(
       result.subscribed ? 'subscribed' : 'form'
     );
@@ -3108,6 +3185,100 @@ async function loadNewsletterStatus() {
     showNewsletterState('error');
   }
 }
+
+/* PUBLIC NEWSLETTER POP-UP */
+const newsletterPopup = $('#newsletterPopup');
+const newsletterPopupOpen = $('#newsletterPopupOpen');
+const newsletterPopupClose = $('#newsletterPopupClose');
+const newsletterPopupForm = $('#newsletterPopupForm');
+const newsletterPopupSubmit = $('#newsletterPopupSubmit');
+const newsletterPopupMessage = $('#newsletterPopupMessage');
+
+function openNewsletterPopup(){
+  if(!newsletterPopup) return;
+  newsletterPopup.hidden = false;
+  newsletterPopup.setAttribute('aria-hidden','false');
+  document.body.style.overflow = 'hidden';
+  setTimeout(()=>$('#newsletterPopupFirstName')?.focus(),80);
+}
+function closeNewsletterPopup(){
+  if(!newsletterPopup) return;
+  newsletterPopup.hidden = true;
+  newsletterPopup.setAttribute('aria-hidden','true');
+  document.body.style.overflow = '';
+  try { sessionStorage.setItem('wf-newsletter-popup-seen','yes'); } catch(e) {}
+}
+newsletterPopupOpen?.addEventListener('click',openNewsletterPopup);
+newsletterPopupClose?.addEventListener('click',closeNewsletterPopup);
+newsletterPopup?.addEventListener('click',event=>{
+  if(event.target===newsletterPopup) closeNewsletterPopup();
+});
+document.addEventListener('keydown',event=>{
+  if(event.key==='Escape' && newsletterPopup && !newsletterPopup.hidden) closeNewsletterPopup();
+});
+
+let newsletterPopupSeen = false;
+let publicNewsletterJoined = false;
+try {
+  newsletterPopupSeen = sessionStorage.getItem('wf-newsletter-popup-seen') === 'yes';
+  publicNewsletterJoined = localStorage.getItem('wf-public-newsletter-subscribed') === 'yes';
+} catch(e) {}
+if(!newsletterPopupSeen && !publicNewsletterJoined && 'IntersectionObserver' in window){
+  const newsletterObserver = new IntersectionObserver(entries=>{
+    if(entries.some(entry=>entry.isIntersecting)){
+      newsletterObserver.disconnect();
+      openNewsletterPopup();
+    }
+  },{threshold:0.22});
+  const newsletterSection = $('#about');
+  if(newsletterSection) newsletterObserver.observe(newsletterSection);
+}
+
+newsletterPopupForm?.addEventListener('submit',async event=>{
+  event.preventDefault();
+  const formData = new FormData(newsletterPopupForm);
+  const consent = $('#newsletterPopupConsent').checked;
+  newsletterPopupMessage.textContent = '';
+  if(!consent){
+    newsletterPopupMessage.textContent = 'Please confirm your newsletter subscription.';
+    return;
+  }
+  newsletterPopupSubmit.disabled = true;
+  newsletterPopupSubmit.textContent = 'SUBSCRIBING...';
+  try{
+    const response = await fetch('/api/newsletter-subscribe',{
+      method:'POST',
+      credentials:'same-origin',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        firstName:String(formData.get('firstName')||'').trim(),
+        email:String(formData.get('email')||'').trim(),
+        consent,
+        website:String(formData.get('website')||'')
+      })
+    });
+    const result = await response.json();
+    if(!response.ok || !result.success){
+      newsletterPopupMessage.textContent = result.error || 'Subscription could not be completed. Please try again.';
+      return;
+    }
+    try { localStorage.setItem('wf-public-newsletter-subscribed','yes'); } catch(e) {}
+    newsletterStateMessage.textContent = result.alreadySubscribed
+      ? "This email address is already subscribed to WF Pundit."
+      : "Thank you for subscribing! Your WF Pundit welcome email is on its way.";
+    newsletterSubscribedEmail.textContent = String(formData.get('email')||'').trim();
+    newsletterUnsubscribeButton.hidden = true;
+    showNewsletterState('subscribed');
+    newsletterPopupForm.reset();
+    closeNewsletterPopup();
+  }catch(error){
+    console.error('Public newsletter subscription error:',error);
+    newsletterPopupMessage.textContent = 'Connection error. Please try again.';
+  }finally{
+    newsletterPopupSubmit.disabled = false;
+    newsletterPopupSubmit.textContent = 'SUBSCRIBE TO WF PUNDIT';
+  }
+});
 
 /* SUBSCRIBE */
 newsletterForm.addEventListener('submit', async event => {
