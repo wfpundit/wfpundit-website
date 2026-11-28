@@ -316,20 +316,24 @@ export async function onRequestPost({ request, env }) {
 
     let welcomeEmailSent = false;
 
-    try {
-      await sendWelcomeEmail(
-        email,
-        firstName,
-        unsubscribeUrl,
-        env
-      );
+    // Do not resend the welcome message when an existing subscriber
+    // simply updates their newsletter preferences.
+    if (!alreadySubscribed) {
+      try {
+        await sendWelcomeEmail(
+          email,
+          firstName,
+          unsubscribeUrl,
+          env
+        );
 
-      welcomeEmailSent = true;
-    } catch (emailError) {
-      console.error(
-        "Newsletter welcome email error:",
-        emailError
-      );
+        welcomeEmailSent = true;
+      } catch (emailError) {
+        console.error(
+          "Newsletter welcome email error:",
+          emailError
+        );
+      }
     }
 
     return json({
