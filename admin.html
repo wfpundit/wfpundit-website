@@ -2234,7 +2234,7 @@ function updateNewsletterPreview() {
     }
   }
 
-  renderLinkedText($("newsletterPreviewBody"), body);
+  renderLinkedText($("newsletterPreviewBody"), body.replace(/\{\{\s*contact\.FIRSTNAME\|default:\\?"there\\?"\s*\}\}/g, "there"));
   const previewButtons = $("newsletterPreviewButtons");
   previewButtons.replaceChildren();
   buttons.forEach(item => {
@@ -2259,7 +2259,7 @@ $("newsletterTemplate").addEventListener("change", () => {
   if (selected === "christmas") {
     newsletterSubject.value = "Merry Christmas from WF Pundit!";
     newsletterMessage.value =
-      "Merry Christmas from all of us at WF Pundit! 🎄\n\n" +
+      "Merry Christmas, {{ contact.FIRSTNAME|default:\"there\" }}! 🎄\n\n" +
       "As the year draws to a close, thank you for reading, sharing and supporting our coverage of women's football. Your support means a great deal to us.\n\n" +
       "We wish you and your loved ones a joyful Christmas and a wonderful festive season. We look forward to bringing you more of the stories, moments and people shaping the women's game.\n\n" +
       "Warm wishes,\nThe WF Pundit Team";
@@ -2270,7 +2270,7 @@ $("newsletterTemplate").addEventListener("change", () => {
   } else if (selected === "newyear") {
     newsletterSubject.value = "Happy New Year from WF Pundit!";
     newsletterMessage.value =
-      "Happy New Year from all of us at WF Pundit! ✨🎉\n\n" +
+      "Happy New Year, {{ contact.FIRSTNAME|default:\"there\" }}! ✨🎉\n\n" +
       "As we welcome a new year, thank you for being part of the WF Pundit community. Thank you for reading, sharing our stories and supporting independent coverage of women's football.\n\n" +
       "We wish you and your loved ones a year filled with happiness, good health and unforgettable moments. We look forward to bringing you even more of the stories, players and teams shaping the women's game.\n\n" +
       "Here is to another year of celebrating women's football together.\n\n" +
