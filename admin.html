@@ -939,9 +939,18 @@ Official Club Website — https://example.com"></textarea>
     <span id="newsletterCharCount">0</span>/15,000 characters
   </p>
 
+  <label for="newsletterTestEmail">Test recipient email</label>
+  <input id="newsletterTestEmail" type="email" maxlength="254"
+    placeholder="Enter your email address to receive a test"
+    autocomplete="email">
+  <p class="editor-help">Send a test to this address only. Newsletter subscribers will not receive it.</p>
+
   <div class="actions">
     <button type="button" id="newsletterPreviewButton" class="secondary">
       Preview newsletter
+    </button>
+    <button type="button" id="newsletterTestButton" class="secondary">
+      Send Test Email
     </button>
     <button type="button" id="newsletterSendButton">
       Review &amp; Send Now
@@ -2302,7 +2311,15 @@ async function submitNewsletter(mode) {
   const body = newsletterMessage.value.trim();
   const scheduleValue = $("newsletterScheduleAt").value;
   const isScheduled = mode === "schedule";
+  const isTest = mode === "test";
+  const testEmail = $("newsletterTestEmail").value.trim();
   let scheduledAt = null;
+
+  if (isTest && (!testEmail || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(testEmail))) {
+    setNewsletterStatus("Enter a valid email address to receive the test.", true);
+    $("newsletterTestEmail").focus();
+    return;
+  }
   let buttons;
 
   try {
@@ -2329,22 +2346,30 @@ async function submitNewsletter(mode) {
     scheduledAt = nigeriaDate.toISOString();
   }
 
-  const actionLabel = isScheduled
-    ? "schedule this newsletter for " + scheduleValue.replace("T", " ") + " WAT"
-    : "send this newsletter immediately";
+  const actionLabel = isTest
+    ? "send a test email to " + testEmail
+    : isScheduled
+      ? "schedule this newsletter for " + scheduleValue.replace("T", " ") + " WAT"
+      : "send this newsletter immediately";
 
   const confirmed = confirm(
-    "FINAL CHECK\n\nSubject: " + subject +
-    "\nButtons included: " + buttons.length +
-    "\n\nYou are about to " + actionLabel + ". " +
-    "The campaign will go to the WF Pundit subscriber list in Brevo. " +
-    "Please check the message, links and recipient list.\n\nContinue?"
+    "FINAL CHECK\\n\\nSubject: " + subject +
+    "\\nButtons included: " + buttons.length +
+    (isTest
+      ? "\\n\\nOnly this test address will receive the email: " + testEmail +
+        ". Your newsletter subscribers will NOT receive it."
+      : "\\n\\nThe campaign will go to the WF Pundit subscriber list in Brevo. " +
+        "Please check the message, links and recipient list.") +
+    "\\n\\nContinue?"
   );
   if (!confirmed) return;
 
   newsletterSendButton.disabled = true;
   $("newsletterScheduleButton").disabled = true;
-  setNewsletterStatus(isScheduled
+  $("newsletterTestButton").disabled = true;
+  setNewsletterStatus(isTest
+    ? "Creating a draft and sending a test to " + testEmail + " only..."
+    : isScheduled
     ? "Creating your scheduled campaign in Brevo..."
     : "Preparing and sending your newsletter. Please keep this page open...");
 
@@ -2353,12 +2378,21 @@ async function submitNewsletter(mode) {
       method: "POST",
       credentials: "same-origin",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ subject, message: body, buttons, scheduledAt, template: $("newsletterTemplate").value, musicUrl: $("newsletterMusicUrl").value.trim(), videoUrl: $("newsletterVideoUrl").value.trim() })
+      body: JSON.stringify({ subject, message: body, buttons, scheduledAt, testOnly: isTest, testEmail: isTest ? testEmail : "", template: $("newsletterTemplate").value, musicUrl: $("newsletterMusicUrl").value.trim(), videoUrl: $("newsletterVideoUrl").value.trim() })
     });
     const result = await response.json();
 
     if (!response.ok || !result.success) {
       throw new Error(result.error || "Newsletter could not be processed.");
+    }
+
+    if (isTest) {
+      setNewsletterStatus(
+        "Test email sent to " + testEmail +
+        " only. Campaign draft ID: " + result.campaignId +
+        ". Your newsletter subscribers were not sent this test."
+      );
+      return;
     }
 
     setNewsletterStatus(isScheduled
@@ -2387,9 +2421,11 @@ async function submitNewsletter(mode) {
   } finally {
     newsletterSendButton.disabled = false;
     $("newsletterScheduleButton").disabled = false;
+    $("newsletterTestButton").disabled = false;
   }
 }
 
+$("newsletterTestButton").addEventListener("click", () => submitNewsletter("test"));
 newsletterSendButton.addEventListener("click", () => submitNewsletter("send"));
 $("newsletterScheduleButton").addEventListener("click", () => submitNewsletter("schedule"));
 
