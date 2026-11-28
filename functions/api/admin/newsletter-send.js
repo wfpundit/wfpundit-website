@@ -219,6 +219,13 @@ export async function onRequestPost({ request, env }) {
   const videoUrl = data.videoUrl ? getSafeHttpsUrl(data.videoUrl) : "";
   if (data.musicUrl && !musicUrl) return json({ success: false, error: "The music link must be a valid HTTPS URL." }, 400);
   if (data.videoUrl && !videoUrl) return json({ success: false, error: "The video link must be a valid HTTPS URL." }, 400);
+  const testOnly = data.testOnly === true;
+  const testEmail = String(data.testEmail || "").trim().toLowerCase();
+
+  if (testOnly && (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(testEmail) || testEmail.length > 254)) {
+    return json({ success: false, error: "Enter a valid email address for the test message." }, 400);
+  }
+
   const rawScheduledAt = data.scheduledAt == null ? "" : String(data.scheduledAt).trim();
   let scheduledAt = null;
 
@@ -348,6 +355,36 @@ export async function onRequestPost({ request, env }) {
         success: false,
         error: "Brevo created a campaign but did not return a valid campaign ID. Check Brevo before trying again."
       }, 502);
+    }
+
+    if (testOnly) {
+      const testResponse = await fetch(
+        "https://api.brevo.com/v3/emailCampaigns/" + campaignId + "/sendTest",
+        {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ emailTo: [testEmail] })
+        }
+      );
+
+      if (!testResponse.ok) {
+        const detail = await testResponse.text();
+        console.error("Brevo test email failed:", detail);
+        return json({
+          success: false,
+          campaignCreated: true,
+          campaignId,
+          error: "Brevo created the campaign draft, but could not send the test email. Review the draft in Brevo before retrying."
+        }, 502);
+      }
+
+      return json({
+        success: true,
+        testOnly: true,
+        campaignId,
+        testEmail,
+        message: "Test email sent to the specified address only. The subscriber list was not sent the campaign."
+      });
     }
 
     if (scheduledAt) {
